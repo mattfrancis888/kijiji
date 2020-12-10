@@ -8,10 +8,11 @@ var databasePool_1 = __importDefault(require("../databasePool"));
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var bcrypt_1 = __importDefault(require("bcrypt"));
 var tokenForUser = function (email) {
+    var timeStamp = new Date().getTime();
     //Generate a token by using user id and 'secret key'
     if (process.env.privateKey) {
         //iat- issued at  property is implemented by default
-        return jsonwebtoken_1.default.sign({ subject: email }, process.env.privateKey);
+        return jsonwebtoken_1.default.sign({ subject: email, iat: timeStamp }, process.env.privateKey);
     }
 };
 // export const signIn = (req: any, res: Response) => {

@@ -4,10 +4,11 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 const tokenForUser = (email: string) => {
+    const timeStamp = new Date().getTime();
     //Generate a token by using user id and 'secret key'
     if (process.env.privateKey) {
         //iat- issued at  property is implemented by default
-        return jwt.sign({ subject: email}, process.env.privateKey);
+        return jwt.sign({ subject: email, iat: timeStamp}, process.env.privateKey);
     }
 };
 
