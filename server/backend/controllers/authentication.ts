@@ -8,15 +8,18 @@ const tokenForUser = (email: string) => {
     //Generate a token by using user id and 'secret key'
     if (process.env.privateKey) {
         //iat- issued at  property is implemented by default
+        //create token with these properties below and privatekey
+        //for example, if our email variable is super long, our token might be super long
         return jwt.sign({ subject: email, iat: timeStamp}, process.env.privateKey);
     }
 };
 
 
-// export const signIn = (req: any, res: Response) => {
-//     //req.user exists because of the done(null, user) used in the Strategies at passport.ts
-//     res.send({ token: tokenForUser(req.user) });
-// };
+export const signIn = (req: any, res: Response) => {
+    //req.user exists because of the done(null, user) used in the Strategies at passport.ts
+   // console.log("REQ.USER", req.user.email);
+    res.send({ token: tokenForUser(req.user.email) });
+};
 export const signUp = (req: Request, res: Response, next: NextFunction) => {
     //If user with given email exists
     const email = req.body.email;

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signUp = void 0;
+exports.signUp = exports.signIn = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var bcrypt_1 = __importDefault(require("bcrypt"));
@@ -12,13 +12,17 @@ var tokenForUser = function (email) {
     //Generate a token by using user id and 'secret key'
     if (process.env.privateKey) {
         //iat- issued at  property is implemented by default
+        //create token with these properties below and privatekey
+        //for example, if our email variable is super long, our token might be super long
         return jsonwebtoken_1.default.sign({ subject: email, iat: timeStamp }, process.env.privateKey);
     }
 };
-// export const signIn = (req: any, res: Response) => {
-//     //req.user exists because of the done(null, user) used in the Strategies at passport.ts
-//     res.send({ token: tokenForUser(req.user) });
-// };
+var signIn = function (req, res) {
+    //req.user exists because of the done(null, user) used in the Strategies at passport.ts
+    // console.log("REQ.USER", req.user.email);
+    res.send({ token: tokenForUser(req.user.email) });
+};
+exports.signIn = signIn;
 var signUp = function (req, res, next) {
     //If user with given email exists
     var email = req.body.email;

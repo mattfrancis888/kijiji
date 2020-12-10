@@ -2,6 +2,7 @@ import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
 import { Strategy as LocalStrategy } from "passport-local";
 import dotenv from "dotenv";
 import pool from "../databasePool";
+import bcrypt from "bcrypt";
 //IMPORTANT: https://www.youtube.com/watch?v=7Q17ubqLfaM&t=772s&ab_channel=WebDevSimplified
 //Video above will make everything clearer
 
@@ -12,42 +13,54 @@ if (process.env.NODE_ENV !== "production") {
     dotenv.config();
 }
 
+const comparePassword =  (
+    candidatePassword: string,
+    passwordInDatabase: string,
+    callback: Function
+) => {
+    bcrypt.compare(candidatePassword, passwordInDatabase, (err, isMatch) => {
+        if (err) return callback(err);
+        callback(null, isMatch);
+    });
+};
+
+
 //Created a strategy to log in, If the user log ins sucesfully, will give the user a token so they can access "protected routes"/
 //resources that can only be accessed by logged in users
 
 //Create local strategy
-// const localOptions = {
-//     //By defaut localStrategy thinks the usernameField is username; in our case we are logging in with email and password
-//     usernameField: "email",
-// };
+const localOptions = {
+    //By defaut localStrategy thinks the usernameField is username; in our case we are logging in with email and password
+    usernameField: "email",
+};
 
-// export const localLogin = new LocalStrategy(
-//     localOptions,
-//     (email: any, password, done) => {
-//         //Used email:any because LocalStrategy automaticaly thinks email is a string, but since our User schema follows
-//         //IUser's types; email needs to be object type when we do User.findOne({email:email)})
-//         //Check if email is valid
-//         User.findOne({ email: email }, (err, user) => {
-//             //done() is just a non-official standard name for a function (a.k.a callback)
-//             //that informs the calling function (parent in stacktrace) that a task is completed.
+export const localLogin = new LocalStrategy(
+    localOptions,
+    (email: any, password, done) => {
+        //Used email:any because LocalStrategy automaticaly thinks email is a string, but since our User schema follows
+        //IUser's types; email needs to be object type when we do User.findOne({email:email)})
+        //Check if email is valid
+        pool.query(`SELECT email, password FROM AUTH WHERE email =  '${email}'`, (err, user) => {
+            //done() is just a non-official standard name for a function (a.k.a callback)
+            //that informs the calling function (parent in stacktrace) that a task is completed.
 
-//             if (err) return done(err, false); //Will return "Unauthorized" in the response
-//             //Second param in done(), it asks if there is a user is returned
-//             if (!user) {
-//                 return done(null, false); //Will return "Unauthorized" in the response
-//             }
+            if (err) return done(err, false); //Will return "Unauthorized" in the response
+            //Second param in done(), it asks if there is a user is returned
+            if (!user.rows[0]) {
+                return done(null, false); //Will return "Unauthorized" in the response
+            }
 
-//             //Compare password - is password equal to user.password?
-//             //we are comparing our hashed password (stored in our database that was created by salt + submitted password) with
-//             //salting the current submitted password and see if the hash password matches
-//             user.comparePassword(password, (err: any, isMatch: boolean) => {
-//                 if (err) return done(err);
-//                 if (!isMatch) return done(null, false); //Will return "Unauthorized" in the response
-//                 return done(null, user); //user can be accesed as req.user now; as demosntrated in authentication.ts
-//             });
-//         });
-//     }
-// );
+            //Compare password - is password equal to user.password?
+            //we are comparing our hashed password (stored in our database that was created by salt + submitted password) with
+            //salting the current submitted password and see if the hash password matches
+            comparePassword(password, user.rows[0].password, (err: any, isMatch: boolean) => {
+                if (err) return done(err);
+                if (!isMatch) return done(null, false); //Will return "Unauthorized" in the response
+                return done(null, user.rows[0]); //user can be accesed as req.user now; as demosntrated in authentication.ts
+            });
+        });
+    }
+);
 
 //Create strategy that authenticates if a user can log in / acess a specific resource; also known as a "protected route"
 const jwtOptions = {
@@ -70,13 +83,13 @@ export const jwtLogin = new JWTStrategy(
         //Check if email in the paylod is in our database
         //Reminder that 'subject' of JWT paylod is email
         console.log(payload);
-        pool.query(`SELECT * FROM AUTH where email =  '${payload.subject}'`, (err, user) => {
+        pool.query(`SELECT email FROM AUTH WHERE email =  '${payload.subject}'`, (err, user) => {
             //done() is just a non-official standard name for a function (a.k.a callback)
             //that informs the calling function (parent in stacktrace) that a task is completed.
             if (err) return done(err, false); //Will return "Unauthorized" in the response
             //Second param in done(), it asks if there is a user is returned
-            if (user) {
-                done(null, user); //user can be accesed as req.user now; as demosntrated in authentication.ts
+            if (user.rows[0]) {
+                done(null, user.rows[0]); //user can be accesed as req.user now; as demosntrated in authentication.ts
             } else {
                 done(null, false); //Will return "Unauthorized" in the response
             }
