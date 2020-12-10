@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.signUp = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+var bcrypt_1 = __importDefault(require("bcrypt"));
 var tokenForUser = function (email) {
     //Generate a token by using user id and 'secret key'
     if (process.env.privateKey) {
@@ -40,14 +41,23 @@ var signUp = function (req, res, next) {
                 .send({ error: "Email in use" });
         }
         //If a user with email does NOT exist
-        databasePool_1.default.query("INSERT INTO auth(email, password, refresh_token)VALUES('" + email + "', '" + password + "', 'abcdefg')", function (error, response) {
-            if (error)
-                return next(error);
-            //Generate a token when user signs in, this token will be used so that they can access protected routes
-            res.send({ token: tokenForUser(email) });
-            //Respond to request indicating user was created
+        var saltRounds = 10;
+        bcrypt_1.default.hash(password, saltRounds, function (err, hash) {
+            // Now we can store the password hash in db.
+            if (err) {
+                return next(err);
+            }
+            console.log(hash);
+            //Override current text password with hash
+            var hashedPassword = hash;
+            databasePool_1.default.query("INSERT INTO auth(email, password, refresh_token)VALUES('" + email + "', '" + hashedPassword + "', 'abcdefg')", function (error, response) {
+                if (error)
+                    return next(error);
+                //Generate a token when user signs in, this token will be used so that they can access protected routes
+                res.send({ token: tokenForUser(email) });
+                //Respond to request indicating user was created
+            });
         });
-        ;
     });
 };
 exports.signUp = signUp;

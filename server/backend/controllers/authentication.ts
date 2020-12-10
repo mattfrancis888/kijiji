@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import pool from "../databasePool";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const tokenForUser = (email: string) => {
     //Generate a token by using user id and 'secret key'
@@ -9,6 +10,7 @@ const tokenForUser = (email: string) => {
         return jwt.sign({ subject: email}, process.env.privateKey);
     }
 };
+
 
 // export const signIn = (req: any, res: Response) => {
 //     //req.user exists because of the done(null, user) used in the Strategies at passport.ts
@@ -42,14 +44,25 @@ export const signUp = (req: Request, res: Response, next: NextFunction) => {
             }
 
             //If a user with email does NOT exist
-          
-             pool.query(`INSERT INTO auth(email, password, refresh_token)VALUES('${email}', '${password}', 'abcdefg')`,
-             (error, response) => {
-                if (error) return next(error);
-                //Generate a token when user signs in, this token will be used so that they can access protected routes
-                res.send({ token: tokenForUser(email) });
-                //Respond to request indicating user was created
-             });;
+            const saltRounds = 10;
+            bcrypt.hash(password, saltRounds, (err, hash) => {
+                // Now we can store the password hash in db.
+                if (err) {
+                    return next(err);
+                }
+                console.log(hash);
+                //Override current text password with hash
+                const hashedPassword = hash;
+                pool.query(`INSERT INTO auth(email, password, refresh_token)VALUES('${email}', '${hashedPassword}', 'abcdefg')`,
+                (error, response) => {
+                   if (error) return next(error);
+                   //Generate a token when user signs in, this token will be used so that they can access protected routes
+                   res.send({ token: tokenForUser(email) });
+                   //Respond to request indicating user was created
+                });
+    
+            });
+
         }
     );
       
