@@ -70,7 +70,11 @@ var jwtOptions = {
 exports.jwtLogin = new passport_jwt_1.Strategy(jwtOptions, function (payload, done) {
     //Refer to comment in jwtOptions. The payload is a token and it's read by JWT. After it's read,
     // it recognizes that the token has a subject and iat properties that's defined in authentication.ts
-    //Check if email in the paylod is in our database
+    //Check if token expired
+    if (Date.now() >= payload.exp * 1000) {
+        done(null, false);
+    }
+    //Check if email in the payload is in our database
     //Reminder that 'subject' of JWT paylod is email
     console.log(payload);
     databasePool_1.default.query("SELECT email FROM AUTH WHERE email =  '" + payload.subject + "'", function (err, user) {
