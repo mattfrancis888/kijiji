@@ -43,42 +43,36 @@ exports.signUp = exports.signIn = exports.refreshToken = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var bcrypt_1 = __importDefault(require("bcrypt"));
-var generateAccessToken = function (email) {
-    if (process.env.privateKey) {
-        var timeStamp = new Date().getTime();
-        //Generate a token by using user email  and 'secret key'
-        //iat- issued at  property is implemented by default
-        //create token with these properties below and privatekey
-        //for example, if our email variable is super long, our token might be super long
-        return jsonwebtoken_1.default.sign({ subject: email }, process.env.privateKey, {
-            expiresIn: "15s",
-        });
-    }
+var FORBIDDEN_STATUS = 403;
+var PRIVATE_KEY = process.env.privateKey;
+var generateAccessToken = function (email, privateKey) {
+    //Generate a token by using user email  and 'secret key'
+    //iat- issued at  property is implemented by default
+    //create token with these properties below and privatekey
+    //for example, if our email variable is super long, our token might be super long
+    return jsonwebtoken_1.default.sign({ subject: email }, privateKey, {
+        expiresIn: "15s",
+    });
 };
-var generateRefreshToken = function (email) {
-    if (process.env.privateKey) {
-        var timeStamp = new Date().getTime();
-        //Generate a refresh token by using user email and 'secret key'
-        return jsonwebtoken_1.default.sign({ subject: email }, process.env.privateKey);
-    }
+var generateRefreshToken = function (email, privateKey) {
+    return jsonwebtoken_1.default.sign({ subject: email }, privateKey);
 };
 var refreshToken = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var FORBIDDEN_STATUS, refreshToken_1, user;
+    var refreshToken_1, user;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                FORBIDDEN_STATUS = 403;
-                if (!process.env.privateKey) return [3 /*break*/, 2];
+                if (!PRIVATE_KEY) return [3 /*break*/, 2];
                 refreshToken_1 = req.headers["authorization"];
                 if (refreshToken_1 === null)
                     return [2 /*return*/, res.sendStatus(401)];
-                return [4 /*yield*/, authenticateToken(refreshToken_1, process.env.privateKey)];
+                return [4 /*yield*/, authenticateToken(refreshToken_1, PRIVATE_KEY)];
             case 1:
                 user = _a.sent();
                 if (user === null) {
                     return [2 /*return*/, res.sendStatus(FORBIDDEN_STATUS)];
                 }
-                //Check if token is in database
+                //Check if token is in database (in the case the attacker forged their own refresh token)
                 databasePool_1.default.query("SELECT email, refresh_token FROM auth WHERE refresh_token = '" + refreshToken_1 + "'", function (error, user) {
                     if (error)
                         return console.log(error);
@@ -86,8 +80,16 @@ var refreshToken = function (req, res) { return __awaiter(void 0, void 0, void 0
                         return res.sendStatus(FORBIDDEN_STATUS);
                     }
                     //If the refresh token matches the one in our database
-                    //Generate a new acces token for the user to use
-                    res.send({ token: generateAccessToken(user.rows[0].email) });
+                    //Generate a new access token for the user to use
+                    // For acces token,  flags should be "secure: true"
+                    //For refreshtoken "secure: true" and "httpOnly: true"
+                    var token = generateAccessToken(user.rows[0].email, PRIVATE_KEY);
+                    res.setHeader("set-cookie", [
+                        "ACCESS_TOKEN=" + token + "; samesite=lax; secure",
+                    ]);
+                    res.send({
+                        token: token,
+                    });
                 });
                 return [3 /*break*/, 3];
             case 2:
@@ -113,60 +115,81 @@ var authenticateToken = function (token, secret) { return __awaiter(void 0, void
     });
 }); };
 var signIn = function (req, res) {
-    //req.user exists because of the done(null, user) used in the Strategies at passport.ts
-    // console.log("REQ.USER", req.user.email);
-    var refreshToken = generateRefreshToken(req.user.email);
-    // Update Refresh token to database
-    databasePool_1.default.query("UPDATE auth\n        SET refresh_token = '" + refreshToken + "' WHERE email = '" + req.user.email + "'", function (error, response) {
-        if (error)
-            return console.log(error);
-        res.send({
-            token: generateAccessToken(req.user.email),
-            refreshToken: refreshToken,
+    if (PRIVATE_KEY) {
+        //req.user exists because of the done(null, user) used in the Strategies at passport.ts
+        // console.log("REQ.USER", req.user.email);
+        var refreshToken_2 = generateRefreshToken(req.user.email, PRIVATE_KEY);
+        var token_1 = generateAccessToken(req.user.email, PRIVATE_KEY);
+        // Update Refresh token to database
+        databasePool_1.default.query("UPDATE auth\n        SET refresh_token = '" + refreshToken_2 + "' WHERE email = '" + req.user.email + "'", function (error, response) {
+            if (error)
+                return console.log(error);
+            // For acces token,  flags should be "secure: true"
+            //For refreshtoken "secure: true" and "httpOnly: true"
+            res.setHeader("set-cookie", [
+                "ACCESS_TOKEN=" + token_1 + "; samesite=lax; secure",
+            ]);
+            res.setHeader("set-cookie", [
+                "REFRESH_TOKEN=" + refreshToken_2 + "; httponly; samesite=lax; secure",
+            ]);
+            res.send({
+                token: token_1,
+                refreshToken: refreshToken_2,
+            });
         });
-    });
+    }
+    else {
+        res.send(FORBIDDEN_STATUS);
+    }
 };
 exports.signIn = signIn;
 var signUp = function (req, res, next) {
-    //If user with given email exists
-    var email = req.body.email;
-    var password = req.body.password;
-    var UNPROCESSABLE_ENTITY_STATUS = 422;
-    //Email or password not given
-    if (!email || !password) {
-        return res
-            .status(UNPROCESSABLE_ENTITY_STATUS)
-            .send({ error: "Email and password must be provided" });
-    }
-    //If email already exist, return an error
-    databasePool_1.default.query("SELECT * from auth WHERE email = '" + email + "'", function (error, response) {
-        if (error)
-            return console.log(error);
-        //User already exist
-        if (response.rows.length > 0) {
-            //422 is UNPROCESSABLE_ETITY; data user gave was "bad/unproceesssed"
+    if (PRIVATE_KEY) {
+        //If user with given email exists
+        var email_1 = req.body.email;
+        var password_1 = req.body.password;
+        var UNPROCESSABLE_ENTITY_STATUS_1 = 422;
+        //Email or password not given
+        if (!email_1 || !password_1) {
             return res
-                .status(UNPROCESSABLE_ENTITY_STATUS)
-                .send({ error: "Email in use" });
+                .status(UNPROCESSABLE_ENTITY_STATUS_1)
+                .send({ error: "Email and password must be provided" });
         }
-        //If a user with email does NOT exist
-        var saltRounds = 10;
-        bcrypt_1.default.hash(password, saltRounds, function (err, hash) {
-            // Now we can store the password hash in db.
-            if (err) {
-                return next(err);
+        //If email already exist, return an error
+        databasePool_1.default.query("SELECT * from auth WHERE email = '" + email_1 + "'", function (error, response) {
+            if (error)
+                return console.log(error);
+            //User already exist
+            if (response.rows.length > 0) {
+                //422 is UNPROCESSABLE_ETITY; data user gave was "bad/unproceesssed"
+                return res
+                    .status(UNPROCESSABLE_ENTITY_STATUS_1)
+                    .send({ error: "Email in use" });
             }
-            console.log(hash);
-            //Override current text password with hash
-            var hashedPassword = hash;
-            databasePool_1.default.query("INSERT INTO auth(email, password, refresh_token)VALUES('" + email + "', '" + hashedPassword + "', 'abcdefg')", function (error, response) {
-                if (error)
-                    return next(error);
-                //Generate a token when user signs in, this token will be used so that they can access protected routes
-                res.send({ token: generateAccessToken(email) });
-                //Respond to request indicating user was created
+            //If a user with email does NOT exist
+            var saltRounds = 10;
+            bcrypt_1.default.hash(password_1, saltRounds, function (err, hash) {
+                // Now we can store the password hash in db.
+                if (err) {
+                    return next(err);
+                }
+                console.log(hash);
+                //Override current text password with hash
+                var hashedPassword = hash;
+                databasePool_1.default.query("INSERT INTO auth(email, password, refresh_token)VALUES('" + email_1 + "', '" + hashedPassword + "', 'abcdefg')", function (error, response) {
+                    if (error)
+                        return next(error);
+                    //Generate a token when user signs in, this token will be used so that they can access protected routes
+                    res.send({
+                        token: generateAccessToken(email_1, PRIVATE_KEY),
+                    });
+                    //Respond to request indicating user was created
+                });
             });
         });
-    });
+    }
+    else {
+        res.send(FORBIDDEN_STATUS);
+    }
 };
 exports.signUp = signUp;
