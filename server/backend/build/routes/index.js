@@ -44,4 +44,5 @@ router.get("/category", function (req, res) {
 router.post("/signin", requireSignIn, authentication_1.signIn);
 router.post("/signup", authentication_1.signUp);
 router.post("/token", authentication_1.refreshToken);
+router.post("/logout", authentication_1.logOut);
 exports.default = router;

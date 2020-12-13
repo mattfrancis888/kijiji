@@ -39,11 +39,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signUp = exports.signIn = exports.refreshToken = void 0;
+exports.signUp = exports.signIn = exports.logOut = exports.refreshToken = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var bcrypt_1 = __importDefault(require("bcrypt"));
 var FORBIDDEN_STATUS = 403;
+var INTERNAL_SERVER_ERROR_STATUS = 500;
 var PRIVATE_KEY = process.env.privateKey;
 var generateAccessToken = function (email, privateKey) {
     //Generate a token by using user email  and 'secret key'
@@ -75,7 +76,7 @@ var refreshToken = function (req, res) { return __awaiter(void 0, void 0, void 0
                 //Check if token is in database (in the case the attacker forged their own refresh token)
                 databasePool_1.default.query("SELECT email, refresh_token FROM auth WHERE refresh_token = '" + refreshToken_1 + "'", function (error, user) {
                     if (error)
-                        return console.log(error);
+                        return res.send(INTERNAL_SERVER_ERROR_STATUS);
                     if (user.rowCount === 0) {
                         return res.sendStatus(FORBIDDEN_STATUS);
                     }
@@ -114,6 +115,22 @@ var authenticateToken = function (token, secret) { return __awaiter(void 0, void
         return [2 /*return*/];
     });
 }); };
+var logOut = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var refreshToken;
+    return __generator(this, function (_a) {
+        refreshToken = req.headers["authorization"];
+        if (refreshToken) {
+            databasePool_1.default.query("UPDATE auth SET refresh_token = null WHERE refresh_token = '" + refreshToken + "'", function (error, user) {
+                if (error)
+                    return res.send(INTERNAL_SERVER_ERROR_STATUS);
+                //Intenral Server Error
+                res.send({ "success": "logged out successfully" });
+            });
+        }
+        return [2 /*return*/];
+    });
+}); };
+exports.logOut = logOut;
 var signIn = function (req, res) {
     if (PRIVATE_KEY) {
         //req.user exists because of the done(null, user) used in the Strategies at passport.ts
@@ -123,7 +140,7 @@ var signIn = function (req, res) {
         // Update Refresh token to database
         databasePool_1.default.query("UPDATE auth\n        SET refresh_token = '" + refreshToken_2 + "' WHERE email = '" + req.user.email + "'", function (error, response) {
             if (error)
-                return console.log(error);
+                return res.send(INTERNAL_SERVER_ERROR_STATUS);
             // For acces token,  flags should be "secure: true"
             //For refreshtoken "secure: true" and "httpOnly: true"
             res.setHeader("set-cookie", [
@@ -158,7 +175,7 @@ var signUp = function (req, res, next) {
         //If email already exist, return an error
         databasePool_1.default.query("SELECT * from auth WHERE email = '" + email_1 + "'", function (error, response) {
             if (error)
-                return console.log(error);
+                return res.send(INTERNAL_SERVER_ERROR_STATUS);
             //User already exist
             if (response.rows.length > 0) {
                 //422 is UNPROCESSABLE_ETITY; data user gave was "bad/unproceesssed"

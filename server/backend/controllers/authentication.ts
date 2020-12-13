@@ -3,6 +3,7 @@ import pool from "../databasePool";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 const FORBIDDEN_STATUS = 403;
+const INTERNAL_SERVER_ERROR_STATUS = 500;
 const PRIVATE_KEY = process.env.privateKey;
 const generateAccessToken = (email: string, privateKey: string) => {
     //Generate a token by using user email  and 'secret key'
@@ -45,7 +46,7 @@ export const refreshToken = async (req: any, res: Response) => {
         pool.query(
             `SELECT email, refresh_token FROM auth WHERE refresh_token = '${refreshToken}'`,
             (error, user) => {
-                if (error) return console.log(error);
+                if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
                 if (user.rowCount === 0) {
                     return res.sendStatus(FORBIDDEN_STATUS);
                 }
@@ -77,6 +78,7 @@ export const refreshToken = async (req: any, res: Response) => {
 
 const authenticateToken = async (token: string, secret: string) => {
     //Checks if token is still valid / has not expired
+    
     try {
         const result: any = jwt.verify(token, secret);
         return { email: result.email };
@@ -94,6 +96,22 @@ const authenticateToken = async (token: string, secret: string) => {
     //     https://solidgeargroup.com/en/refresh-token-with-jwt-authentication-node-js/
 };
 
+export const logOut =  async (req: Request, res: Response) => {
+    const refreshToken =  req.headers["authorization"]
+    if (refreshToken) {
+        pool.query(
+            `UPDATE auth SET refresh_token = null WHERE refresh_token = '${refreshToken}'`,
+            (error, user) => {
+                if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
+                //Intenral Server Error
+                res.send({"success": "logged out successfully"})
+            }
+        );
+    }
+
+
+})
+
 export const signIn = (req: any, res: Response) => {
     if (PRIVATE_KEY) {
         //req.user exists because of the done(null, user) used in the Strategies at passport.ts
@@ -105,7 +123,7 @@ export const signIn = (req: any, res: Response) => {
             `UPDATE auth
         SET refresh_token = '${refreshToken}' WHERE email = '${req.user.email}'`,
             (error, response) => {
-                if (error) return console.log(error);
+                if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
                 // For acces token,  flags should be "secure: true"
                 //For refreshtoken "secure: true" and "httpOnly: true"
                 res.setHeader("set-cookie", [
@@ -144,7 +162,7 @@ export const signUp = (req: any, res: Response, next: NextFunction) => {
         pool.query(
             `SELECT * from auth WHERE email = '${email}'`,
             (error, response) => {
-                if (error) return console.log(error);
+                if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
 
                 //User already exist
                 if (response.rows.length > 0) {

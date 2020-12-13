@@ -1,6 +1,11 @@
 import { Router, Request, Response } from "express";
 import pool from "../databasePool";
-import { signUp, signIn, refreshToken } from "../controllers/authentication";
+import {
+    signUp,
+    signIn,
+    refreshToken,
+    logOut,
+} from "../controllers/authentication";
 import { jwtLogin, localLogin } from "../services/passport";
 import passport from "passport";
 import jwt from "jsonwebtoken";
@@ -46,4 +51,5 @@ router.get("/category", (req: Request, res: Response) => {
 router.post("/signin", requireSignIn, signIn);
 router.post("/signup", signUp);
 router.post("/token", refreshToken);
+router.post("/logout", logOut);
 export default router;
