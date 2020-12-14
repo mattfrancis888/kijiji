@@ -10,7 +10,7 @@ import {
 //compose is used to make it easier to "organize" mapStateToProps and redux form
 import { StoreState } from "../reducers";
 import { connect } from "react-redux";
-import { RegisterFormProps } from "./Body";
+import { RegisterFormProps } from "./Register";
 //Re-usable component
 export interface RegisterFormValues {
     email: string;
@@ -83,6 +83,7 @@ const RegisterForm: React.FC<
         <React.Fragment>
             <form className="authForm" onSubmit={props.handleSubmit(onSubmit)}>
                 <div className="authFieldSection">
+                    <h1>Register</h1>
                     <div className="authFormFieldTitleWrap">
                         <h1>Email</h1>
                         <h3 className="authFormFieldTitleEmailInUse">

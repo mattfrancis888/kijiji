@@ -1,0 +1,111 @@
+.authForm {
+    text-align: left;
+}
+.createAuthInputs {
+    padding: 0.2rem;
+    font-size: 1rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    &:focus {
+        border-color: black;
+        background-color: white;
+    }
+    @media screen and (min-width: $sm_breakpoint) {
+        padding: 0.5rem;
+        font-size: 1.5rem;
+    }
+    @media screen and (min-width: $md_breakpoint) {
+        padding: 0.8rem;
+        font-size: 1.7rem;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        padding: 1rem;
+        font-size: 1.9rem;
+    }
+    @media screen and (min-width: $xl_breakpoint) {
+        padding: 1.3rem;
+    }
+}
+.authFieldSection {
+    h1 {
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.1rem;
+        margin: 0;
+        font-size: 1rem;
+        @media screen and (min-width: $sm_breakpoint) {
+            font-size: 1.45rem;
+        }
+    }
+}
+
+.authButton {
+    cursor: pointer;
+    padding: 0.4rem;
+    margin: 1rem 0;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    @media screen and (min-width: $sm_breakpoint) {
+        padding: 0.5rem;
+        font-size: 1.4rem;
+    }
+    @media screen and (min-width: $md_breakpoint) {
+        margin-top: 2rem;
+        padding: 0.8rem;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        padding: 1rem;
+    }
+    @media screen and (min-width: $xl_breakpoint) {
+        margin-top: 3rem;
+        padding: 1.3rem;
+    }
+    background-color: $purple;
+    color: white;
+    border-radius: 0.4rem;
+}
+.registerAccountText {
+    color: red;
+    cursor: pointer;
+    &:hover {
+        text-decoration: underline;
+    }
+    @media screen and (min-width: $md_breakpoint) {
+        font-size: 1.7rem;
+    }
+}
+
+.errorText {
+    margin: 0.2rem 0;
+    color: red;
+    font-size: 1rem;
+    @media screen and (min-width: $sm_breakpoint) {
+        font-size: 1.2rem;
+        margin: 1rem 0;
+    }
+    @media screen and (min-width: $md_breakpoint) {
+        font-size: 1.4rem;
+    }
+}
+
+.authFormFieldTitleWrap {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.7rem;
+    padding: 0.5rem 0;
+}
+
+.authFormFieldTitleEmailInUse {
+    margin: 0;
+    font-size: 0.8rem;
+    color: red;
+    margin-left: 0.3rem;
+    @media screen and (min-width: $sm_breakpoint) {
+        font-size: 1.2rem;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        font-size: 1.3rem;
+    }
+}
