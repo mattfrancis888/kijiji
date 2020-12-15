@@ -10,12 +10,10 @@ import {
 //compose is used to make it easier to "organize" mapStateToProps and redux form
 import { StoreState } from "../reducers";
 import { connect } from "react-redux";
-import { RegisterFormProps } from "./Register";
+import { SignInFormProps } from "./SignIn";
 //Re-usable component
-export interface RegisterFormValues {
+export interface SignInFormValues {
     email: string;
-    firstName: string;
-    lastName: string;
     password: string;
 }
 
@@ -39,12 +37,7 @@ const renderTextInput = ({ input, label, meta, placeHolder }: any) => {
     return (
         <div>
             <label>{label}</label>
-            <input
-                data-testid="registerTextInput"
-                className="createAuthInputs"
-                {...input}
-                autoComplete="off"
-            />
+            <input className="createAuthInputs" {...input} autoComplete="off" />
             {renderError(meta)}
         </div>
     );
@@ -57,7 +50,6 @@ const renderPasswordInput = ({ input, label, meta, placeHolder }: any) => {
         <div>
             <label>{label}</label>
             <input
-                data-testid="registerPasswordInput"
                 className="createAuthInputs"
                 type="password"
                 {...input}
@@ -68,8 +60,8 @@ const renderPasswordInput = ({ input, label, meta, placeHolder }: any) => {
     );
 };
 
-const RegisterForm: React.FC<
-    RegisterFormProps & InjectedFormProps<{}, RegisterFormProps>
+const SignInForm: React.FC<
+    SignInFormProps & InjectedFormProps<{}, SignInFormProps>
 > = (props) => {
     const onSubmit = (formValues: any, dispatch: any) => {
         //onSubmit's default param is any
@@ -78,14 +70,13 @@ const RegisterForm: React.FC<
         //after clicking the submit button
         //dispatch(reset("registerForm"));
         props.onSubmit(formValues);
-
-        //dispatch(change("registerForm", "password", ""));
+        // dispatch(change("signInForm", "password", ""));
     };
 
     return (
         <React.Fragment>
             <form className="authForm" onSubmit={props.handleSubmit(onSubmit)}>
-                <h1>Register</h1>
+                <h1>Sign In</h1>
                 <div className="authFieldSection">
                     <div className="authFormFieldTitleWrap">
                         <h1>Email</h1>
@@ -95,32 +86,6 @@ const RegisterForm: React.FC<
                     </div>
                     <Field
                         name="email"
-                        type="text"
-                        component={renderTextInput}
-                    />
-                </div>
-                <div className="authFieldSection">
-                    <div className="authFormFieldTitleWrap">
-                        <h1>First Name</h1>
-                        <h3 className="authFormFieldTitleEmailInUse">
-                            {props.authStatus}
-                        </h3>
-                    </div>
-                    <Field
-                        name="firstName"
-                        type="text"
-                        component={renderTextInput}
-                    />
-                </div>
-                <div className="authFieldSection">
-                    <div className="authFormFieldTitleWrap">
-                        <h1>Last Name</h1>
-                        <h3 className="authFormFieldTitleEmailInUse">
-                            {props.authStatus}
-                        </h3>
-                    </div>
-                    <Field
-                        name="lastName"
                         type="text"
                         component={renderTextInput}
                     />
@@ -139,37 +104,26 @@ const RegisterForm: React.FC<
                     />
                 </div>
 
-                <button data-testid="registerButton" className="authButton">
-                    Register
-                </button>
+                <button className="authButton">Sign In</button>
             </form>
         </React.Fragment>
     );
 };
 
 const validate = (
-    formValues: RegisterFormValues
-): FormErrors<RegisterFormValues> => {
+    formValues: SignInFormValues
+): FormErrors<SignInFormValues> => {
     //MUST BE NAMED VALIDATE! Other names would be ignored by reduxForm(..)
-    const errors: FormErrors<RegisterFormValues> = {};
+    const errors: FormErrors<SignInFormValues> = {};
     //If you return an empty object, redux form will assume everything is ok
     if (!formValues.email) {
         //user did not enter title, so undefined
         errors.email = "You must enter an email";
         //Must be the same name as field name! The "error" property in {meta} would receive this
     }
-
-    if (!formValues.firstName) {
-        errors.firstName = "You must enter your first name";
-    }
-
-    if (!formValues.lastName) {
-        errors.lastName = "You must enter your last name";
-    }
     if (!formValues.password) {
         errors.password = "You must enter a password";
     }
-
     return errors;
     //Erors is going to be passed to renderInput's meta
 };
@@ -181,8 +135,8 @@ const validate = (
 // };
 
 export default connect()(
-    reduxForm<{}, RegisterFormProps>({
-        form: "registerForm",
+    reduxForm<{}, SignInFormProps>({
+        form: "signInForm",
         validate,
-    })(RegisterForm)
+    })(SignInForm)
 );

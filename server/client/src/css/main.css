@@ -394,19 +394,9 @@ body {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.registerFormWrap,
-.registerMiscWrap {
-  margin: 2rem;
-}
-@media screen and (min-width: 768px) {
-  .registerFormWrap,
-.registerMiscWrap {
-    width: auto;
-  }
-}
-
 .registerFormWrap {
   padding: 2rem;
+  margin: 2rem;
 }
 @media screen and (min-width: 768px) {
   .registerFormWrap {
@@ -419,6 +409,9 @@ body {
   }
 }
 
+.registerMiscWrap {
+  margin: 2rem;
+}
 @media screen and (min-width: 768px) {
   .registerMiscWrap {
     width: 50%;
@@ -465,6 +458,81 @@ body {
 }
 .whyRegisterContainer p {
   font-size: 1.2rem;
+}
+
+.signInContainer {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding: 2rem;
+}
+@media screen and (min-width: 768px) {
+  .signInContainer {
+    flex-direction: row;
+    padding: 5rem;
+  }
+}
+
+.registerNowContainer,
+.signInFormWrap {
+  background: white;
+  border-radius: 3px;
+  background-clip: padding-box;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.signInFormWrap {
+  padding: 2rem;
+  margin: 2rem;
+}
+@media screen and (min-width: 768px) {
+  .signInFormWrap {
+    width: 50%;
+  }
+}
+@media screen and (min-width: 992px) {
+  .signInFormWrap {
+    width: 70%;
+  }
+}
+
+.signInMiscWrap {
+  margin: 2rem;
+}
+@media screen and (min-width: 768px) {
+  .signInMiscWrap {
+    width: 50%;
+  }
+}
+@media screen and (min-width: 992px) {
+  .signInMiscWrap {
+    width: 30%;
+  }
+}
+
+.registerNowContainer {
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.registerNowContainer h1 {
+  font-size: 1.4rem;
+  text-align: center;
+}
+.registerNowContainer p {
+  font-size: 1.2rem;
+}
+.registerNowContainer .registerNowButton {
+  background-color: #373373;
+  color: white;
+  padding: 0.7rem;
+  font-size: 1.3rem;
+  width: 100%;
+  border-radius: 0.4rem;
+}
+@media screen and (min-width: 768px) {
+  .registerNowContainer .registerNowButton {
+    padding: 1rem;
+  }
 }
 
 nav {
