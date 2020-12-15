@@ -55,7 +55,10 @@
     .alreadyRegisteredButton {
         background-color: $purple;
         color: white;
-        padding: 1rem;
+        padding: 0.7rem;
+        @media screen and (min-width: $md_breakpoint) {
+            padding: 1rem;
+        }
         font-size: 1.3rem;
         width: 100%;
         border-radius: 0.4rem;

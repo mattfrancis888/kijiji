@@ -444,10 +444,15 @@ body {
 .alreadyRegisteredContainer .alreadyRegisteredButton {
   background-color: #373373;
   color: white;
-  padding: 1rem;
+  padding: 0.7rem;
   font-size: 1.3rem;
   width: 100%;
   border-radius: 0.4rem;
+}
+@media screen and (min-width: 768px) {
+  .alreadyRegisteredContainer .alreadyRegisteredButton {
+    padding: 1rem;
+  }
 }
 
 .whyRegisterContainer {
@@ -549,7 +554,6 @@ nav {
 }
 
 .authFieldSection h1 {
-  text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 0.1rem;
   margin: 0;
@@ -563,7 +567,7 @@ nav {
 
 .authButton {
   cursor: pointer;
-  padding: 0.4rem;
+  padding: 0.8rem;
   margin: 1rem 0;
   font-weight: bold;
   font-size: 1.2rem;
@@ -575,7 +579,6 @@ nav {
 }
 @media screen and (min-width: 520px) {
   .authButton {
-    padding: 0.5rem;
     font-size: 1.4rem;
   }
 }

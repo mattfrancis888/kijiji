@@ -14,6 +14,8 @@ import { RegisterFormProps } from "./Register";
 //Re-usable component
 export interface RegisterFormValues {
     email: string;
+    firstName: string;
+    lastName: string;
     password: string;
 }
 
@@ -82,8 +84,8 @@ const RegisterForm: React.FC<
     return (
         <React.Fragment>
             <form className="authForm" onSubmit={props.handleSubmit(onSubmit)}>
+                <h1>Register</h1>
                 <div className="authFieldSection">
-                    <h1>Register</h1>
                     <div className="authFormFieldTitleWrap">
                         <h1>Email</h1>
                         <h3 className="authFormFieldTitleEmailInUse">
@@ -92,6 +94,32 @@ const RegisterForm: React.FC<
                     </div>
                     <Field
                         name="email"
+                        type="text"
+                        component={renderTextInput}
+                    />
+                </div>
+                <div className="authFieldSection">
+                    <div className="authFormFieldTitleWrap">
+                        <h1>First Name</h1>
+                        <h3 className="authFormFieldTitleEmailInUse">
+                            {props.authStatus}
+                        </h3>
+                    </div>
+                    <Field
+                        name="firstName"
+                        type="text"
+                        component={renderTextInput}
+                    />
+                </div>
+                <div className="authFieldSection">
+                    <div className="authFormFieldTitleWrap">
+                        <h1>Last Name</h1>
+                        <h3 className="authFormFieldTitleEmailInUse">
+                            {props.authStatus}
+                        </h3>
+                    </div>
+                    <Field
+                        name="lastName"
                         type="text"
                         component={renderTextInput}
                     />
@@ -130,6 +158,13 @@ const validate = (
         //Must be the same name as field name! The "error" property in {meta} would receive this
     }
 
+    if (!formValues.firstName) {
+        errors.firstName = "You must enter your first name";
+    }
+
+    if (!formValues.lastName) {
+        errors.lastName = "You must enter your last name";
+    }
     if (!formValues.password) {
         errors.password = "You must enter a password";
     }
