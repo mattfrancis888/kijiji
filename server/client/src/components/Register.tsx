@@ -5,17 +5,18 @@ import { signUp } from "../actions";
 import { connect } from "react-redux";
 export interface RegisterFormProps {
     onSubmit(formValues: any): void;
+    authStatus?: string | null;
 }
 
 export interface RegisterProps {
     signUp(formValues: any): void;
+    authStatus?: string | null;
 }
 
 const Register: React.FC<RegisterProps> = (props) => {
     //const history = useHistory();
     const onSubmitRegister = async (formValues: any) => {
         props.signUp(formValues);
-        console.log(formValues);
     };
 
     return (

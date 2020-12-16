@@ -84,6 +84,8 @@ var refreshToken = function (req, res) { return __awaiter(void 0, void 0, void 0
                     //Generate a new access token for the user to use
                     // For acces token,  flags should be "secure: true"
                     //For refreshtoken "secure: true" and "httpOnly: true"
+                    //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
+                    //and http only; but POSTMAN will show your cookies
                     var token = generateAccessToken(user.rows[0].email, PRIVATE_KEY);
                     res.setHeader("set-cookie", [
                         "ACCESS_TOKEN=" + token + "; samesite=lax; secure",
@@ -143,12 +145,22 @@ var signIn = function (req, res) {
                 return res.send(INTERNAL_SERVER_ERROR_STATUS);
             // For acces token,  flags should be "secure: true"
             //For refreshtoken "secure: true" and "httpOnly: true"
-            res.setHeader("set-cookie", [
-                "ACCESS_TOKEN=" + token_1 + "; samesite=lax; secure",
-            ]);
-            res.setHeader("set-cookie", [
-                "REFRESH_TOKEN=" + refreshToken_2 + "; httponly; samesite=lax; secure",
-            ]);
+            //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
+            //and http only; but POSTMAN will show your cookies
+            //Use .setHeader if we are only sending 1 cookie
+            //Use .cookie if we are sending 1 or more cookies
+            // res.setHeader("set-cookie", [
+            //     `ACCESS_TOKEN=${token}; samesite=lax; secure`,
+            // ]);
+            // res.setHeader("set-cookie", [
+            //     `REFRESH_TOKEN=${refreshToken}; httponly; samesite=lax; secure`,
+            // ]);
+            // res.cookie("hi", "test");
+            res.cookie("ACCESS_TOKEN", token_1);
+            res.cookie("REFRESH-TOKEN", refreshToken_2, { httpOnly: true });
+            // res.setHeader("set-cookie", [
+            //     `REFRESH_TOKEN=${refreshToken}; httponly;`,
+            // ]);
             res.send({
                 token: token_1,
                 refreshToken: refreshToken_2,

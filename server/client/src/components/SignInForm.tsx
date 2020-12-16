@@ -128,13 +128,16 @@ const validate = (
     //Erors is going to be passed to renderInput's meta
 };
 
-// const mapStateToProps = (state: StoreState) => {
-//     return {
-//         authStatus: state.authStatus.errorMessage,
-//     };
-// };
+const mapStateToProps = (state: StoreState) => {
+    return {
+        authStatus: state.authStatus.errorMessage,
+    };
+};
 
-export default connect()(
+export default connect(
+    mapStateToProps,
+    {}
+)(
     reduxForm<{}, SignInFormProps>({
         form: "signInForm",
         validate,

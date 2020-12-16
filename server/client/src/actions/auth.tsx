@@ -32,3 +32,24 @@ export const signUp = (formValues: any) => async (dispatch: Dispatch) => {
         });
     }
 };
+export const signIn = (formValues: any) => async (dispatch: Dispatch) => {
+    try {
+        const response = await auth.post<JWTType>("/signin", formValues);
+        dispatch<AuthUserAction>({
+            type: ActionTypes.AUTH_USER,
+            payload: response.data,
+        });
+        //Save token to local storage so that we could persist login state, keep user log in
+        //localStorage.setItem("token", response.data.token);
+        //history.push("/walkman");
+    } catch (err) {
+        // if (err.message === "Network Error") {
+        //     console.log("check error", err);
+        // }
+
+        dispatch<AuthErrorAction>({
+            type: ActionTypes.AUTH_ERROR,
+            payload: "- Invalid login credentials",
+        });
+    }
+};

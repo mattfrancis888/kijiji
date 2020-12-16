@@ -56,6 +56,9 @@ export const refreshToken = async (req: any, res: Response) => {
 
                 // For acces token,  flags should be "secure: true"
                 //For refreshtoken "secure: true" and "httpOnly: true"
+
+                //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
+                //and http only; but POSTMAN will show your cookies
                 const token = generateAccessToken(
                     user.rows[0].email,
                     PRIVATE_KEY
@@ -124,13 +127,28 @@ export const signIn = (req: any, res: Response) => {
                 if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
                 // For acces token,  flags should be "secure: true"
                 //For refreshtoken "secure: true" and "httpOnly: true"
-                res.setHeader("set-cookie", [
-                    `ACCESS_TOKEN=${token}; samesite=lax; secure`,
-                ]);
 
-                res.setHeader("set-cookie", [
-                    `REFRESH_TOKEN=${refreshToken}; httponly; samesite=lax; secure`,
-                ]);
+                //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
+                //and http only; but POSTMAN will show your cookies
+
+                //Use .setHeader if we are only sending 1 cookie
+                //Use .cookie if we are sending 1 or more cookies
+
+                // res.setHeader("set-cookie", [
+                //     `ACCESS_TOKEN=${token}; samesite=lax; secure`,
+                // ]);
+
+                // res.setHeader("set-cookie", [
+                //     `REFRESH_TOKEN=${refreshToken}; httponly; samesite=lax; secure`,
+                // ]);
+
+                // res.cookie("hi", "test");
+                res.cookie("ACCESS_TOKEN", token);
+                res.cookie("REFRESH-TOKEN", refreshToken, { httpOnly: true });
+
+                // res.setHeader("set-cookie", [
+                //     `REFRESH_TOKEN=${refreshToken}; httponly;`,
+                // ]);
 
                 res.send({
                     token,
