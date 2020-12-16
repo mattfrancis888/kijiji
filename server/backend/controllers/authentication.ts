@@ -142,13 +142,8 @@ export const signIn = (req: any, res: Response) => {
                 //     `REFRESH_TOKEN=${refreshToken}; httponly; samesite=lax; secure`,
                 // ]);
 
-                // res.cookie("hi", "test");
                 res.cookie("ACCESS_TOKEN", token);
                 res.cookie("REFRESH-TOKEN", refreshToken, { httpOnly: true });
-
-                // res.setHeader("set-cookie", [
-                //     `REFRESH_TOKEN=${refreshToken}; httponly;`,
-                // ]);
 
                 res.send({
                     token,

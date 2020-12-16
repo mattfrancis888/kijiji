@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import requireAuth from "./requireAuth";
 
 const PostAd: React.FC<{}> = () => {
     //const history = useHistory();
@@ -10,4 +11,4 @@ const PostAd: React.FC<{}> = () => {
     );
 };
 
-export default PostAd;
+export default requireAuth(PostAd);

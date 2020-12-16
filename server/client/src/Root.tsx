@@ -5,7 +5,7 @@ import { createStore, applyMiddleware } from "redux";
 import reducers from "./reducers";
 import { composeWithDevTools } from "redux-devtools-extension";
 import reduxThunk from "redux-thunk";
-
+import Cookies from "js-cookie";
 // const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 // const store = createStore(
 //     reducers,
@@ -30,7 +30,7 @@ interface IProps {
 const provider = ({ initialState = {}, children }: IProps) => {
     const store = createStore(
         reducers,
-        { authStatus: { authenticated: localStorage.getItem("token") } },
+        { authStatus: { authenticated: Cookies.get("ACCESS_TOKEN") } },
         //if our inital state (authStauts) has a token from local storage, keep them logged in
         composeWithDevTools(applyMiddleware(reduxThunk))
     );

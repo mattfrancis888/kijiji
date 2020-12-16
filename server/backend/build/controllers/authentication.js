@@ -155,12 +155,8 @@ var signIn = function (req, res) {
             // res.setHeader("set-cookie", [
             //     `REFRESH_TOKEN=${refreshToken}; httponly; samesite=lax; secure`,
             // ]);
-            // res.cookie("hi", "test");
             res.cookie("ACCESS_TOKEN", token_1);
             res.cookie("REFRESH-TOKEN", refreshToken_2, { httpOnly: true });
-            // res.setHeader("set-cookie", [
-            //     `REFRESH_TOKEN=${refreshToken}; httponly;`,
-            // ]);
             res.send({
                 token: token_1,
                 refreshToken: refreshToken_2,

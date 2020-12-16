@@ -1,8 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 const Header: React.FC<{}> = () => {
-    //const history = useHistory();
+    const history = useHistory();
     return (
         <nav>
             <div className="headerInfoWrap">
@@ -16,7 +17,14 @@ const Header: React.FC<{}> = () => {
                 <div className="headerProfileAndPostWrap">
                     <h1 className="register">Register</h1>
                     <h1 className="signIn">Sign in</h1>
-                    <button className="postAdButton">Post Ad</button>
+                    <button
+                        onClick={() => {
+                            history.push("/post-ad");
+                        }}
+                        className="postAdButton"
+                    >
+                        Post Ad
+                    </button>
                 </div>
             </div>
         </nav>
