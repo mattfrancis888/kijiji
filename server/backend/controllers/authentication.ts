@@ -78,7 +78,7 @@ export const refreshToken = async (req: any, res: Response) => {
 
 const authenticateToken = async (token: string, secret: string) => {
     //Checks if token is still valid / has not expired
-    
+
     try {
         const result: any = jwt.verify(token, secret);
         return { email: result.email };
@@ -96,21 +96,19 @@ const authenticateToken = async (token: string, secret: string) => {
     //     https://solidgeargroup.com/en/refresh-token-with-jwt-authentication-node-js/
 };
 
-export const logOut =  async (req: Request, res: Response) => {
-    const refreshToken =  req.headers["authorization"]
+export const logOut = async (req: Request, res: Response) => {
+    const refreshToken = req.headers["authorization"];
     if (refreshToken) {
         pool.query(
             `UPDATE auth SET refresh_token = null WHERE refresh_token = '${refreshToken}'`,
             (error, user) => {
                 if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
                 //Intenral Server Error
-                res.send({"success": "logged out successfully"})
+                res.send({ success: "logged out successfully" });
             }
         );
     }
-
-
-})
+};
 
 export const signIn = (req: any, res: Response) => {
     if (PRIVATE_KEY) {
@@ -144,11 +142,14 @@ export const signIn = (req: any, res: Response) => {
         res.send(FORBIDDEN_STATUS);
     }
 };
-export const signUp = (req: any, res: Response, next: NextFunction) => {
+export const signUp = async (req: any, res: Response, next: NextFunction) => {
     if (PRIVATE_KEY) {
         //If user with given email exists
+        console.log(req.body);
         const email = req.body.email;
         const password = req.body.password;
+        const firstName = req.body.firstName;
+        const lastName = req.body.lastName;
 
         const UNPROCESSABLE_ENTITY_STATUS = 422;
         //Email or password not given
@@ -158,45 +159,58 @@ export const signUp = (req: any, res: Response, next: NextFunction) => {
                 .send({ error: "Email and password must be provided" });
         }
 
-        //If email already exist, return an error
-        pool.query(
-            `SELECT * from auth WHERE email = '${email}'`,
-            (error, response) => {
-                if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
+        try {
+            //If a user with email does NOT exist
+            const checkEmailResponse = await pool.query(
+                `SELECT * from auth WHERE email = '${email}'`
+            );
 
-                //User already exist
-                if (response.rows.length > 0) {
-                    //422 is UNPROCESSABLE_ETITY; data user gave was "bad/unproceesssed"
-                    return res
-                        .status(UNPROCESSABLE_ENTITY_STATUS)
-                        .send({ error: "Email in use" });
-                }
-
-                //If a user with email does NOT exist
-                const saltRounds = 10;
-                bcrypt.hash(password, saltRounds, (err, hash) => {
-                    // Now we can store the password hash in db.
-                    if (err) {
-                        return next(err);
-                    }
-                    console.log(hash);
-                    //Override current text password with hash
-                    const hashedPassword = hash;
-                    pool.query(
-                        `INSERT INTO auth(email, password, refresh_token)VALUES('${email}', '${hashedPassword}', 'abcdefg')`,
-                        (error, response) => {
-                            if (error) return next(error);
-                            //Generate a token when user signs in, this token will be used so that they can access protected routes
-
-                            res.send({
-                                token: generateAccessToken(email, PRIVATE_KEY),
-                            });
-                            //Respond to request indicating user was created
-                        }
-                    );
-                });
+            //User already exist
+            if (checkEmailResponse.rows.length > 0) {
+                //422 is UNPROCESSABLE_ETITY; data user gave was "bad/unproceesssed"
+                return res
+                    .status(UNPROCESSABLE_ENTITY_STATUS)
+                    .send({ error: "Email in use" });
             }
-        );
+
+            const saltRounds = 10;
+            const hash = await bcrypt.hash(password, saltRounds);
+            /// Now we can store the password hash in db.
+            //Override current text password with hash
+            const hashedPassword = hash;
+            try {
+                //Using transactions with psql pool:
+                //https://kb.objectrocket.com/postgresql/nodejs-and-the-postgres-transaction-968
+                await pool.query("BEGIN");
+                await pool.query(
+                    ` INSERT INTO auth(email, password)VALUES($1, $2)`,
+                    [email, hashedPassword]
+                );
+                await pool.query(
+                    ` INSERT INTO user_info(first_name, last_name, email)VALUES($1, $2, $3);`,
+                    [firstName, lastName, email]
+                );
+                pool.query("COMMIT");
+                //Generate a token when user signs in, this token will be used so that they can access protected routes
+                res.send({
+                    token: generateAccessToken(email, PRIVATE_KEY),
+                });
+            } catch (error) {
+                pool.query("ROLLBACK");
+                console.log(error);
+                console.log("ROLLBACK TRIGGERED");
+                return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+            }
+        } catch (error) {
+            //return next(error);
+            console.log(error);
+            return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+        }
+
+        // START TRANSACTION;
+        //     INSERT INTO auth(email, password)VALUES($1, $2);
+        //     INSERT INTO user_info(first_name, last_name, email)VALUES($3, $4, $5);
+        // COMMIT
     } else {
         res.send(FORBIDDEN_STATUS);
     }

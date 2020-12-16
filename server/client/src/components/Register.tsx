@@ -1,6 +1,8 @@
 import React from "react";
 import RegisterForm from "./RegisterForm";
-
+import { StoreState } from "../reducers";
+import { signUp } from "../actions";
+import { connect } from "react-redux";
 export interface RegisterFormProps {
     onSubmit(formValues: any): void;
 }
@@ -12,7 +14,7 @@ export interface RegisterProps {
 const Register: React.FC<RegisterProps> = (props) => {
     //const history = useHistory();
     const onSubmitRegister = async (formValues: any) => {
-        // props.signUp(formValues);
+        props.signUp(formValues);
         console.log(formValues);
     };
 
@@ -52,4 +54,9 @@ const Register: React.FC<RegisterProps> = (props) => {
     );
 };
 
-export default Register;
+const mapStateToProps = (state: StoreState) => {
+    return {
+        authStatus: state.authStatus.authenticated,
+    };
+};
+export default connect(mapStateToProps, { signUp })(Register);

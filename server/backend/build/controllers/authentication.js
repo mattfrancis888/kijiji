@@ -124,7 +124,7 @@ var logOut = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                 if (error)
                     return res.send(INTERNAL_SERVER_ERROR_STATUS);
                 //Intenral Server Error
-                res.send({ "success": "logged out successfully" });
+                res.send({ success: "logged out successfully" });
             });
         }
         return [2 /*return*/];
@@ -160,53 +160,83 @@ var signIn = function (req, res) {
     }
 };
 exports.signIn = signIn;
-var signUp = function (req, res, next) {
-    if (PRIVATE_KEY) {
-        //If user with given email exists
-        var email_1 = req.body.email;
-        var password_1 = req.body.password;
-        var UNPROCESSABLE_ENTITY_STATUS_1 = 422;
-        //Email or password not given
-        if (!email_1 || !password_1) {
-            return res
-                .status(UNPROCESSABLE_ENTITY_STATUS_1)
-                .send({ error: "Email and password must be provided" });
-        }
-        //If email already exist, return an error
-        databasePool_1.default.query("SELECT * from auth WHERE email = '" + email_1 + "'", function (error, response) {
-            if (error)
-                return res.send(INTERNAL_SERVER_ERROR_STATUS);
-            //User already exist
-            if (response.rows.length > 0) {
-                //422 is UNPROCESSABLE_ETITY; data user gave was "bad/unproceesssed"
-                return res
-                    .status(UNPROCESSABLE_ENTITY_STATUS_1)
-                    .send({ error: "Email in use" });
-            }
-            //If a user with email does NOT exist
-            var saltRounds = 10;
-            bcrypt_1.default.hash(password_1, saltRounds, function (err, hash) {
-                // Now we can store the password hash in db.
-                if (err) {
-                    return next(err);
+var signUp = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var email, password, firstName, lastName, UNPROCESSABLE_ENTITY_STATUS, checkEmailResponse, saltRounds, hash, hashedPassword, error_1, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (!PRIVATE_KEY) return [3 /*break*/, 12];
+                //If user with given email exists
+                console.log(req.body);
+                email = req.body.email;
+                password = req.body.password;
+                firstName = req.body.firstName;
+                lastName = req.body.lastName;
+                UNPROCESSABLE_ENTITY_STATUS = 422;
+                //Email or password not given
+                if (!email || !password) {
+                    return [2 /*return*/, res
+                            .status(UNPROCESSABLE_ENTITY_STATUS)
+                            .send({ error: "Email and password must be provided" })];
                 }
-                console.log(hash);
-                //Override current text password with hash
-                var hashedPassword = hash;
-                databasePool_1.default.query("INSERT INTO auth(email, password, refresh_token)VALUES('" + email_1 + "', '" + hashedPassword + "', 'abcdefg')", function (error, response) {
-                    if (error)
-                        return next(error);
-                    //Generate a token when user signs in, this token will be used so that they can access protected routes
-                    res.send({
-                        token: generateAccessToken(email_1, PRIVATE_KEY),
-                    });
-                    //Respond to request indicating user was created
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 10, , 11]);
+                return [4 /*yield*/, databasePool_1.default.query("SELECT * from auth WHERE email = '" + email + "'")];
+            case 2:
+                checkEmailResponse = _a.sent();
+                //User already exist
+                if (checkEmailResponse.rows.length > 0) {
+                    //422 is UNPROCESSABLE_ETITY; data user gave was "bad/unproceesssed"
+                    return [2 /*return*/, res
+                            .status(UNPROCESSABLE_ENTITY_STATUS)
+                            .send({ error: "Email in use" })];
+                }
+                saltRounds = 10;
+                return [4 /*yield*/, bcrypt_1.default.hash(password, saltRounds)];
+            case 3:
+                hash = _a.sent();
+                hashedPassword = hash;
+                _a.label = 4;
+            case 4:
+                _a.trys.push([4, 8, , 9]);
+                //Using transactions with psql pool:
+                //https://kb.objectrocket.com/postgresql/nodejs-and-the-postgres-transaction-968
+                return [4 /*yield*/, databasePool_1.default.query("BEGIN")];
+            case 5:
+                //Using transactions with psql pool:
+                //https://kb.objectrocket.com/postgresql/nodejs-and-the-postgres-transaction-968
+                _a.sent();
+                return [4 /*yield*/, databasePool_1.default.query(" INSERT INTO auth(email, password)VALUES($1, $2)", [email, hashedPassword])];
+            case 6:
+                _a.sent();
+                return [4 /*yield*/, databasePool_1.default.query(" INSERT INTO user_info(first_name, last_name, email)VALUES($1, $2, $3);", [firstName, lastName, email])];
+            case 7:
+                _a.sent();
+                databasePool_1.default.query("COMMIT");
+                //Generate a token when user signs in, this token will be used so that they can access protected routes
+                res.send({
+                    token: generateAccessToken(email, PRIVATE_KEY),
                 });
-            });
-        });
-    }
-    else {
-        res.send(FORBIDDEN_STATUS);
-    }
-};
+                return [3 /*break*/, 9];
+            case 8:
+                error_1 = _a.sent();
+                databasePool_1.default.query("ROLLBACK");
+                console.log(error_1);
+                console.log("ROLLBACK TRIGGERED");
+                return [2 /*return*/, res.sendStatus(INTERNAL_SERVER_ERROR_STATUS)];
+            case 9: return [3 /*break*/, 11];
+            case 10:
+                error_2 = _a.sent();
+                //return next(error);
+                console.log(error_2);
+                return [2 /*return*/, res.sendStatus(INTERNAL_SERVER_ERROR_STATUS)];
+            case 11: return [3 /*break*/, 13];
+            case 12:
+                res.send(FORBIDDEN_STATUS);
+                _a.label = 13;
+            case 13: return [2 /*return*/];
+        }
+    });
+}); };
 exports.signUp = signUp;
