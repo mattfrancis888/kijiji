@@ -66,3 +66,33 @@ export const signOut = () => async (dispatch: Dispatch) => {
         alert("Log out failed, try again");
     }
 };
+
+export const validateToken = (path: string, token: string) => async (
+    dispatch: Dispatch
+) => {
+    try {
+        await auth.post<JWTType>(
+            path,
+            {},
+            { headers: { Authorization: token } }
+        );
+    } catch (err) {
+        dispatch<AuthErrorAction>({
+            type: ActionTypes.AUTH_ERROR,
+            payload: "",
+        });
+    }
+};
+
+// export const refresh = () => async (dispatch: Dispatch) => {
+//     try {
+//         const response = await auth.post<JWTType>("/refresh");
+//         dispatch<AuthUserAction>({
+//             type: ActionTypes.AUTH_USER,
+//             payload: response.data,
+//         });
+//         alert("Logged out succesfully");
+//     } catch (err) {
+
+//     }
+// };

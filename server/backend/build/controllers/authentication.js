@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signUp = exports.signIn = exports.signOut = exports.refreshToken = void 0;
+exports.signUp = exports.signIn = exports.signOut = exports.authenticateAccessToken = exports.refreshToken = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var bcrypt_1 = __importDefault(require("bcrypt"));
@@ -119,13 +119,32 @@ var authenticateToken = function (token, secret) { return __awaiter(void 0, void
         return [2 /*return*/];
     });
 }); };
+var authenticateAccessToken = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var token, result;
+    return __generator(this, function (_a) {
+        token = req.headers["authorization"];
+        if (PRIVATE_KEY && token) {
+            try {
+                result = jsonwebtoken_1.default.verify(token, PRIVATE_KEY);
+                // return { email: result.email };
+                next();
+            }
+            catch (_b) {
+                return [2 /*return*/, res.sendStatus(FORBIDDEN_STATUS)];
+            }
+        }
+        else {
+            res.sendStatus(FORBIDDEN_STATUS);
+        }
+        return [2 /*return*/];
+    });
+}); };
+exports.authenticateAccessToken = authenticateAccessToken;
 var signOut = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var refreshToken;
     var _a, _b;
     return __generator(this, function (_c) {
         refreshToken = (_b = (_a = req.headers["cookie"]) === null || _a === void 0 ? void 0 : _a.split(";").map(function (item) { return item.trim(); }).find(function (str) { return str.startsWith(REFRESH_TOKEN); })) === null || _b === void 0 ? void 0 : _b.split("=").pop();
-        console.log(refreshToken);
-        // console.log(req.headers["cookie"]?.split(";").map(item =>item.trim()).find(str => str.startsWith(REFRESH_TOKEN));
         if (refreshToken) {
             databasePool_1.default.query("UPDATE auth SET refresh_token = null WHERE refresh_token = '" + refreshToken + "'", function (error, user) {
                 if (error)
@@ -151,7 +170,7 @@ var signIn = function (req, res) {
         // Update Refresh token to database
         databasePool_1.default.query("UPDATE auth\n        SET refresh_token = '" + refreshToken_2 + "' WHERE email = '" + req.user.email + "'", function (error, response) {
             if (error)
-                return res.send(INTERNAL_SERVER_ERROR_STATUS);
+                return res.send(FORBIDDEN_STATUS);
             // For acces token,  flags should be "secure: true"
             //For refreshtoken "secure: true" and "httpOnly: true"
             //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure

@@ -5,6 +5,7 @@ import {
     signIn,
     refreshToken,
     signOut,
+    authenticateAccessToken,
 } from "../controllers/authentication";
 import { jwtLogin, localLogin } from "../services/passport";
 import passport from "passport";
@@ -52,4 +53,7 @@ router.post("/signin", requireSignIn, signIn);
 router.post("/signup", signUp);
 router.post("/token", refreshToken);
 router.post("/signout", signOut);
+router.post("/post-ad", authenticateAccessToken, (req, res) => {
+    res.send("success");
+});
 export default router;

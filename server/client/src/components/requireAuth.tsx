@@ -2,9 +2,13 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import { History } from "history";
+import { validateToken } from "../actions";
+
 export interface IHoc {
     authStatus?: string | null;
     history: History;
+    validateToken(path: string, token: string): void;
+    // path: string;
 }
 const hoc = (ChildComponent: any) => {
     class ComposedComponent extends Component<IHoc> {
@@ -25,6 +29,9 @@ const hoc = (ChildComponent: any) => {
                 //if authStatus is empty string
                 //history is automatically passed due to React-router
                 this.props.history.push("/");
+            } else {
+                //validate access token, if it's not valid, redux's authStatus would be empty
+                this.props.validateToken("/post-ad", this.props.authStatus);
             }
         }
 
@@ -37,7 +44,7 @@ const hoc = (ChildComponent: any) => {
         return { authStatus: state.authStatus.authenticated };
     }
 
-    return connect(mapStateToProps)(ComposedComponent);
+    return connect(mapStateToProps, { validateToken })(ComposedComponent);
 };
 
 export default hoc;

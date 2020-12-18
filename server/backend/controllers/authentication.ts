@@ -103,6 +103,25 @@ const authenticateToken = async (token: string, secret: string) => {
     //     https://solidgeargroup.com/en/refresh-token-with-jwt-authentication-node-js/
 };
 
+export const authenticateAccessToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const token = req.headers["authorization"];
+    if (PRIVATE_KEY && token) {
+        try {
+            const result: any = jwt.verify(token, PRIVATE_KEY);
+            // return { email: result.email };
+            next();
+        } catch {
+            return res.sendStatus(FORBIDDEN_STATUS);
+        }
+    } else {
+        res.sendStatus(FORBIDDEN_STATUS);
+    }
+};
+
 export const signOut = async (req: Request, res: Response) => {
     const refreshToken = req.headers["cookie"]
         ?.split(";")
@@ -110,8 +129,7 @@ export const signOut = async (req: Request, res: Response) => {
         .find((str) => str.startsWith(REFRESH_TOKEN))
         ?.split("=")
         .pop();
-    console.log(refreshToken);
-    // console.log(req.headers["cookie"]?.split(";").map(item =>item.trim()).find(str => str.startsWith(REFRESH_TOKEN));
+
     if (refreshToken) {
         pool.query(
             `UPDATE auth SET refresh_token = null WHERE refresh_token = '${refreshToken}'`,
@@ -138,7 +156,7 @@ export const signIn = (req: any, res: Response) => {
             `UPDATE auth
         SET refresh_token = '${refreshToken}' WHERE email = '${req.user.email}'`,
             (error, response) => {
-                if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
+                if (error) return res.send(FORBIDDEN_STATUS);
                 // For acces token,  flags should be "secure: true"
                 //For refreshtoken "secure: true" and "httpOnly: true"
 

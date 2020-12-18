@@ -22,7 +22,11 @@ const authReducer = (
                 errorMessage: "",
             };
         case ActionTypes.AUTH_ERROR:
-            return { ...state, errorMessage: action.payload };
+            return {
+                ...state,
+                authenticated: "",
+                errorMessage: action.payload,
+            };
         default:
             return state;
     }
