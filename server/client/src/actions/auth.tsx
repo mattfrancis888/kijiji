@@ -53,3 +53,16 @@ export const signIn = (formValues: any) => async (dispatch: Dispatch) => {
         });
     }
 };
+
+export const signOut = () => async (dispatch: Dispatch) => {
+    try {
+        const response = await auth.post<JWTType>("/signout");
+        dispatch<AuthUserAction>({
+            type: ActionTypes.AUTH_USER,
+            payload: response.data,
+        });
+        alert("Logged out succesfully");
+    } catch (err) {
+        alert("Log out failed, try again");
+    }
+};

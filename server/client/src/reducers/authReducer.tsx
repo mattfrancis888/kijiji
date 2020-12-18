@@ -23,8 +23,6 @@ const authReducer = (
             };
         case ActionTypes.AUTH_ERROR:
             return { ...state, errorMessage: action.payload };
-        case ActionTypes.RESET_AUTH_ERROR:
-            return { ...state, errorMessage: action.payload };
         default:
             return state;
     }

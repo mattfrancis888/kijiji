@@ -39,13 +39,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signUp = exports.signIn = exports.logOut = exports.refreshToken = void 0;
+exports.signUp = exports.signIn = exports.signOut = exports.refreshToken = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var bcrypt_1 = __importDefault(require("bcrypt"));
 var FORBIDDEN_STATUS = 403;
 var INTERNAL_SERVER_ERROR_STATUS = 500;
 var PRIVATE_KEY = process.env.privateKey;
+var ACCESS_TOKEN = "ACCESS_TOKEN";
+var REFRESH_TOKEN = "REFRESH_TOKEN";
 var generateAccessToken = function (email, privateKey) {
     //Generate a token by using user email  and 'secret key'
     //iat- issued at  property is implemented by default
@@ -117,22 +119,29 @@ var authenticateToken = function (token, secret) { return __awaiter(void 0, void
         return [2 /*return*/];
     });
 }); };
-var logOut = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var signOut = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var refreshToken;
-    return __generator(this, function (_a) {
-        refreshToken = req.headers["authorization"];
+    var _a, _b;
+    return __generator(this, function (_c) {
+        refreshToken = (_b = (_a = req.headers["cookie"]) === null || _a === void 0 ? void 0 : _a.split(";").map(function (item) { return item.trim(); }).find(function (str) { return str.startsWith(REFRESH_TOKEN); })) === null || _b === void 0 ? void 0 : _b.split("=").pop();
+        console.log(refreshToken);
+        // console.log(req.headers["cookie"]?.split(";").map(item =>item.trim()).find(str => str.startsWith(REFRESH_TOKEN));
         if (refreshToken) {
             databasePool_1.default.query("UPDATE auth SET refresh_token = null WHERE refresh_token = '" + refreshToken + "'", function (error, user) {
                 if (error)
                     return res.send(INTERNAL_SERVER_ERROR_STATUS);
-                //Intenral Server Error
-                res.send({ success: "logged out successfully" });
+                res.clearCookie(ACCESS_TOKEN);
+                res.clearCookie(REFRESH_TOKEN);
+                res.send({ token: "" });
             });
+        }
+        else {
+            res.sendStatus(FORBIDDEN_STATUS);
         }
         return [2 /*return*/];
     });
 }); };
-exports.logOut = logOut;
+exports.signOut = signOut;
 var signIn = function (req, res) {
     if (PRIVATE_KEY) {
         //req.user exists because of the done(null, user) used in the Strategies at passport.ts
@@ -147,16 +156,14 @@ var signIn = function (req, res) {
             //For refreshtoken "secure: true" and "httpOnly: true"
             //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
             //and http only; but POSTMAN will show your cookies
-            //Use .setHeader if we are only sending 1 cookie
-            //Use .cookie if we are sending 1 or more cookies
-            // res.setHeader("set-cookie", [
-            //     `ACCESS_TOKEN=${token}; samesite=lax; secure`,
-            // ]);
-            // res.setHeader("set-cookie", [
-            //     `REFRESH_TOKEN=${refreshToken}; httponly; samesite=lax; secure`,
-            // ]);
-            res.cookie("ACCESS_TOKEN", token_1);
-            res.cookie("REFRESH-TOKEN", refreshToken_2, { httpOnly: true });
+            //Send http only cookie to header, then we can read it in /token
+            //Reason why we send it to header is because httponly cookies cannot be read by javascript
+            //eg; we cannot use cookieService.getRefreshToken() and then pass it to /token req.body or header
+            //Note: ORDER IS IMPORTANT, SEND setHeader FIRST EBFORE SENDING cookie!
+            res.setHeader("set-cookie", [
+                "REFRESH_TOKEN=" + refreshToken_2 + "; httponly; samesite=lax;",
+            ]);
+            res.cookie(ACCESS_TOKEN, token_1);
             res.send({
                 token: token_1,
                 refreshToken: refreshToken_2,
@@ -174,8 +181,6 @@ var signUp = function (req, res, next) { return __awaiter(void 0, void 0, void 0
         switch (_a.label) {
             case 0:
                 if (!PRIVATE_KEY) return [3 /*break*/, 12];
-                //If user with given email exists
-                console.log(req.body);
                 email = req.body.email;
                 password = req.body.password;
                 firstName = req.body.firstName;
@@ -230,14 +235,12 @@ var signUp = function (req, res, next) { return __awaiter(void 0, void 0, void 0
             case 8:
                 error_1 = _a.sent();
                 databasePool_1.default.query("ROLLBACK");
-                console.log(error_1);
                 console.log("ROLLBACK TRIGGERED");
                 return [2 /*return*/, res.sendStatus(INTERNAL_SERVER_ERROR_STATUS)];
             case 9: return [3 /*break*/, 11];
             case 10:
                 error_2 = _a.sent();
                 //return next(error);
-                console.log(error_2);
                 return [2 /*return*/, res.sendStatus(INTERNAL_SERVER_ERROR_STATUS)];
             case 11: return [3 /*break*/, 13];
             case 12:

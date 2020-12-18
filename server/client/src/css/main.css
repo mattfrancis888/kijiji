@@ -551,21 +551,27 @@ nav {
   display: flex;
   align-items: center;
 }
-.headerProfileAndPostWrap h1 {
+
+.navAuthStatus {
+  cursor: pointer;
   color: #2681db;
   font-size: 1.5rem;
   margin-right: 1rem;
 }
 @media screen and (min-width: 520px) {
-  .headerProfileAndPostWrap h1 {
+  .navAuthStatus {
     font-size: 2rem;
     margin-right: 1.5rem;
   }
 }
 @media screen and (min-width: 768px) {
-  .headerProfileAndPostWrap h1 {
+  .navAuthStatus {
     font-size: 2rem;
   }
+}
+
+.navAuthStatusHide {
+  display: none;
 }
 
 .postAdButton {

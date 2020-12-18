@@ -5,6 +5,10 @@ import bcrypt from "bcrypt";
 const FORBIDDEN_STATUS = 403;
 const INTERNAL_SERVER_ERROR_STATUS = 500;
 const PRIVATE_KEY = process.env.privateKey;
+
+const ACCESS_TOKEN = "ACCESS_TOKEN";
+const REFRESH_TOKEN = "REFRESH_TOKEN";
+
 const generateAccessToken = (email: string, privateKey: string) => {
     //Generate a token by using user email  and 'secret key'
     //iat- issued at  property is implemented by default
@@ -99,17 +103,27 @@ const authenticateToken = async (token: string, secret: string) => {
     //     https://solidgeargroup.com/en/refresh-token-with-jwt-authentication-node-js/
 };
 
-export const logOut = async (req: Request, res: Response) => {
-    const refreshToken = req.headers["authorization"];
+export const signOut = async (req: Request, res: Response) => {
+    const refreshToken = req.headers["cookie"]
+        ?.split(";")
+        .map((item) => item.trim())
+        .find((str) => str.startsWith(REFRESH_TOKEN))
+        ?.split("=")
+        .pop();
+    console.log(refreshToken);
+    // console.log(req.headers["cookie"]?.split(";").map(item =>item.trim()).find(str => str.startsWith(REFRESH_TOKEN));
     if (refreshToken) {
         pool.query(
             `UPDATE auth SET refresh_token = null WHERE refresh_token = '${refreshToken}'`,
             (error, user) => {
                 if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
-                //Intenral Server Error
-                res.send({ success: "logged out successfully" });
+                res.clearCookie(ACCESS_TOKEN);
+                res.clearCookie(REFRESH_TOKEN);
+                res.send({ token: "" });
             }
         );
+    } else {
+        res.sendStatus(FORBIDDEN_STATUS);
     }
 };
 
@@ -131,19 +145,14 @@ export const signIn = (req: any, res: Response) => {
                 //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
                 //and http only; but POSTMAN will show your cookies
 
-                //Use .setHeader if we are only sending 1 cookie
-                //Use .cookie if we are sending 1 or more cookies
-
-                // res.setHeader("set-cookie", [
-                //     `ACCESS_TOKEN=${token}; samesite=lax; secure`,
-                // ]);
-
-                // res.setHeader("set-cookie", [
-                //     `REFRESH_TOKEN=${refreshToken}; httponly; samesite=lax; secure`,
-                // ]);
-
-                res.cookie("ACCESS_TOKEN", token);
-                res.cookie("REFRESH-TOKEN", refreshToken, { httpOnly: true });
+                //Send http only cookie to header, then we can read it in /token
+                //Reason why we send it to header is because httponly cookies cannot be read by javascript
+                //eg; we cannot use cookieService.getRefreshToken() and then pass it to /token req.body or header
+                //Note: ORDER IS IMPORTANT, SEND setHeader FIRST EBFORE SENDING cookie!
+                res.setHeader("set-cookie", [
+                    `REFRESH_TOKEN=${refreshToken}; httponly; samesite=lax;`,
+                ]);
+                res.cookie(ACCESS_TOKEN, token);
 
                 res.send({
                     token,
@@ -158,7 +167,6 @@ export const signIn = (req: any, res: Response) => {
 export const signUp = async (req: any, res: Response, next: NextFunction) => {
     if (PRIVATE_KEY) {
         //If user with given email exists
-        console.log(req.body);
         const email = req.body.email;
         const password = req.body.password;
         const firstName = req.body.firstName;
@@ -210,13 +218,11 @@ export const signUp = async (req: any, res: Response, next: NextFunction) => {
                 });
             } catch (error) {
                 pool.query("ROLLBACK");
-                console.log(error);
                 console.log("ROLLBACK TRIGGERED");
                 return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
             }
         } catch (error) {
             //return next(error);
-            console.log(error);
             return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
         }
 
