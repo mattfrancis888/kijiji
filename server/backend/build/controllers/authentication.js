@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signUp = exports.signIn = exports.signOut = exports.authenticateAccessToken = exports.refreshToken = void 0;
+exports.signUp = exports.signIn = exports.signOut = exports.authenticateToken = exports.refreshToken = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var bcrypt_1 = __importDefault(require("bcrypt"));
@@ -61,72 +61,56 @@ var generateRefreshToken = function (email, privateKey) {
     return jsonwebtoken_1.default.sign({ subject: email }, privateKey);
 };
 var refreshToken = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var refreshToken_1, user;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                if (!PRIVATE_KEY) return [3 /*break*/, 2];
-                refreshToken_1 = req.headers["authorization"];
-                if (refreshToken_1 === null)
-                    return [2 /*return*/, res.sendStatus(401)];
-                return [4 /*yield*/, authenticateToken(refreshToken_1, PRIVATE_KEY)];
-            case 1:
-                user = _a.sent();
-                if (user === null) {
-                    return [2 /*return*/, res.sendStatus(FORBIDDEN_STATUS)];
+    var refreshToken;
+    var _a, _b;
+    return __generator(this, function (_c) {
+        refreshToken = (_b = (_a = req.headers["cookie"]) === null || _a === void 0 ? void 0 : _a.split(";").map(function (item) { return item.trim(); }).find(function (str) { return str.startsWith(REFRESH_TOKEN); })) === null || _b === void 0 ? void 0 : _b.split("=").pop();
+        if (PRIVATE_KEY && refreshToken) {
+            //Validate token:
+            jsonwebtoken_1.default.verify(refreshToken, PRIVATE_KEY, function (err, user) {
+                if (err)
+                    return res.sendStatus(FORBIDDEN_STATUS);
+            });
+            //Check if token is in database (in the case the attacker forged their own refresh token)
+            databasePool_1.default.query("SELECT email, refresh_token FROM auth WHERE refresh_token = $1", [refreshToken], function (error, user) {
+                if (error) {
+                    return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
                 }
-                //Check if token is in database (in the case the attacker forged their own refresh token)
-                databasePool_1.default.query("SELECT email, refresh_token FROM auth WHERE refresh_token = '" + refreshToken_1 + "'", function (error, user) {
-                    if (error)
-                        return res.send(INTERNAL_SERVER_ERROR_STATUS);
-                    if (user.rowCount === 0) {
-                        return res.sendStatus(FORBIDDEN_STATUS);
-                    }
-                    //If the refresh token matches the one in our database
-                    //Generate a new access token for the user to use
-                    // For acces token,  flags should be "secure: true"
-                    //For refreshtoken "secure: true" and "httpOnly: true"
-                    //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
-                    //and http only; but POSTMAN will show your cookies
-                    var token = generateAccessToken(user.rows[0].email, PRIVATE_KEY);
-                    res.setHeader("set-cookie", [
-                        "ACCESS_TOKEN=" + token + "; samesite=lax; secure",
-                    ]);
-                    res.send({
-                        token: token,
-                    });
+                if (user.rowCount === 0) {
+                    return res.sendStatus(FORBIDDEN_STATUS);
+                }
+                //If the refresh token matches the one in our database
+                //Generate a new access token for the user to use
+                // For acces token,  flags should be "secure: true"
+                //For refreshtoken "secure: true" and "httpOnly: true"
+                //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
+                /// but POSTMAN will show your cookies
+                ////Cookies, when used with the HttpOnly cookie flag, are not accessible through JavaScript, and are immune to XSS
+                var token = generateAccessToken(user.rows[0].email, PRIVATE_KEY);
+                // res.setHeader("set-cookie", [
+                //     `ACCESS_TOKEN=${token}; samesite=lax;`,
+                // ]);
+                res.cookie(ACCESS_TOKEN, token);
+                res.send({
+                    token: token,
                 });
-                return [3 /*break*/, 3];
-            case 2:
-                res.send(FORBIDDEN_STATUS);
-                _a.label = 3;
-            case 3: return [2 /*return*/];
+            });
         }
-    });
-}); };
-exports.refreshToken = refreshToken;
-var authenticateToken = function (token, secret) { return __awaiter(void 0, void 0, void 0, function () {
-    var result;
-    return __generator(this, function (_a) {
-        //Checks if token is still valid / has not expired
-        try {
-            result = jsonwebtoken_1.default.verify(token, secret);
-            return [2 /*return*/, { email: result.email }];
-        }
-        catch (_b) {
-            return [2 /*return*/, null];
+        else {
+            res.send(FORBIDDEN_STATUS);
         }
         return [2 /*return*/];
     });
 }); };
-var authenticateAccessToken = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var token, result;
+exports.refreshToken = refreshToken;
+var authenticateToken = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var token;
     return __generator(this, function (_a) {
         token = req.headers["authorization"];
         if (PRIVATE_KEY && token) {
             try {
-                result = jsonwebtoken_1.default.verify(token, PRIVATE_KEY);
-                // return { email: result.email };
+                //Check if token is valid / has not expired
+                jsonwebtoken_1.default.verify(token, PRIVATE_KEY);
                 next();
             }
             catch (_b) {
@@ -139,7 +123,7 @@ var authenticateAccessToken = function (req, res, next) { return __awaiter(void 
         return [2 /*return*/];
     });
 }); };
-exports.authenticateAccessToken = authenticateAccessToken;
+exports.authenticateToken = authenticateToken;
 var signOut = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var refreshToken;
     var _a, _b;
@@ -165,27 +149,28 @@ var signIn = function (req, res) {
     if (PRIVATE_KEY) {
         //req.user exists because of the done(null, user) used in the Strategies at passport.ts
         // console.log("REQ.USER", req.user.email);
-        var refreshToken_2 = generateRefreshToken(req.user.email, PRIVATE_KEY);
+        var refreshToken_1 = generateRefreshToken(req.user.email, PRIVATE_KEY);
         var token_1 = generateAccessToken(req.user.email, PRIVATE_KEY);
         // Update Refresh token to database
-        databasePool_1.default.query("UPDATE auth\n        SET refresh_token = '" + refreshToken_2 + "' WHERE email = '" + req.user.email + "'", function (error, response) {
+        databasePool_1.default.query("UPDATE auth\n        SET refresh_token = $1 WHERE email = $2", [refreshToken_1, req.user.email], function (error, response) {
             if (error)
                 return res.send(FORBIDDEN_STATUS);
             // For acces token,  flags should be "secure: true"
             //For refreshtoken "secure: true" and "httpOnly: true"
             //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
             //and http only; but POSTMAN will show your cookies
-            //Send http only cookie to header, then we can read it in /token
-            //Reason why we send it to header is because httponly cookies cannot be read by javascript
-            //eg; we cannot use cookieService.getRefreshToken() and then pass it to /token req.body or header
             //Note: ORDER IS IMPORTANT, SEND setHeader FIRST EBFORE SENDING cookie!
-            res.setHeader("set-cookie", [
-                "REFRESH_TOKEN=" + refreshToken_2 + "; httponly; samesite=lax;",
-            ]);
+            // res.setHeader("set-cookie", [
+            //     `REFRESH_TOKEN=${refreshToken}; httponly;`,
+            // ]);
+            res.cookie(REFRESH_TOKEN, refreshToken_1, {
+                httpOnly: true,
+                sameSite: true,
+            });
             res.cookie(ACCESS_TOKEN, token_1);
             res.send({
                 token: token_1,
-                refreshToken: refreshToken_2,
+                refreshToken: refreshToken_1,
             });
         });
     }

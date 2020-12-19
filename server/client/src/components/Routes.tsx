@@ -10,7 +10,7 @@ const Routes: React.FC<{}> = () => {
             <Header />
             <Switch>
                 <Route path="/" exact component={Register} />
-                <Route path="/sign-in" exact component={SignIn} />
+                <Route path="/signin" exact component={SignIn} />
                 <Route path="/post-ad" exact component={PostAd} />
             </Switch>
         </React.Fragment>

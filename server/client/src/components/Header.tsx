@@ -43,7 +43,7 @@ const Header: React.FC<IHeader> = (props) => {
                                 : "navAuthStatus"
                         }
                         onClick={() => {
-                            history.push("/");
+                            history.push("/signin");
                         }}
                     >
                         Sign in

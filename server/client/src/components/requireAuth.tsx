@@ -3,12 +3,12 @@ import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import { History } from "history";
 import { validateToken } from "../actions";
-
+import { useLocation } from "react-router-dom";
+import history from "../browserHistory";
 export interface IHoc {
     authStatus?: string | null;
     history: History;
     validateToken(path: string, token: string): void;
-    // path: string;
 }
 const hoc = (ChildComponent: any) => {
     class ComposedComponent extends Component<IHoc> {
@@ -31,7 +31,10 @@ const hoc = (ChildComponent: any) => {
                 this.props.history.push("/");
             } else {
                 //validate access token, if it's not valid, redux's authStatus would be empty
-                this.props.validateToken("/post-ad", this.props.authStatus);
+                this.props.validateToken(
+                    history.location.pathname,
+                    this.props.authStatus
+                );
             }
         }
 

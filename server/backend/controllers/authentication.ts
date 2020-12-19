@@ -25,32 +25,32 @@ const generateRefreshToken = (email: string, privateKey: string) => {
 };
 
 export const refreshToken = async (req: any, res: Response) => {
-    //Generates a new access token by using refresh token in header
+    //Generates a new access token by using refresh token
 
-    if (PRIVATE_KEY) {
-        const refreshToken = req.headers["authorization"];
+    //REFRESH_TOKEN cookie is automatically sent in POST request because we made an httponly cookie at /signin
+    //and withCredentials:true sends the request and automatically includes the httponly cookie.
+    //Cookies that don't have httponly will not be sent automatically.
+    const refreshToken = req.headers["cookie"]
+        ?.split(";")
+        .map((item: any) => item.trim())
+        .find((str: string) => str.startsWith(REFRESH_TOKEN))
+        ?.split("=")
+        .pop();
 
-        if (refreshToken === null) return res.sendStatus(401);
-        // Unauthorized access
-
-        //Check if token is valid / has not expired
-
-        //Using callback:
-        // jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        //     if (err) return res.sendStatus(403)
-        //   })
-        //Using async await
-        const user = await authenticateToken(refreshToken, PRIVATE_KEY);
-
-        if (user === null) {
-            return res.sendStatus(FORBIDDEN_STATUS);
-        }
+    if (PRIVATE_KEY && refreshToken) {
+        //Validate token:
+        jwt.verify(refreshToken, PRIVATE_KEY, (err: any, user: any) => {
+            if (err) return res.sendStatus(FORBIDDEN_STATUS);
+        });
 
         //Check if token is in database (in the case the attacker forged their own refresh token)
         pool.query(
-            `SELECT email, refresh_token FROM auth WHERE refresh_token = '${refreshToken}'`,
+            `SELECT email, refresh_token FROM auth WHERE refresh_token = $1`,
+            [refreshToken],
             (error, user) => {
-                if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
+                if (error) {
+                    return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+                }
                 if (user.rowCount === 0) {
                     return res.sendStatus(FORBIDDEN_STATUS);
                 }
@@ -62,35 +62,43 @@ export const refreshToken = async (req: any, res: Response) => {
                 //For refreshtoken "secure: true" and "httpOnly: true"
 
                 //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
-                //and http only; but POSTMAN will show your cookies
+                /// but POSTMAN will show your cookies
+                ////Cookies, when used with the HttpOnly cookie flag, are not accessible through JavaScript, and are immune to XSS
                 const token = generateAccessToken(
                     user.rows[0].email,
                     PRIVATE_KEY
                 );
-                res.setHeader("set-cookie", [
-                    `ACCESS_TOKEN=${token}; samesite=lax; secure`,
-                ]);
+                // res.setHeader("set-cookie", [
+                //     `ACCESS_TOKEN=${token}; samesite=lax;`,
+                // ]);
+                res.cookie(ACCESS_TOKEN, token);
 
                 res.send({
                     token,
                 });
             }
         );
-
-        //Cookies, when used with the HttpOnly cookie flag, are not accessible through JavaScript, and are immune to XS
     } else {
         res.send(FORBIDDEN_STATUS);
     }
 };
 
-const authenticateToken = async (token: string, secret: string) => {
-    //Checks if token is still valid / has not expired
-
-    try {
-        const result: any = jwt.verify(token, secret);
-        return { email: result.email };
-    } catch {
-        return null;
+export const authenticateToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const token = req.headers["authorization"];
+    if (PRIVATE_KEY && token) {
+        try {
+            //Check if token is valid / has not expired
+            jwt.verify(token, PRIVATE_KEY);
+            next();
+        } catch {
+            return res.sendStatus(FORBIDDEN_STATUS);
+        }
+    } else {
+        res.sendStatus(FORBIDDEN_STATUS);
     }
 
     //     Note: To validate token, you could use authenticateToken above
@@ -103,30 +111,11 @@ const authenticateToken = async (token: string, secret: string) => {
     //     https://solidgeargroup.com/en/refresh-token-with-jwt-authentication-node-js/
 };
 
-export const authenticateAccessToken = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    const token = req.headers["authorization"];
-    if (PRIVATE_KEY && token) {
-        try {
-            const result: any = jwt.verify(token, PRIVATE_KEY);
-            // return { email: result.email };
-            next();
-        } catch {
-            return res.sendStatus(FORBIDDEN_STATUS);
-        }
-    } else {
-        res.sendStatus(FORBIDDEN_STATUS);
-    }
-};
-
 export const signOut = async (req: Request, res: Response) => {
     const refreshToken = req.headers["cookie"]
         ?.split(";")
-        .map((item) => item.trim())
-        .find((str) => str.startsWith(REFRESH_TOKEN))
+        .map((item: any) => item.trim())
+        .find((str: string) => str.startsWith(REFRESH_TOKEN))
         ?.split("=")
         .pop();
 
@@ -154,7 +143,8 @@ export const signIn = (req: any, res: Response) => {
         // Update Refresh token to database
         pool.query(
             `UPDATE auth
-        SET refresh_token = '${refreshToken}' WHERE email = '${req.user.email}'`,
+        SET refresh_token = $1 WHERE email = $2`,
+            [refreshToken, req.user.email],
             (error, response) => {
                 if (error) return res.send(FORBIDDEN_STATUS);
                 // For acces token,  flags should be "secure: true"
@@ -163,13 +153,14 @@ export const signIn = (req: any, res: Response) => {
                 //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
                 //and http only; but POSTMAN will show your cookies
 
-                //Send http only cookie to header, then we can read it in /token
-                //Reason why we send it to header is because httponly cookies cannot be read by javascript
-                //eg; we cannot use cookieService.getRefreshToken() and then pass it to /token req.body or header
                 //Note: ORDER IS IMPORTANT, SEND setHeader FIRST EBFORE SENDING cookie!
-                res.setHeader("set-cookie", [
-                    `REFRESH_TOKEN=${refreshToken}; httponly; samesite=lax;`,
-                ]);
+                // res.setHeader("set-cookie", [
+                //     `REFRESH_TOKEN=${refreshToken}; httponly;`,
+                // ]);
+                res.cookie(REFRESH_TOKEN, refreshToken, {
+                    httpOnly: true,
+                    sameSite: true,
+                });
                 res.cookie(ACCESS_TOKEN, token);
 
                 res.send({
