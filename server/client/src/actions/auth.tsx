@@ -3,6 +3,9 @@ import auth from "./axiosConfig";
 import axios from "axios";
 import { Dispatch } from "redux";
 import history from "../browserHistory";
+import CookieService from "../CookieService";
+
+const cookieService = CookieService.getService();
 export interface JWTType {
     token: string;
 }
@@ -15,6 +18,10 @@ export interface AuthErrorAction {
     payload: string;
 }
 
+export interface RefetchingAccessTokenAction {
+    type: ActionTypes.REFETCHING_ACCESS_TOKEN;
+    payload: boolean;
+}
 export const signUp = (formValues: any) => async (dispatch: Dispatch) => {
     try {
         const response = await auth.post<JWTType>("/signup", formValues);
@@ -67,32 +74,29 @@ export const signOut = () => async (dispatch: Dispatch) => {
     }
 };
 
-export const validateToken = (path: string, token: string) => async (
+export const validateToken = (path: string, retriedCalling: boolean) => async (
     dispatch: Dispatch
 ) => {
     try {
-        await auth.post<JWTType>(
+        const response = await auth.post<JWTType>(
             path,
-            {},
-            { headers: { Authorization: token } }
+            {}
+            // { headers: { Authorization: cookieService.getAccessToken() } } //assigned in axios' interceptors.request
         );
-    } catch (err) {
-        dispatch<AuthErrorAction>({
-            type: ActionTypes.AUTH_ERROR,
-            payload: "",
+        //Ensures that our current access token is the newest one; if a new access token is given,
+        //we will update our current access token
+        dispatch<AuthUserAction>({
+            type: ActionTypes.AUTH_USER,
+            payload: response.data,
         });
+    } catch (err) {
+        console.log("retriedCalling", retriedCalling);
+        if (retriedCalling !== true) {
+            //Invalid token, kick our users out from a certain resource only accecible to signed in users
+            dispatch<AuthErrorAction>({
+                type: ActionTypes.AUTH_ERROR,
+                payload: "",
+            });
+        }
     }
 };
-
-// export const refresh = () => async (dispatch: Dispatch) => {
-//     try {
-//         const response = await auth.post<JWTType>("/refresh");
-//         dispatch<AuthUserAction>({
-//             type: ActionTypes.AUTH_USER,
-//             payload: response.data,
-//         });
-//         alert("Logged out succesfully");
-//     } catch (err) {
-
-//     }
-// };

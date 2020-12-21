@@ -45,7 +45,5 @@ router.post("/signin", requireSignIn, authentication_1.signIn);
 router.post("/signup", authentication_1.signUp);
 router.post("/token", authentication_1.refreshToken);
 router.post("/signout", authentication_1.signOut);
-router.post("/post-ad", authentication_1.authenticateToken, function (req, res) {
-    res.send("success");
-});
+router.post("/post-ad", authentication_1.authenticateToken);
 exports.default = router;

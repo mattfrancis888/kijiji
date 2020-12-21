@@ -21,6 +21,13 @@ import Cookies from "js-cookie";
 //     return <Provider store={store}>{props.children}</Provider>;
 // };
 
+export const store = createStore(
+    reducers,
+    { authStatus: { authenticated: Cookies.get("ACCESS_TOKEN") } },
+    //if our inital state (authStauts) has a token from local storage, keep them logged in
+    composeWithDevTools(applyMiddleware(reduxThunk))
+);
+
 interface IProps {
     initialState?: {};
     //Optional property so that not every file has to use initialState (initialState is used for testing)
@@ -28,12 +35,12 @@ interface IProps {
     // any other props that come into the component
 }
 const provider = ({ initialState = {}, children }: IProps) => {
-    const store = createStore(
-        reducers,
-        { authStatus: { authenticated: Cookies.get("ACCESS_TOKEN") } },
-        //if our inital state (authStauts) has a token from local storage, keep them logged in
-        composeWithDevTools(applyMiddleware(reduxThunk))
-    );
+    // const store = createStore(
+    //     reducers,
+    //     { authStatus: { authenticated: Cookies.get("ACCESS_TOKEN") } },
+    //     //if our inital state (authStauts) has a token from local storage, keep them logged in
+    //     composeWithDevTools(applyMiddleware(reduxThunk))
+    // );
 
     return <Provider store={store}>{children}</Provider>;
 };

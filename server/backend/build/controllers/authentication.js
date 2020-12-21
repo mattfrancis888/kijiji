@@ -111,9 +111,11 @@ var authenticateToken = function (req, res, next) { return __awaiter(void 0, voi
             try {
                 //Check if token is valid / has not expired
                 jsonwebtoken_1.default.verify(token, PRIVATE_KEY);
-                next();
+                res.send({ token: token });
+                // next();
             }
-            catch (_b) {
+            catch (error) {
+                console.log("authenticateTokenError", error);
                 return [2 /*return*/, res.sendStatus(FORBIDDEN_STATUS)];
             }
         }

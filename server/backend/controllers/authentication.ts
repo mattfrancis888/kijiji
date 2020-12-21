@@ -93,8 +93,10 @@ export const authenticateToken = async (
         try {
             //Check if token is valid / has not expired
             jwt.verify(token, PRIVATE_KEY);
-            next();
-        } catch {
+            res.send({ token });
+            // next();
+        } catch (error) {
+            console.log("authenticateTokenError", error);
             return res.sendStatus(FORBIDDEN_STATUS);
         }
     } else {
