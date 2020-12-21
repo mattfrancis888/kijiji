@@ -18,7 +18,7 @@ var app = express_1.default();
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(body_parser_1.default.json());
 app.use(cookie_parser_1.default());
-app.use(cors_1.default());
+app.use(cors_1.default({ origin: true, credentials: true }));
 console.log("NODE ENV", process.env.NODE_ENV);
 app.use("/", routes_1.default);
 app.get("/", function (req, res) {

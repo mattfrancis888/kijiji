@@ -5,6 +5,10 @@ import bcrypt from "bcrypt";
 const FORBIDDEN_STATUS = 403;
 const INTERNAL_SERVER_ERROR_STATUS = 500;
 const PRIVATE_KEY = process.env.privateKey;
+
+const ACCESS_TOKEN = "ACCESS_TOKEN";
+const REFRESH_TOKEN = "REFRESH_TOKEN";
+
 const generateAccessToken = (email: string, privateKey: string) => {
     //Generate a token by using user email  and 'secret key'
     //iat- issued at  property is implemented by default
@@ -21,32 +25,32 @@ const generateRefreshToken = (email: string, privateKey: string) => {
 };
 
 export const refreshToken = async (req: any, res: Response) => {
-    //Generates a new access token by using refresh token in header
+    //Generates a new access token by using refresh token
 
-    if (PRIVATE_KEY) {
-        const refreshToken = req.headers["authorization"];
+    //REFRESH_TOKEN cookie is automatically sent in POST request because we made an httponly cookie at /signin
+    //and withCredentials:true sends the request and automatically includes the httponly cookie.
+    //Cookies that don't have httponly will not be sent automatically.
+    const refreshToken = req.headers["cookie"]
+        ?.split(";")
+        .map((item: any) => item.trim())
+        .find((str: string) => str.startsWith(REFRESH_TOKEN))
+        ?.split("=")
+        .pop();
 
-        if (refreshToken === null) return res.sendStatus(401);
-        // Unauthorized access
-
-        //Check if token is valid / has not expired
-
-        //Using callback:
-        // jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        //     if (err) return res.sendStatus(403)
-        //   })
-        //Using async await
-        const user = await authenticateToken(refreshToken, PRIVATE_KEY);
-
-        if (user === null) {
-            return res.sendStatus(FORBIDDEN_STATUS);
-        }
+    if (PRIVATE_KEY && refreshToken) {
+        //Validate token:
+        jwt.verify(refreshToken, PRIVATE_KEY, (err: any, user: any) => {
+            if (err) return res.sendStatus(FORBIDDEN_STATUS);
+        });
 
         //Check if token is in database (in the case the attacker forged their own refresh token)
         pool.query(
-            `SELECT email, refresh_token FROM auth WHERE refresh_token = '${refreshToken}'`,
+            `SELECT email, refresh_token FROM auth WHERE refresh_token = $1`,
+            [refreshToken],
             (error, user) => {
-                if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
+                if (error) {
+                    return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+                }
                 if (user.rowCount === 0) {
                     return res.sendStatus(FORBIDDEN_STATUS);
                 }
@@ -56,34 +60,47 @@ export const refreshToken = async (req: any, res: Response) => {
 
                 // For acces token,  flags should be "secure: true"
                 //For refreshtoken "secure: true" and "httpOnly: true"
+
+                //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
+                /// but POSTMAN will show your cookies
+                ////Cookies, when used with the HttpOnly cookie flag, are not accessible through JavaScript, and are immune to XSS
                 const token = generateAccessToken(
                     user.rows[0].email,
                     PRIVATE_KEY
                 );
-                res.setHeader("set-cookie", [
-                    `ACCESS_TOKEN=${token}; samesite=lax; secure`,
-                ]);
+                // res.setHeader("set-cookie", [
+                //     `ACCESS_TOKEN=${token}; samesite=lax;`,
+                // ]);
+                res.cookie(ACCESS_TOKEN, token);
 
                 res.send({
                     token,
                 });
             }
         );
-
-        //Cookies, when used with the HttpOnly cookie flag, are not accessible through JavaScript, and are immune to XS
     } else {
         res.send(FORBIDDEN_STATUS);
     }
 };
 
-const authenticateToken = async (token: string, secret: string) => {
-    //Checks if token is still valid / has not expired
-    
-    try {
-        const result: any = jwt.verify(token, secret);
-        return { email: result.email };
-    } catch {
-        return null;
+export const authenticateToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const token = req.headers["authorization"];
+    if (PRIVATE_KEY && token) {
+        try {
+            //Check if token is valid / has not expired
+            jwt.verify(token, PRIVATE_KEY);
+            res.send({ token });
+            // next();
+        } catch (error) {
+            console.log("authenticateTokenError", error);
+            return res.sendStatus(FORBIDDEN_STATUS);
+        }
+    } else {
+        res.sendStatus(FORBIDDEN_STATUS);
     }
 
     //     Note: To validate token, you could use authenticateToken above
@@ -96,21 +113,28 @@ const authenticateToken = async (token: string, secret: string) => {
     //     https://solidgeargroup.com/en/refresh-token-with-jwt-authentication-node-js/
 };
 
-export const logOut =  async (req: Request, res: Response) => {
-    const refreshToken =  req.headers["authorization"]
+export const signOut = async (req: Request, res: Response) => {
+    const refreshToken = req.headers["cookie"]
+        ?.split(";")
+        .map((item: any) => item.trim())
+        .find((str: string) => str.startsWith(REFRESH_TOKEN))
+        ?.split("=")
+        .pop();
+
     if (refreshToken) {
         pool.query(
             `UPDATE auth SET refresh_token = null WHERE refresh_token = '${refreshToken}'`,
             (error, user) => {
                 if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
-                //Intenral Server Error
-                res.send({"success": "logged out successfully"})
+                res.clearCookie(ACCESS_TOKEN);
+                res.clearCookie(REFRESH_TOKEN);
+                res.send({ token: "" });
             }
         );
+    } else {
+        res.sendStatus(FORBIDDEN_STATUS);
     }
-
-
-})
+};
 
 export const signIn = (req: any, res: Response) => {
     if (PRIVATE_KEY) {
@@ -121,18 +145,25 @@ export const signIn = (req: any, res: Response) => {
         // Update Refresh token to database
         pool.query(
             `UPDATE auth
-        SET refresh_token = '${refreshToken}' WHERE email = '${req.user.email}'`,
+        SET refresh_token = $1 WHERE email = $2`,
+            [refreshToken, req.user.email],
             (error, response) => {
-                if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
+                if (error) return res.send(FORBIDDEN_STATUS);
                 // For acces token,  flags should be "secure: true"
                 //For refreshtoken "secure: true" and "httpOnly: true"
-                res.setHeader("set-cookie", [
-                    `ACCESS_TOKEN=${token}; samesite=lax; secure`,
-                ]);
 
-                res.setHeader("set-cookie", [
-                    `REFRESH_TOKEN=${refreshToken}; httponly; samesite=lax; secure`,
-                ]);
+                //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
+                //and http only; but POSTMAN will show your cookies
+
+                //Note: ORDER IS IMPORTANT, SEND setHeader FIRST EBFORE SENDING cookie!
+                // res.setHeader("set-cookie", [
+                //     `REFRESH_TOKEN=${refreshToken}; httponly;`,
+                // ]);
+                res.cookie(REFRESH_TOKEN, refreshToken, {
+                    httpOnly: true,
+                    sameSite: true,
+                });
+                res.cookie(ACCESS_TOKEN, token);
 
                 res.send({
                     token,
@@ -144,11 +175,13 @@ export const signIn = (req: any, res: Response) => {
         res.send(FORBIDDEN_STATUS);
     }
 };
-export const signUp = (req: any, res: Response, next: NextFunction) => {
+export const signUp = async (req: any, res: Response, next: NextFunction) => {
     if (PRIVATE_KEY) {
         //If user with given email exists
         const email = req.body.email;
         const password = req.body.password;
+        const firstName = req.body.firstName;
+        const lastName = req.body.lastName;
 
         const UNPROCESSABLE_ENTITY_STATUS = 422;
         //Email or password not given
@@ -158,45 +191,56 @@ export const signUp = (req: any, res: Response, next: NextFunction) => {
                 .send({ error: "Email and password must be provided" });
         }
 
-        //If email already exist, return an error
-        pool.query(
-            `SELECT * from auth WHERE email = '${email}'`,
-            (error, response) => {
-                if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
+        try {
+            //If a user with email does NOT exist
+            const checkEmailResponse = await pool.query(
+                `SELECT * from auth WHERE email = '${email}'`
+            );
 
-                //User already exist
-                if (response.rows.length > 0) {
-                    //422 is UNPROCESSABLE_ETITY; data user gave was "bad/unproceesssed"
-                    return res
-                        .status(UNPROCESSABLE_ENTITY_STATUS)
-                        .send({ error: "Email in use" });
-                }
-
-                //If a user with email does NOT exist
-                const saltRounds = 10;
-                bcrypt.hash(password, saltRounds, (err, hash) => {
-                    // Now we can store the password hash in db.
-                    if (err) {
-                        return next(err);
-                    }
-                    console.log(hash);
-                    //Override current text password with hash
-                    const hashedPassword = hash;
-                    pool.query(
-                        `INSERT INTO auth(email, password, refresh_token)VALUES('${email}', '${hashedPassword}', 'abcdefg')`,
-                        (error, response) => {
-                            if (error) return next(error);
-                            //Generate a token when user signs in, this token will be used so that they can access protected routes
-
-                            res.send({
-                                token: generateAccessToken(email, PRIVATE_KEY),
-                            });
-                            //Respond to request indicating user was created
-                        }
-                    );
-                });
+            //User already exist
+            if (checkEmailResponse.rows.length > 0) {
+                //422 is UNPROCESSABLE_ETITY; data user gave was "bad/unproceesssed"
+                return res
+                    .status(UNPROCESSABLE_ENTITY_STATUS)
+                    .send({ error: "Email in use" });
             }
-        );
+
+            const saltRounds = 10;
+            const hash = await bcrypt.hash(password, saltRounds);
+            /// Now we can store the password hash in db.
+            //Override current text password with hash
+            const hashedPassword = hash;
+            try {
+                //Using transactions with psql pool:
+                //https://kb.objectrocket.com/postgresql/nodejs-and-the-postgres-transaction-968
+                await pool.query("BEGIN");
+                await pool.query(
+                    ` INSERT INTO auth(email, password)VALUES($1, $2)`,
+                    [email, hashedPassword]
+                );
+                await pool.query(
+                    ` INSERT INTO user_info(first_name, last_name, email)VALUES($1, $2, $3);`,
+                    [firstName, lastName, email]
+                );
+                pool.query("COMMIT");
+                //Generate a token when user signs in, this token will be used so that they can access protected routes
+                res.send({
+                    token: generateAccessToken(email, PRIVATE_KEY),
+                });
+            } catch (error) {
+                pool.query("ROLLBACK");
+                console.log("ROLLBACK TRIGGERED");
+                return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+            }
+        } catch (error) {
+            //return next(error);
+            return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+        }
+
+        // START TRANSACTION;
+        //     INSERT INTO auth(email, password)VALUES($1, $2);
+        //     INSERT INTO user_info(first_name, last_name, email)VALUES($3, $4, $5);
+        // COMMIT
     } else {
         res.send(FORBIDDEN_STATUS);
     }

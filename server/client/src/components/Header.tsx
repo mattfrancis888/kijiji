@@ -1,8 +1,18 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
+import { connect } from "react-redux";
+import { signOut } from "../actions";
+import { StoreState } from "../reducers";
+import CookieService from "../CookieService";
 
-const Header: React.FC<{}> = () => {
-    //const history = useHistory();
+interface IHeader {
+    authStatus?: string | null;
+    signOut(): void;
+}
+
+const Header: React.FC<IHeader> = (props) => {
+    const history = useHistory();
     return (
         <nav>
             <div className="headerInfoWrap">
@@ -14,13 +24,61 @@ const Header: React.FC<{}> = () => {
                     />
                 </Link>
                 <div className="headerProfileAndPostWrap">
-                    <h1 className="register">Register</h1>
-                    <h1 className="signIn">Sign in</h1>
-                    <button className="postAdButton">Post Ad</button>
+                    <h1
+                        className={
+                            props.authStatus
+                                ? "navAuthStatusHide"
+                                : "navAuthStatus"
+                        }
+                        onClick={() => {
+                            history.push("/signup");
+                        }}
+                    >
+                        Register
+                    </h1>
+                    <h1
+                        className={
+                            props.authStatus
+                                ? "navAuthStatusHide"
+                                : "navAuthStatus"
+                        }
+                        onClick={() => {
+                            history.push("/signin");
+                        }}
+                    >
+                        Sign in
+                    </h1>
+                    <h1
+                        className={
+                            props.authStatus
+                                ? "navAuthStatus"
+                                : "navAuthStatusHide"
+                        }
+                        onClick={() => {
+                            props.signOut();
+                        }}
+                    >
+                        Sign Out
+                    </h1>
+
+                    <button
+                        onClick={() => {
+                            history.push("/post-ad");
+                        }}
+                        className="postAdButton"
+                    >
+                        Post Ad
+                    </button>
                 </div>
             </div>
         </nav>
     );
 };
 
-export default Header;
+const mapStateToProps = (state: StoreState) => {
+    return {
+        authStatus: state.authStatus.authenticated,
+    };
+};
+
+export default connect(mapStateToProps, { signOut })(Header);
