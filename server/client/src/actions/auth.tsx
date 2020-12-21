@@ -18,10 +18,6 @@ export interface AuthErrorAction {
     payload: string;
 }
 
-export interface RefetchingAccessTokenAction {
-    type: ActionTypes.REFETCHING_ACCESS_TOKEN;
-    payload: boolean;
-}
 export const signUp = (formValues: any) => async (dispatch: Dispatch) => {
     try {
         const response = await auth.post<JWTType>("/signup", formValues);
@@ -90,13 +86,16 @@ export const validateToken = (path: string, retriedCalling: boolean) => async (
             payload: response.data,
         });
     } catch (err) {
-        console.log("retriedCalling", retriedCalling);
-        if (retriedCalling !== true) {
-            //Invalid token, kick our users out from a certain resource only accecible to signed in users
-            dispatch<AuthErrorAction>({
-                type: ActionTypes.AUTH_ERROR,
-                payload: "",
-            });
+        if (retriedCalling === true) {
+            // If it fails again with the new access token (might be a forged token)
+            // Invalid token, kick our users out from a certain resource only accecible to signed in users
+            // dispatch<AuthErrorAction>({
+            //     type: ActionTypes.AUTH_ERROR,
+            //     payload: "",
+            // });
+
+            //Log them out
+            dispatch(signOut() as any);
         }
     }
 };

@@ -9,7 +9,6 @@ import history from "../browserHistory";
 
 export interface IHoc {
     authStatus?: string | null;
-    refetchingAccessToken: boolean;
     history: History;
     validateToken(path: string, retriedCalling: boolean): void;
 }
@@ -35,11 +34,10 @@ const hoc = (ChildComponent: any) => {
                 //If done loading
                 this.props.history.push("/");
             } else {
+                //When user enter a page,
                 //validate access token, if it's not valid, redux's authStatus would be empty
-                this.props.validateToken(
-                    history.location.pathname,
-                    this.props.refetchingAccessToken
-                );
+
+                this.props.validateToken(history.location.pathname, false);
             }
         }
 
@@ -51,7 +49,6 @@ const hoc = (ChildComponent: any) => {
     function mapStateToProps(state: StoreState) {
         return {
             authStatus: state.authStatus.authenticated,
-            refetchingAccessToken: state.refetchingAccessToken.status,
         };
     }
 

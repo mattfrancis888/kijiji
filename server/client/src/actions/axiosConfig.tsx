@@ -39,16 +39,17 @@ auth.interceptors.response.use(
     },
     (error) => {
         //Catches 403 error from our axios request
-        console.log("INTERCEPTOR RES - ERROR", error.config._retry);
         // throw error; //Throw error to action creator so it can be caught
         const originalRequest = error.config;
 
         //If my refresh token is not valid then my endpoint(/token) will come with 401 status code and
         // If we do not handle it then it will go in an infinite loop.
         // here is my condition to stop going in an infinite loop,
-        if (error.response.status === 401 && originalRequest.url === "/token") {
-            return Promise.reject(error);
-        }
+
+        //But in this project, our refresh token will not expire to make things simpler :)
+        // if (error.response.status === 401 && originalRequest.url === "/token") {
+        //     return Promise.reject(error);
+        // }
 
         if (error.response.status === 403 && !originalRequest._retry) {
             //ALL 403 errors are because of invalid tokens
@@ -66,8 +67,8 @@ auth.interceptors.response.use(
                     );
 
                     //flow:
-                    //click on post-ad - > post-ad with expired token -> returns 403 -> refrsh token is called
-                    //use refresh token in Authorization header (via axios interceptor response) -> trigger post-ad again
+                    //click on post-ad - > validate token in HOC ->  if post-ad with expired token -> returns 403 -> refrsh token is called
+                    //use refresh token in Authorization header (via axios interceptor response) -> trigger post-ad again with store.dispatch(validateToken(..))
                 })
                 .catch((error) => {
                     return Promise.reject(error);
