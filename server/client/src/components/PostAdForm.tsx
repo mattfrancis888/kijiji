@@ -1,4 +1,4 @@
-import React, { ComponentType, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
     Field,
     reduxForm,
@@ -11,6 +11,8 @@ import {
 import { StoreState } from "../reducers";
 import { connect } from "react-redux";
 import { PostAdFormProps } from "./PostAd";
+import postAdListingImagePlaceHolder from "../img/postAdListingImagePlaceHolder.png";
+
 //Re-usable component
 export interface RegisterFormValues {
     title: string;
@@ -87,6 +89,12 @@ const renderDropDown = ({
 const PostAdForm: React.FC<
     PostAdFormProps & InjectedFormProps<{}, PostAdFormProps>
 > = (props) => {
+    const [listingImage, setListingImage] = useState(null);
+    console.log(listingImage);
+    // useEffect(() => {
+
+    // }, [listingImage]);
+    const openFileExplorer = useRef(null);
     const onSubmit = (formValues: any, dispatch: any) => {
         //onSubmit's default param is any
         //event.preventDefault() is automatically called with handleSubmit, a redux-form property
@@ -143,6 +151,49 @@ const PostAdForm: React.FC<
                         component={renderDropDown}
                         optionValues={["black"]}
                     ></Field>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        ref={openFileExplorer}
+                        onChange={
+                            (event) =>
+                                setListingImage(
+                                    URL.createObjectURL(event.target.files[0])
+                                )
+                            // console.log(
+                            //     `Selected file - ${event.target.files[0].name}`
+                            // )
+                            //https://medium.com/@650egor/react-30-day-challenge-day-2-image-upload-preview-2d534f8eaaa
+                        }
+                    />
+                </div>
+
+                <div className="postAdFieldSection">
+                    <div className="postAdFieldTitleWrap">
+                        <h1>Add a photo for your ad</h1>
+                        <h3 className="authFormFieldTitleEmailInUse">
+                            {props.authStatus}
+                        </h3>
+                    </div>
+
+                    <input
+                        type="button"
+                        value="Choose Files!"
+                        className="postAdChooseListingImage"
+                        onClick={() => openFileExplorer.current.click()}
+                        style={
+                            listingImage
+                                ? {
+                                      backgroundImage: `url(${listingImage})`,
+                                      backgroundPosition: "cover",
+                                      backgroundColor: "white",
+                                  }
+                                : {
+                                      backgroundImage: `url(${postAdListingImagePlaceHolder})`,
+                                  }
+                        }
+                    />
                 </div>
 
                 <button className="postAdFormSubmit">Post Your Ad</button>
