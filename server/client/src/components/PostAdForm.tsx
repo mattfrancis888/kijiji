@@ -44,8 +44,6 @@ const renderTextInput = ({ input, label, meta, placeHolder }: any) => {
 };
 
 const renderTextArea = ({ input, label, meta, placeHolder }: any) => {
-    //"component" property automatically passes props to argument, it has {input properties and meta properties}
-    //"label" automatically passes props to arguments
     return (
         <div className="postAdTextAreaWrap">
             {/* <label>{label}</label> */}
@@ -57,10 +55,35 @@ const renderTextArea = ({ input, label, meta, placeHolder }: any) => {
             {renderError(meta)}
         </div>
     );
+};
+
+const renderDropDown = ({
+    input,
+    label,
+    meta,
+    placeHolder,
+    optionValues,
+}: any) => {
+    return (
+        <div>
+            {/* <label>{label}</label> */}
+            <select
+                className="createPostAdDropDown"
+                {...input}
+                autoComplete="off"
+            >
+                <option></option>
+                {optionValues.map((hi) => (
+                    <option value="#00ff00">{hi}</option>
+                ))}
+            </select>
+
+            {renderError(meta)}
+        </div>
+    );
     //{..input} is shortcut for redux-form; where you take all the input from "component's" props and pass it as
     //props to <input>
 };
-
 const PostAdForm: React.FC<
     PostAdFormProps & InjectedFormProps<{}, PostAdFormProps>
 > = (props) => {
@@ -107,6 +130,19 @@ const PostAdForm: React.FC<
                         type="text"
                         component={renderTextArea}
                     />
+                </div>
+                <div className="postAdFieldSection">
+                    <div className="postAdFieldTitleWrap">
+                        <h1>Category</h1>
+                        <h3 className="authFormFieldTitleEmailInUse">
+                            {props.authStatus}
+                        </h3>
+                    </div>
+                    <Field
+                        name="categoryOfAd"
+                        component={renderDropDown}
+                        optionValues={["black"]}
+                    ></Field>
                 </div>
 
                 <button className="postAdFormSubmit">Post Your Ad</button>
