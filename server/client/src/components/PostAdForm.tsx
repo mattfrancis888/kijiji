@@ -12,6 +12,8 @@ import { StoreState } from "../reducers";
 import { connect } from "react-redux";
 import { PostAdFormProps } from "./PostAd";
 import postAdListingImagePlaceHolder from "../img/postAdListingImagePlaceHolder.png";
+import { CANADIAN_PROVINCES, CANADIAN_PROVINCE_AND_CITIES } from "../constants";
+import { formValueSelector } from "redux-form";
 
 //Re-usable component
 export interface RegisterFormValues {
@@ -81,7 +83,7 @@ const renderDropDown = ({
             >
                 <option></option>
                 {optionValues.map((val) => (
-                    <option value="#00ff00">{val}</option>
+                    <option value={val}>{val}</option>
                 ))}
             </select>
 
@@ -108,17 +110,11 @@ const PostAdForm: React.FC<
     PostAdFormProps & InjectedFormProps<{}, PostAdFormProps>
 > = (props) => {
     const [listingImage, setListingImage] = useState(null);
-
+    console.log("PROVINCE VAL", props.provinceValue);
     const openFileExplorer = useRef(null);
-    const onSubmit = (formValues: any, dispatch: any) => {
-        //onSubmit's default param is any
-        //event.preventDefault() is automatically called with handleSubmit, a redux-form property
-        //form values are the values from the fields that redux-form automatiacally passes
-        //after clicking the submit button
-        //dispatch(reset("registerForm"));
-        props.onSubmit(formValues);
 
-        //dispatch(change("registerForm", "password", ""));
+    const onSubmit = (formValues: any, dispatch: any) => {
+        props.onSubmit(formValues);
     };
 
     return (
@@ -206,7 +202,10 @@ const PostAdForm: React.FC<
                     <Field
                         name="province"
                         type="text"
-                        component={renderTextInput}
+                        component={renderDropDown}
+                        optionValues={CANADIAN_PROVINCES.map((province) => {
+                            return province.name;
+                        })}
                     />
                 </div>
 
@@ -217,7 +216,16 @@ const PostAdForm: React.FC<
                     <Field
                         name="city"
                         type="text"
-                        component={renderTextInput}
+                        component={renderDropDown}
+                        optionValues={
+                            !props.provinceValue
+                                ? []
+                                : CANADIAN_PROVINCE_AND_CITIES.filter(
+                                      (provinceAndCity) =>
+                                          provinceAndCity.province ===
+                                          props.provinceValue
+                                  )[0].cities
+                        }
                     />
                 </div>
 
@@ -290,14 +298,16 @@ const validate = (
     return errors;
     //Erors is going to be passed to renderInput's meta
 };
+const selector = formValueSelector("postAdForm");
+//get form values with formvalueSelector
+//https://redux-form.com/6.6.0/docs/api/formvalueselector.md/
+const mapStateToProps = (state: StoreState) => {
+    return {
+        provinceValue: selector(state, "province"),
+    };
+};
 
-// const mapStateToProps = (state: StoreState) => {
-//     return {
-//         authStatus: state.authStatus.errorMessage,
-//     };
-// };
-
-export default connect()(
+export default connect(mapStateToProps)(
     reduxForm<{}, PostAdFormProps>({
         form: "postAdForm",
         validate,
