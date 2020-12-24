@@ -12,7 +12,8 @@ const auth = axios.create({
     baseURL: "http://localhost:5000/",
 });
 
-//Axios in
+//Followed article below for axios interceptors:
+//https://medium.com/swlh/handling-access-and-refresh-tokens-using-axios-interceptors-3970b601a5da
 
 //Executes before axios request
 auth.interceptors.request.use(

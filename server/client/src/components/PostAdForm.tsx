@@ -17,6 +17,11 @@ import postAdListingImagePlaceHolder from "../img/postAdListingImagePlaceHolder.
 export interface RegisterFormValues {
     title: string;
     description: string;
+    category: string;
+    province: string;
+    city: string;
+    street: string;
+    price: number;
 }
 
 const renderError = ({ error, touched }: any) => {
@@ -75,25 +80,35 @@ const renderDropDown = ({
                 autoComplete="off"
             >
                 <option></option>
-                {optionValues.map((hi) => (
-                    <option value="#00ff00">{hi}</option>
+                {optionValues.map((val) => (
+                    <option value="#00ff00">{val}</option>
                 ))}
             </select>
 
             {renderError(meta)}
         </div>
     );
-    //{..input} is shortcut for redux-form; where you take all the input from "component's" props and pass it as
-    //props to <input>
 };
+
+const formatAmount = (input) => {
+    //For price input, from: https://blog.harveydelaney.com/redux-form-lifecycle-example/
+    if (!input) return;
+    if (isNaN(parseInt(input[input.length - 1], 10))) {
+        return input.slice(0, -1);
+    }
+    return input.replace(/,/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
+const normalizeAmount = (val) => {
+    //For price input, from: https://blog.harveydelaney.com/redux-form-lifecycle-example/
+    return val.replace(/,/g, "");
+};
+
 const PostAdForm: React.FC<
     PostAdFormProps & InjectedFormProps<{}, PostAdFormProps>
 > = (props) => {
     const [listingImage, setListingImage] = useState(null);
-    console.log(listingImage);
-    // useEffect(() => {
 
-    // }, [listingImage]);
     const openFileExplorer = useRef(null);
     const onSubmit = (formValues: any, dispatch: any) => {
         //onSubmit's default param is any
@@ -115,9 +130,6 @@ const PostAdForm: React.FC<
                 <div className="postAdFieldSection">
                     <div className="postAdFieldTitleWrap">
                         <h1>Ad Title</h1>
-                        <h3 className="authFormFieldTitleEmailInUse">
-                            {props.authStatus}
-                        </h3>
                     </div>
                     <Field
                         name="title"
@@ -129,9 +141,6 @@ const PostAdForm: React.FC<
                 <div className="postAdFieldSection">
                     <div className="postAdFieldTitleWrap">
                         <h1>Description</h1>
-                        <h3 className="authFormFieldTitleEmailInUse">
-                            {props.authStatus}
-                        </h3>
                     </div>
                     <Field
                         name="description"
@@ -142,15 +151,19 @@ const PostAdForm: React.FC<
                 <div className="postAdFieldSection">
                     <div className="postAdFieldTitleWrap">
                         <h1>Category</h1>
-                        <h3 className="authFormFieldTitleEmailInUse">
-                            {props.authStatus}
-                        </h3>
                     </div>
                     <Field
-                        name="categoryOfAd"
+                        name="category"
                         component={renderDropDown}
                         optionValues={["black"]}
                     ></Field>
+                </div>
+
+                <div className="postAdFieldSection">
+                    <div className="postAdFieldTitleWrap">
+                        <h1>Add a photo for your ad</h1>
+                    </div>
+
                     <input
                         type="file"
                         accept="image/*"
@@ -167,16 +180,6 @@ const PostAdForm: React.FC<
                             //https://medium.com/@650egor/react-30-day-challenge-day-2-image-upload-preview-2d534f8eaaa
                         }
                     />
-                </div>
-
-                <div className="postAdFieldSection">
-                    <div className="postAdFieldTitleWrap">
-                        <h1>Add a photo for your ad</h1>
-                        <h3 className="authFormFieldTitleEmailInUse">
-                            {props.authStatus}
-                        </h3>
-                    </div>
-
                     <input
                         type="button"
                         value="Choose Files!"
@@ -193,6 +196,53 @@ const PostAdForm: React.FC<
                                       backgroundImage: `url(${postAdListingImagePlaceHolder})`,
                                   }
                         }
+                    />
+                </div>
+
+                <div className="postAdFieldSection">
+                    <div className="postAdFieldTitleWrap">
+                        <h1>Province</h1>
+                    </div>
+                    <Field
+                        name="province"
+                        type="text"
+                        component={renderTextInput}
+                    />
+                </div>
+
+                <div className="postAdFieldSection">
+                    <div className="postAdFieldTitleWrap">
+                        <h1>City</h1>
+                    </div>
+                    <Field
+                        name="city"
+                        type="text"
+                        component={renderTextInput}
+                    />
+                </div>
+
+                <div className="postAdFieldSection">
+                    <div className="postAdFieldTitleWrap">
+                        <h1>Street</h1>
+                    </div>
+                    <Field
+                        name="street"
+                        type="text"
+                        component={renderTextInput}
+                    />
+                </div>
+
+                <div className="postAdFieldSection">
+                    <div className="postAdFieldTitleWrap">
+                        <h1>Price ($ CAD) </h1>
+                    </div>
+
+                    <Field
+                        name="price"
+                        type="text"
+                        format={formatAmount}
+                        normalize={normalizeAmount}
+                        component={renderTextInput}
                     />
                 </div>
 
@@ -216,6 +266,25 @@ const validate = (
 
     if (!formValues.description) {
         errors.description = "You must enter a description";
+    }
+
+    if (!formValues.category) {
+        errors.category = "You must enter a category";
+    }
+
+    if (!formValues.province) {
+        errors.province = "You must enter a province";
+    }
+
+    if (!formValues.city) {
+        errors.city = "You must enter a city";
+    }
+
+    if (!formValues.street) {
+        errors.street = "You must enter a street";
+    }
+    if (!formValues.price) {
+        errors.price = "You must enter a price";
     }
 
     return errors;
