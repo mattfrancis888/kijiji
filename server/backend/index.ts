@@ -9,6 +9,8 @@ if (process.env.NODE_ENV !== "production") {
     dotenv.config();
 }
 import route from "./routes";
+import authenticatedRouter from "./routes/authenticated";
+import { authenticateToken } from "./controllers/authentication";
 const app = express();
 // middleware for parsing bodies from URL
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -18,9 +20,7 @@ app.use(cors({ origin: true, credentials: true }));
 
 console.log("NODE ENV", process.env.NODE_ENV);
 app.use("/", route);
-app.get("/", (req, res) => {
-    res.send("hi");
-});
+app.use("/", authenticatedRouter);
 
 const port = 5000;
 //app.use(errorHandler);

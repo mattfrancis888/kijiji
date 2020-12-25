@@ -13,6 +13,7 @@ if (process.env.NODE_ENV !== "production") {
     dotenv_1.default.config();
 }
 var routes_1 = __importDefault(require("./routes"));
+var authenticated_1 = __importDefault(require("./routes/authenticated"));
 var app = express_1.default();
 // middleware for parsing bodies from URL
 app.use(body_parser_1.default.urlencoded({ extended: true }));
@@ -21,9 +22,7 @@ app.use(cookie_parser_1.default());
 app.use(cors_1.default({ origin: true, credentials: true }));
 console.log("NODE ENV", process.env.NODE_ENV);
 app.use("/", routes_1.default);
-app.get("/", function (req, res) {
-    res.send("hi");
-});
+app.use("/", authenticated_1.default);
 var port = 5000;
 //app.use(errorHandler);
 app.listen(port, function () {
