@@ -17,7 +17,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors({ origin: true, credentials: true }));
-
 console.log("NODE ENV", process.env.NODE_ENV);
 app.use("/", route);
 app.use("/", authenticatedRouter);

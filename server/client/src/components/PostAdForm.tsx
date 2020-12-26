@@ -109,8 +109,32 @@ const normalizeAmount = (val) => {
 const PostAdForm: React.FC<
     PostAdFormProps & InjectedFormProps<{}, PostAdFormProps>
 > = (props) => {
+    const renderImageUpload = ({
+        input,
+        label,
+        meta,
+        placeHolder,
+        optionValues,
+    }: any) => {
+        return (
+            <input
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                ref={openFileExplorer}
+                onChange={(event) => {
+                    setListingImage(URL.createObjectURL(event.target.files[0]));
+                    // console.log(
+                    //     `Selected file - ${event.target.files[0].name}`
+                    // );
+                    //https://medium.com/@650egor/react-30-day-challenge-day-2-image-upload-preview-2d534f8eaaa
+                }}
+            />
+        );
+    };
+
     const [listingImage, setListingImage] = useState(null);
-    console.log("PROVINCE VAL", props.provinceValue);
+
     const openFileExplorer = useRef(null);
 
     const onSubmit = (formValues: any, dispatch: any) => {
@@ -160,21 +184,23 @@ const PostAdForm: React.FC<
                         <h1>Add a photo for your ad</h1>
                     </div>
 
-                    <input
+                    <Field
+                        name="image"
+                        component={renderImageUpload}
                         type="file"
                         accept="image/*"
                         style={{ display: "none" }}
                         ref={openFileExplorer}
-                        onChange={
-                            (event) =>
-                                setListingImage(
-                                    URL.createObjectURL(event.target.files[0])
-                                )
+                        withRef
+                        onChange={(event) => {
+                            setListingImage(
+                                URL.createObjectURL(event.target.files[0])
+                            );
                             // console.log(
                             //     `Selected file - ${event.target.files[0].name}`
-                            // )
+                            // );
                             //https://medium.com/@650egor/react-30-day-challenge-day-2-image-upload-preview-2d534f8eaaa
-                        }
+                        }}
                     />
                     <input
                         type="button"

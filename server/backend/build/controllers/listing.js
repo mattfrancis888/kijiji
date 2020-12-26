@@ -39,9 +39,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createListing = void 0;
+exports.uploadImage = exports.createListing = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var constants_1 = require("../constants");
+var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
+var multer_1 = __importDefault(require("multer"));
 var createListing = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var title, description, category, image, province, city, street, price, categoryQuery, categoryId, error_1;
     return __generator(this, function (_a) {
@@ -50,7 +52,7 @@ var createListing = function (req, res, next) { return __awaiter(void 0, void 0,
                 title = req.body.title;
                 description = req.body.description;
                 category = req.body.category;
-                image = req.body.image;
+                image = req.body.cloudinaryImagePath;
                 province = req.body.province;
                 city = req.body.city;
                 street = req.body.street;
@@ -72,7 +74,7 @@ var createListing = function (req, res, next) { return __awaiter(void 0, void 0,
             case 4:
                 categoryQuery = _a.sent();
                 categoryId = console.log("CATEGORY_ID", categoryQuery.rows[0].category_id);
-                return [4 /*yield*/, databasePool_1.default.query(" INSERT INTO listing(listing_name, listing_price, listing_description, \n                category_id, province, city)VALUES($1, $2, $3, $4, $5, $6);", [title, price, description, categoryId, province, city])];
+                return [4 /*yield*/, databasePool_1.default.query(" INSERT INTO listing(listing_name, listing_price, listing_description, \n                category_id, listing_image, province, city)VALUES($1, $2, $3, $4, $5, $6,$7);", [title, price, description, categoryId, image, province, city])];
             case 5:
                 _a.sent();
                 databasePool_1.default.query("COMMIT");
@@ -90,3 +92,40 @@ var createListing = function (req, res, next) { return __awaiter(void 0, void 0,
     });
 }); };
 exports.createListing = createListing;
+var cloudinary = require("cloudinary").v2;
+cloudinary.config({
+    cloud_name: process.env.cloudinary_cloud_name,
+    api_key: process.env.cloudinary_api_key,
+    api_secret: process.env.cloudinary_secret,
+});
+var storage = new multer_storage_cloudinary_1.CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: "kijiji",
+        format: function (req, file) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
+            return [2 /*return*/, "jpg"];
+        }); }); },
+    },
+});
+var multerUploader = multer_1.default({ storage: storage });
+var upload = multerUploader.single("image");
+var uploadImage = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        //Unable ot use async await with upload()
+        //Wants 3 arguments
+        upload(req, res, function (err) {
+            if (err instanceof multer_1.default.MulterError) {
+                res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
+                // A Multer error occurred when uploading.
+            }
+            else if (err) {
+                // An unknown error occurred when uploading.
+                res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
+            }
+            res.send({ cloudinaryImagePath: req.file.path });
+            // Everything went fine and save document in DB here.
+        });
+        return [2 /*return*/];
+    });
+}); };
+exports.uploadImage = uploadImage;
