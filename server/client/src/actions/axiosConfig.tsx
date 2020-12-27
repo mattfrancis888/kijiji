@@ -4,7 +4,7 @@ import CookieService from "../CookieService";
 import { store } from "../Root";
 import { validateToken } from "./auth";
 const cookieService = CookieService.getService();
-const auth = axios.create({
+const axiosConfig = axios.create({
     // .. where we make our configurations
     withCredentials: true, //Without it cookies will not be sent! Also, needs to be first in axios.create(..)!!
     //As mentioned in:
@@ -16,7 +16,7 @@ const auth = axios.create({
 //https://medium.com/swlh/handling-access-and-refresh-tokens-using-axios-interceptors-3970b601a5da
 
 //Executes before axios request
-auth.interceptors.request.use(
+axiosConfig.interceptors.request.use(
     (config) => {
         //Create Authorizaiton header for our axios requests
         //Note: this won't affect /token because we are using the http-only cookie not authorization header :) (look at backend)
@@ -33,7 +33,7 @@ auth.interceptors.request.use(
 );
 
 //Axios calls response interceptors after it sends the request and receives a response.
-auth.interceptors.response.use(
+axiosConfig.interceptors.response.use(
     //If we have a response from our recent http call
     (response) => {
         return response;
@@ -55,7 +55,8 @@ auth.interceptors.response.use(
         if (error.response.status === 403 && !originalRequest._retry) {
             //ALL 403 errors are because of invalid tokens
             originalRequest._retry = true;
-            auth.post("/token")
+            axiosConfig
+                .post("/token")
                 .then((res) => {
                     //Call original request again so that we can use the new access token on the original request
                     //We give the new access token by giving it at axios.interceptors.request
@@ -78,4 +79,4 @@ auth.interceptors.response.use(
     }
 );
 
-export default auth;
+export default axiosConfig;

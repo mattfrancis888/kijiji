@@ -1,10 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import requireAuth from "./requireAuth";
 import PostAdForm from "./PostAdForm";
+
 export interface PostAdFormProps {
     onSubmit(formValues: any): void;
-    //authStatus?: string | null;
+    fetchCategoriesForListing(): void;
+    provinceValue: string;
+    categories: [];
 }
 
 const PostAd: React.FC<{}> = () => {

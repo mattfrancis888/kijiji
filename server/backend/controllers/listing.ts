@@ -4,6 +4,17 @@ import { FORBIDDEN_STATUS, INTERNAL_SERVER_ERROR_STATUS } from "../constants";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 
+export const categoriesForListing = async (
+    req: any,
+    res: Response,
+    next: NextFunction
+) => {
+    pool.query(`SELECT category_name FROM category`, (error, category) => {
+        if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
+
+        res.send(category.rows.map((category) => category.category_name));
+    });
+};
 export const createListing = async (
     req: any,
     res: Response,

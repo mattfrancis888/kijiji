@@ -39,11 +39,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadImage = exports.createListing = void 0;
+exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
 var multer_1 = __importDefault(require("multer"));
+var categoriesForListing = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        databasePool_1.default.query("SELECT category_name FROM category", function (error, category) {
+            if (error)
+                return res.send(constants_1.INTERNAL_SERVER_ERROR_STATUS);
+            res.send(category.rows.map(function (category) { return category.category_name; }));
+        });
+        return [2 /*return*/];
+    });
+}); };
+exports.categoriesForListing = categoriesForListing;
 var createListing = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var title, description, category, image, province, city, street, price, categoryQuery, categoryId, error_1;
     return __generator(this, function (_a) {

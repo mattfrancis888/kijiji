@@ -5,7 +5,6 @@ import { Dispatch } from "redux";
 import history from "../browserHistory";
 import CookieService from "../CookieService";
 
-const cookieService = CookieService.getService();
 export interface JWTType {
     token: string;
 }

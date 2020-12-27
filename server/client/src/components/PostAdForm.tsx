@@ -14,8 +14,8 @@ import { PostAdFormProps } from "./PostAd";
 import postAdListingImagePlaceHolder from "../img/postAdListingImagePlaceHolder.png";
 import { CANADIAN_PROVINCES, CANADIAN_PROVINCE_AND_CITIES } from "../constants";
 import { formValueSelector } from "redux-form";
+import { fetchCategoriesForListing } from "../actions";
 
-//Re-usable component
 export interface RegisterFormValues {
     title: string;
     description: string;
@@ -109,6 +109,10 @@ const normalizeAmount = (val) => {
 const PostAdForm: React.FC<
     PostAdFormProps & InjectedFormProps<{}, PostAdFormProps>
 > = (props) => {
+    useEffect(() => {
+        props.fetchCategoriesForListing();
+    }, []);
+
     const renderImageUpload = ({
         input,
         label,
@@ -175,7 +179,7 @@ const PostAdForm: React.FC<
                     <Field
                         name="category"
                         component={renderDropDown}
-                        optionValues={["black"]}
+                        optionValues={props.categories}
                     ></Field>
                 </div>
 
@@ -329,11 +333,12 @@ const selector = formValueSelector("postAdForm");
 //https://redux-form.com/6.6.0/docs/api/formvalueselector.md/
 const mapStateToProps = (state: StoreState) => {
     return {
+        categories: state.categories,
         provinceValue: selector(state, "province"),
     };
 };
 
-export default connect(mapStateToProps)(
+export default connect(mapStateToProps, { fetchCategoriesForListing })(
     reduxForm<{}, PostAdFormProps>({
         form: "postAdForm",
         validate,
