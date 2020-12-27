@@ -15,7 +15,7 @@ import postAdListingImagePlaceHolder from "../img/postAdListingImagePlaceHolder.
 import { CANADIAN_PROVINCES, CANADIAN_PROVINCE_AND_CITIES } from "../constants";
 import { formValueSelector } from "redux-form";
 import { fetchCategoriesForListing } from "../actions";
-
+import Loading from "./Loading";
 export interface RegisterFormValues {
     title: string;
     description: string;
@@ -109,6 +109,158 @@ const normalizeAmount = (val) => {
 const PostAdForm: React.FC<
     PostAdFormProps & InjectedFormProps<{}, PostAdFormProps>
 > = (props) => {
+    const renderFields = (): JSX.Element | JSX.Element[] => {
+        if (props.categories.length === 0)
+            return (
+                <div className="loadingCenter">
+                    <Loading />
+                </div>
+            );
+        else {
+            return (
+                <form
+                    className="postAdForm"
+                    onSubmit={props.handleSubmit(onSubmit)}
+                >
+                    <div className="postAdFieldSection">
+                        <div className="postAdFieldTitleWrap">
+                            <h1>Ad Title</h1>
+                        </div>
+                        <Field
+                            name="title"
+                            type="text"
+                            // label="Ad Title"
+                            component={renderTextInput}
+                        />
+                    </div>
+                    <div className="postAdFieldSection">
+                        <div className="postAdFieldTitleWrap">
+                            <h1>Description</h1>
+                        </div>
+                        <Field
+                            name="description"
+                            type="text"
+                            component={renderTextArea}
+                        />
+                    </div>
+                    <div className="postAdFieldSection">
+                        <div className="postAdFieldTitleWrap">
+                            <h1>Category</h1>
+                        </div>
+                        <Field
+                            name="category"
+                            component={renderDropDown}
+                            optionValues={props.categories}
+                        ></Field>
+                    </div>
+
+                    <div className="postAdFieldSection">
+                        <div className="postAdFieldTitleWrap">
+                            <h1>Add a photo for your ad</h1>
+                        </div>
+
+                        <Field
+                            name="image"
+                            component={renderImageUpload}
+                            type="file"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            ref={openFileExplorer}
+                            withRef
+                            onChange={(event) => {
+                                setListingImage(
+                                    URL.createObjectURL(event.target.files[0])
+                                );
+                                // console.log(
+                                //     `Selected file - ${event.target.files[0].name}`
+                                // );
+                                //https://medium.com/@650egor/react-30-day-challenge-day-2-image-upload-preview-2d534f8eaaa
+                            }}
+                        />
+                        <input
+                            type="button"
+                            value="Choose Files!"
+                            className="postAdChooseListingImage"
+                            onClick={() => openFileExplorer.current.click()}
+                            style={
+                                listingImage
+                                    ? {
+                                          backgroundImage: `url(${listingImage})`,
+                                          backgroundPosition: "cover",
+                                          backgroundColor: "white",
+                                      }
+                                    : {
+                                          backgroundImage: `url(${postAdListingImagePlaceHolder})`,
+                                      }
+                            }
+                        />
+                    </div>
+
+                    <div className="postAdFieldSection">
+                        <div className="postAdFieldTitleWrap">
+                            <h1>Province</h1>
+                        </div>
+                        <Field
+                            name="province"
+                            type="text"
+                            component={renderDropDown}
+                            optionValues={CANADIAN_PROVINCES.map((province) => {
+                                return province.name;
+                            })}
+                        />
+                    </div>
+
+                    <div className="postAdFieldSection">
+                        <div className="postAdFieldTitleWrap">
+                            <h1>City</h1>
+                        </div>
+                        <Field
+                            name="city"
+                            type="text"
+                            component={renderDropDown}
+                            optionValues={
+                                !props.provinceValue
+                                    ? []
+                                    : CANADIAN_PROVINCE_AND_CITIES.filter(
+                                          (provinceAndCity) =>
+                                              provinceAndCity.province ===
+                                              props.provinceValue
+                                      )[0].cities
+                            }
+                        />
+                    </div>
+
+                    <div className="postAdFieldSection">
+                        <div className="postAdFieldTitleWrap">
+                            <h1>Street</h1>
+                        </div>
+                        <Field
+                            name="street"
+                            type="text"
+                            component={renderTextInput}
+                        />
+                    </div>
+
+                    <div className="postAdFieldSection">
+                        <div className="postAdFieldTitleWrap">
+                            <h1>Price ($ CAD) </h1>
+                        </div>
+
+                        <Field
+                            name="price"
+                            type="text"
+                            format={formatAmount}
+                            normalize={normalizeAmount}
+                            component={renderTextInput}
+                        />
+                    </div>
+
+                    <button className="postAdFormSubmit">Post Your Ad</button>
+                </form>
+            );
+        }
+    };
+
     useEffect(() => {
         props.fetchCategoriesForListing();
     }, []);
@@ -145,149 +297,7 @@ const PostAdForm: React.FC<
         props.onSubmit(formValues);
     };
 
-    return (
-        <React.Fragment>
-            <form
-                className="postAdForm"
-                onSubmit={props.handleSubmit(onSubmit)}
-            >
-                <div className="postAdFieldSection">
-                    <div className="postAdFieldTitleWrap">
-                        <h1>Ad Title</h1>
-                    </div>
-                    <Field
-                        name="title"
-                        type="text"
-                        // label="Ad Title"
-                        component={renderTextInput}
-                    />
-                </div>
-                <div className="postAdFieldSection">
-                    <div className="postAdFieldTitleWrap">
-                        <h1>Description</h1>
-                    </div>
-                    <Field
-                        name="description"
-                        type="text"
-                        component={renderTextArea}
-                    />
-                </div>
-                <div className="postAdFieldSection">
-                    <div className="postAdFieldTitleWrap">
-                        <h1>Category</h1>
-                    </div>
-                    <Field
-                        name="category"
-                        component={renderDropDown}
-                        optionValues={props.categories}
-                    ></Field>
-                </div>
-
-                <div className="postAdFieldSection">
-                    <div className="postAdFieldTitleWrap">
-                        <h1>Add a photo for your ad</h1>
-                    </div>
-
-                    <Field
-                        name="image"
-                        component={renderImageUpload}
-                        type="file"
-                        accept="image/*"
-                        style={{ display: "none" }}
-                        ref={openFileExplorer}
-                        withRef
-                        onChange={(event) => {
-                            setListingImage(
-                                URL.createObjectURL(event.target.files[0])
-                            );
-                            // console.log(
-                            //     `Selected file - ${event.target.files[0].name}`
-                            // );
-                            //https://medium.com/@650egor/react-30-day-challenge-day-2-image-upload-preview-2d534f8eaaa
-                        }}
-                    />
-                    <input
-                        type="button"
-                        value="Choose Files!"
-                        className="postAdChooseListingImage"
-                        onClick={() => openFileExplorer.current.click()}
-                        style={
-                            listingImage
-                                ? {
-                                      backgroundImage: `url(${listingImage})`,
-                                      backgroundPosition: "cover",
-                                      backgroundColor: "white",
-                                  }
-                                : {
-                                      backgroundImage: `url(${postAdListingImagePlaceHolder})`,
-                                  }
-                        }
-                    />
-                </div>
-
-                <div className="postAdFieldSection">
-                    <div className="postAdFieldTitleWrap">
-                        <h1>Province</h1>
-                    </div>
-                    <Field
-                        name="province"
-                        type="text"
-                        component={renderDropDown}
-                        optionValues={CANADIAN_PROVINCES.map((province) => {
-                            return province.name;
-                        })}
-                    />
-                </div>
-
-                <div className="postAdFieldSection">
-                    <div className="postAdFieldTitleWrap">
-                        <h1>City</h1>
-                    </div>
-                    <Field
-                        name="city"
-                        type="text"
-                        component={renderDropDown}
-                        optionValues={
-                            !props.provinceValue
-                                ? []
-                                : CANADIAN_PROVINCE_AND_CITIES.filter(
-                                      (provinceAndCity) =>
-                                          provinceAndCity.province ===
-                                          props.provinceValue
-                                  )[0].cities
-                        }
-                    />
-                </div>
-
-                <div className="postAdFieldSection">
-                    <div className="postAdFieldTitleWrap">
-                        <h1>Street</h1>
-                    </div>
-                    <Field
-                        name="street"
-                        type="text"
-                        component={renderTextInput}
-                    />
-                </div>
-
-                <div className="postAdFieldSection">
-                    <div className="postAdFieldTitleWrap">
-                        <h1>Price ($ CAD) </h1>
-                    </div>
-
-                    <Field
-                        name="price"
-                        type="text"
-                        format={formatAmount}
-                        normalize={normalizeAmount}
-                        component={renderTextInput}
-                    />
-                </div>
-
-                <button className="postAdFormSubmit">Post Your Ad</button>
-            </form>
-        </React.Fragment>
-    );
+    return <React.Fragment>{renderFields()}</React.Fragment>;
 };
 
 const validate = (

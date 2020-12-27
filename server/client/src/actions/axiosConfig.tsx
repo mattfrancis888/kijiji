@@ -51,30 +51,33 @@ axiosConfig.interceptors.response.use(
         // if (error.response.status === 401 && originalRequest.url === "/token") {
         //     return Promise.reject(error);
         // }
+        if (error.response) {
+            //Above if block is used so that the app won't crash  in localhost when the backend server is not running and we are testing
+            //an axios request (i.e calling an axios request and seeing if a loading component triggers)
+            if (error.response.status === 403 && !originalRequest._retry) {
+                //ALL 403 errors are because of invalid tokens
+                originalRequest._retry = true;
+                axiosConfig
+                    .post("/token")
+                    .then((res) => {
+                        //Call original request again so that we can use the new access token on the original request
+                        //We give the new access token by giving it at axios.interceptors.request
+                        //return auth(originalRequest);
+                        store.dispatch(
+                            validateToken(
+                                originalRequest.url,
+                                originalRequest._retry
+                            ) as any
+                        );
 
-        if (error.response.status === 403 && !originalRequest._retry) {
-            //ALL 403 errors are because of invalid tokens
-            originalRequest._retry = true;
-            axiosConfig
-                .post("/token")
-                .then((res) => {
-                    //Call original request again so that we can use the new access token on the original request
-                    //We give the new access token by giving it at axios.interceptors.request
-                    //return auth(originalRequest);
-                    store.dispatch(
-                        validateToken(
-                            originalRequest.url,
-                            originalRequest._retry
-                        ) as any
-                    );
-
-                    //flow:
-                    //click on post-ad - > validate token in HOC ->  if post-ad with expired token -> returns 403 -> refrsh token is called
-                    //use refresh token in Authorization header (via axios interceptor response) -> trigger post-ad again with store.dispatch(validateToken(..))
-                })
-                .catch((error) => {
-                    return Promise.reject(error);
-                });
+                        //flow:
+                        //click on post-ad - > validate token in HOC ->  if post-ad with expired token -> returns 403 -> refrsh token is called
+                        //use refresh token in Authorization header (via axios interceptor response) -> trigger post-ad again with store.dispatch(validateToken(..))
+                    })
+                    .catch((error) => {
+                        return Promise.reject(error);
+                    });
+            }
         }
     }
 );

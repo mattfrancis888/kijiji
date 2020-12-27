@@ -554,6 +554,28 @@ body {
   margin-bottom: 3rem;
 }
 
+.loadingCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loadingCenter > div {
+  width: 10rem;
+  height: 10rem;
+}
+@media screen and (min-width: 520px) {
+  .loadingCenter > div {
+    width: 12rem;
+    height: 12rem;
+  }
+}
+@media screen and (min-width: 768px) {
+  .loadingCenter > div {
+    width: 16rem;
+    height: 16rem;
+  }
+}
+
 nav {
   z-index: 2;
   width: 100%;
