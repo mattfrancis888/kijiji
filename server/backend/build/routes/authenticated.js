@@ -7,7 +7,5 @@ var authenticatedRouter = express_1.Router();
 authenticatedRouter.post("/post-ad");
 authenticatedRouter.post("/create-listing", listing_1.createListing);
 authenticatedRouter.get("/categories-for-listing", listing_1.categoriesForListing);
-authenticatedRouter.post("/upload-image", 
-// fileUpload.single("image"),
-listing_1.uploadImage);
+authenticatedRouter.post("/upload-image", listing_1.uploadImage);
 exports.default = authenticatedRouter;

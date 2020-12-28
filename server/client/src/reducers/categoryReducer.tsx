@@ -1,9 +1,6 @@
-import { ActionTypes, FetchCategoriesForListing } from "../actions";
+import { ActionTypes, FetchCategoriesActions } from "../actions";
 
-const categoriesReducer = (
-    state: [] = [],
-    action: FetchCategoriesForListing
-) => {
+const categoryReducer = (state: [] = [], action: FetchCategoriesActions) => {
     switch (action.type) {
         case ActionTypes.FETCH_CATEGORIES_FOR_LISTING:
             return action.payload;
@@ -14,4 +11,4 @@ const categoriesReducer = (
     }
 };
 
-export default categoriesReducer;
+export default categoryReducer;

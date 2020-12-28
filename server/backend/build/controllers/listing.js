@@ -55,8 +55,8 @@ var categoriesForListing = function (req, res, next) { return __awaiter(void 0, 
     });
 }); };
 exports.categoriesForListing = categoriesForListing;
-var createListing = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, description, category, image, province, city, street, price, categoryQuery, categoryId, error_1;
+var createListing = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var title, description, category, image, province, city, street, price, categoryQuery, categoryId, response_1, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -78,20 +78,36 @@ var createListing = function (req, res, next) { return __awaiter(void 0, void 0,
                 //Using transactions with psql pool:
                 //https://kb.objectrocket.com/postgresql/nodejs-and-the-postgres-transaction-968
                 _a.sent();
-                return [4 /*yield*/, databasePool_1.default.query("INSERT INTO location(province, city, street)values($1, $2, $3)", [province, city, street])];
-            case 3:
-                _a.sent();
                 return [4 /*yield*/, databasePool_1.default.query("SELECT category_id FROM category WHERE category_name = $1;", [category])];
-            case 4:
+            case 3:
                 categoryQuery = _a.sent();
-                categoryId = console.log("CATEGORY_ID", categoryQuery.rows[0].category_id);
-                return [4 /*yield*/, databasePool_1.default.query(" INSERT INTO listing(listing_name, listing_price, listing_description, \n                category_id, listing_image, province, city)VALUES($1, $2, $3, $4, $5, $6,$7);", [title, price, description, categoryId, image, province, city])];
+                categoryId = categoryQuery.rows[0].category_id;
+                return [4 /*yield*/, databasePool_1.default.query(" INSERT INTO listing(listing_name, listing_price, listing_description, \n                category_id, listing_image, province, city, street)VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;", [
+                        title,
+                        price,
+                        description,
+                        categoryId,
+                        image,
+                        province,
+                        city,
+                        street,
+                    ])];
+            case 4:
+                response_1 = _a.sent();
+                return [4 /*yield*/, databasePool_1.default.query("COMMIT")];
             case 5:
                 _a.sent();
-                databasePool_1.default.query("COMMIT");
-                //Don't think it matters if we have await at COMMIT because the turotiral
-                //above does not include it and our code works fine
-                res.sendStatus(200);
+                res.send({
+                    id: response_1.rows[0].id,
+                    title: title,
+                    description: description,
+                    category: category,
+                    image: image,
+                    province: province,
+                    city: city,
+                    street: street,
+                    price: price,
+                });
                 return [3 /*break*/, 7];
             case 6:
                 error_1 = _a.sent();
@@ -120,20 +136,20 @@ var storage = new multer_storage_cloudinary_1.CloudinaryStorage({
 });
 var multerUploader = multer_1.default({ storage: storage });
 var upload = multerUploader.single("image");
-var uploadImage = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+var uploadImage = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         //Unable ot use async await with upload()
         //Wants 3 arguments
         upload(req, res, function (err) {
             if (err instanceof multer_1.default.MulterError) {
-                res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
+                return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
                 // A Multer error occurred when uploading.
             }
             else if (err) {
                 // An unknown error occurred when uploading.
-                res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
+                return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
             }
-            res.send({ cloudinaryImagePath: req.file.path });
+            return res.send({ cloudinaryImagePath: req.file.path });
             // Everything went fine and save document in DB here.
         });
         return [2 /*return*/];

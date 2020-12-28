@@ -16,10 +16,11 @@ import { CANADIAN_PROVINCES, CANADIAN_PROVINCE_AND_CITIES } from "../constants";
 import { formValueSelector } from "redux-form";
 import { fetchCategoriesForListing } from "../actions";
 import Loading from "./Loading";
-export interface RegisterFormValues {
+export interface PostAdFormValues {
     title: string;
     description: string;
     category: string;
+    image: any;
     province: string;
     city: string;
     street: string;
@@ -109,6 +110,10 @@ const normalizeAmount = (val) => {
 const PostAdForm: React.FC<
     PostAdFormProps & InjectedFormProps<{}, PostAdFormProps>
 > = (props) => {
+    const onSubmit = (formValues: any, dispatch: any) => {
+        props.onSubmit(formValues);
+    };
+
     const renderFields = (): JSX.Element | JSX.Element[] => {
         if (props.categories.length === 0)
             return (
@@ -161,12 +166,11 @@ const PostAdForm: React.FC<
 
                         <Field
                             name="image"
-                            component={renderImageUpload}
                             type="file"
-                            accept="image/*"
+                            component={renderImageUpload}
+                            value={null}
                             style={{ display: "none" }}
                             ref={openFileExplorer}
-                            withRef
                             onChange={(event) => {
                                 setListingImage(
                                     URL.createObjectURL(event.target.files[0])
@@ -176,6 +180,7 @@ const PostAdForm: React.FC<
                                 // );
                                 //https://medium.com/@650egor/react-30-day-challenge-day-2-image-upload-preview-2d534f8eaaa
                             }}
+                            withRef
                         />
                         <input
                             type="button"
@@ -272,18 +277,18 @@ const PostAdForm: React.FC<
         placeHolder,
         optionValues,
     }: any) => {
+        //We cannot pass in {...input} (so that the input is submited when onSubmit button is clicked) like our other renders because <input> has type="file"
+        //Must do this instead: https://github.com/redux-form/redux-form/issues/3686
+
         return (
             <input
                 type="file"
                 accept="image/*"
                 style={{ display: "none" }}
                 ref={openFileExplorer}
-                onChange={(event) => {
-                    setListingImage(URL.createObjectURL(event.target.files[0]));
-                    // console.log(
-                    //     `Selected file - ${event.target.files[0].name}`
-                    // );
-                    //https://medium.com/@650egor/react-30-day-challenge-day-2-image-upload-preview-2d534f8eaaa
+                value={null}
+                onChange={(...args) => {
+                    input.onChange(...args);
                 }}
             />
         );
@@ -293,19 +298,16 @@ const PostAdForm: React.FC<
 
     const openFileExplorer = useRef(null);
 
-    const onSubmit = (formValues: any, dispatch: any) => {
-        props.onSubmit(formValues);
-    };
-
     return <React.Fragment>{renderFields()}</React.Fragment>;
 };
 
 const validate = (
-    formValues: RegisterFormValues
-): FormErrors<RegisterFormValues> => {
+    formValues: PostAdFormValues
+): FormErrors<PostAdFormValues> => {
     //MUST BE NAMED VALIDATE! Other names would be ignored by reduxForm(..)
-    const errors: FormErrors<RegisterFormValues> = {};
+    const errors: FormErrors<PostAdFormValues> = {};
     //If you return an empty object, redux form will assume everything is ok
+
     if (!formValues.title) {
         //user did not enter title, so undefined
         errors.title = "You must enter a title";

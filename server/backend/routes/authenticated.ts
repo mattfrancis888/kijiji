@@ -5,17 +5,10 @@ import {
     uploadImage,
     categoriesForListing,
 } from "../controllers/listing";
-import multer from "multer";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
-
 const authenticatedRouter = Router();
 //Routes that are only accecible if users are signed in
 authenticatedRouter.post("/post-ad");
 authenticatedRouter.post("/create-listing", createListing);
 authenticatedRouter.get("/categories-for-listing", categoriesForListing);
-authenticatedRouter.post(
-    "/upload-image",
-    // fileUpload.single("image"),
-    uploadImage
-);
+authenticatedRouter.post("/upload-image", uploadImage);
 export default authenticatedRouter;
