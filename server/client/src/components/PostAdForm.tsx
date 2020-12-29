@@ -84,7 +84,9 @@ const renderDropDown = ({
             >
                 <option></option>
                 {optionValues.map((val) => (
-                    <option value={val}>{val}</option>
+                    <option key={val} value={val}>
+                        {val}
+                    </option>
                 ))}
             </select>
 
@@ -168,7 +170,6 @@ const PostAdForm: React.FC<
                             name="image"
                             type="file"
                             component={renderImageUpload}
-                            value={null}
                             style={{ display: "none" }}
                             ref={openFileExplorer}
                             onChange={(event) => {
@@ -286,7 +287,6 @@ const PostAdForm: React.FC<
                 accept="image/*"
                 style={{ display: "none" }}
                 ref={openFileExplorer}
-                value={null}
                 onChange={(...args) => {
                     input.onChange(...args);
                 }}

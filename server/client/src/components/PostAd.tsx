@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import requireAuth from "./requireAuth";
 import PostAdForm from "./PostAdForm";
 import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import { createListing, Listing } from "../actions/listing";
+import jwt_decode from "jwt-decode";
+import CookieService from "../CookieService";
 
 export interface PostAdFormProps {
     onSubmit(formValues: any): void;
@@ -19,6 +21,10 @@ export interface PostAdProps {
 }
 
 const PostAd: React.FC<PostAdProps> = (props) => {
+    useEffect(() => {
+        const cookieService = CookieService.getService();
+        console.log("JWT DECODE", jwt_decode(cookieService.getAccessToken()));
+    }, []);
     const onSubmitPostListing = async (formValues: any) => {
         props.createListing(formValues);
     };

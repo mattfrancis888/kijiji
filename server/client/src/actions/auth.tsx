@@ -1,6 +1,5 @@
 import { ActionTypes } from "./types";
 import auth from "./axiosConfig";
-import axios from "axios";
 import { Dispatch } from "redux";
 import history from "../browserHistory";
 import CookieService from "../CookieService";
@@ -80,6 +79,8 @@ export const validateToken = (path: string, retriedCalling: boolean) => async (
         );
         //Ensures that our current access token is the newest one; if a new access token is given,
         //we will update our current access token
+
+        //requireAuth HOC relies on the dispatch below
         dispatch<AuthUserAction>({
             type: ActionTypes.AUTH_USER,
             payload: response.data,
