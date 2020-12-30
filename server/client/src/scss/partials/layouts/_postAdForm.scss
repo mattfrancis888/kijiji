@@ -1,0 +1,158 @@
+.postAdForm {
+    text-align: left;
+    background-color: white;
+    padding: 3rem;
+    border-radius: 0.5rem;
+}
+
+.createPostAdInputs,
+.createPostAdDropDown {
+    border: 1px solid $light-grey;
+    border-radius: 0.5rem;
+    outline: none;
+    padding: 1.3rem;
+    font-size: 1.4rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    &:focus {
+        outline: none;
+        border: 1px solid $light-blue;
+        box-shadow: 0 0 5px $light-blue;
+        background-color: white;
+    }
+
+    @media screen and (min-width: $md_breakpoint) {
+        width: 35rem;
+        padding: 1.7rem;
+        font-size: 1.7rem;
+    }
+}
+
+.postAdTextAreaWrap {
+    @media screen and (min-width: $md_breakpoint) {
+        width: 80%;
+    }
+}
+.createPostAdTextArea {
+    border: 1px solid $light-grey;
+    border-radius: 0.5rem;
+    width: 100%;
+    height: 14rem;
+    padding: 1rem;
+    font-size: 1.4rem;
+    &:focus {
+        outline: none;
+        border: 1px solid $light-blue;
+        box-shadow: 0 0 5px $light-blue;
+        background-color: white;
+    }
+
+    @media screen and (min-width: $md_breakpoint) {
+        padding: 0.8rem;
+        font-size: 1.7rem;
+    }
+}
+.postAdFieldSection {
+    h1 {
+        font-weight: 600;
+        letter-spacing: 0.1rem;
+        margin: 0;
+        font-size: 1.4rem;
+        @media screen and (min-width: $sm_breakpoint) {
+            font-size: 1.45rem;
+        }
+    }
+    @media screen and (min-width: $md_breakpoint) {
+        display: flex;
+        align-items: flex-start;
+    }
+    margin-bottom: 3.5rem;
+}
+
+.postAdFormSubmit {
+    cursor: pointer;
+    padding: 1.3rem 2.5rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    font-weight: bold;
+    font-size: 1.2rem;
+    letter-spacing: 0.1rem;
+    @media screen and (min-width: $sm_breakpoint) {
+        font-size: 1.4rem;
+    }
+    background-color: $purple;
+    color: white;
+}
+.registerAccountText {
+    color: red;
+    cursor: pointer;
+    &:hover {
+        text-decoration: underline;
+    }
+    @media screen and (min-width: $md_breakpoint) {
+        font-size: 1.7rem;
+    }
+}
+
+.errorText {
+    margin: 0.2rem 0;
+    color: red;
+    font-size: 1rem;
+    @media screen and (min-width: $sm_breakpoint) {
+        font-size: 1.2rem;
+        margin: 1rem 0;
+    }
+    @media screen and (min-width: $md_breakpoint) {
+        font-size: 1.4rem;
+    }
+}
+
+.postAdFieldTitleWrap {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.7rem;
+    padding: 0.5rem 0;
+    @media screen and (min-width: $md_breakpoint) {
+        width: 10rem;
+        margin-right: 2rem;
+    }
+}
+
+.authFormFieldTitleEmailInUse {
+    margin: 0;
+    font-size: 0.8rem;
+    color: red;
+    margin-left: 0.3rem;
+    @media screen and (min-width: $sm_breakpoint) {
+        font-size: 1.2rem;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        font-size: 1.3rem;
+    }
+}
+
+.imageUploadWrapper {
+    display: flex;
+    flex-direction: column;
+
+    .postAdChooseListingImage {
+        width: 10rem;
+        padding: 2rem;
+        border: 1px solid $light-grey;
+        border-radius: 0.5rem;
+        height: 10rem;
+        background-color: #f8f9f9;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        &:focus {
+            outline: none !important;
+            border: 1px solid #c5c6cb;
+        }
+    }
+
+    .removeUploadedImage {
+        color: red;
+        text-align: center;
+    }
+}

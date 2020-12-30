@@ -53,5 +53,6 @@ router.post("/signin", requireSignIn, signIn);
 router.post("/signup", signUp);
 router.post("/token", refreshToken);
 router.post("/signout", signOut);
-router.post("/post-ad", authenticateToken);
+// router.post("/post-ad", authenticateToken);
+
 export default router;

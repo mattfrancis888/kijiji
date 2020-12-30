@@ -1,4 +1,4 @@
-import { ActionTypes, Actions } from "../actions";
+import { ActionTypes, AuthActions } from "../actions";
 
 export interface AuthStateResponse {
     authenticated?: string | null;
@@ -12,7 +12,7 @@ export const AUTH_STATE: AuthStateResponse = {
 };
 const authReducer = (
     state: AuthStateResponse = AUTH_STATE,
-    action: Actions
+    action: AuthActions
 ) => {
     switch (action.type) {
         case ActionTypes.AUTH_USER:

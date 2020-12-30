@@ -1,0 +1,14 @@
+.postAdPageContainer {
+    padding: 1rem;
+    text-align: center;
+    @media screen and (min-width: $lg_breakpoint) {
+        padding: 1rem 2rem;
+    }
+    @media screen and (min-width: $xl_breakpoint) {
+        padding: 1rem 9rem;
+    }
+    h1 {
+        font-size: 1.7rem;
+        margin-bottom: 3rem;
+    }
+}

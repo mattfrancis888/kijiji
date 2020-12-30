@@ -43,8 +43,7 @@ exports.signUp = exports.signIn = exports.signOut = exports.authenticateToken = 
 var databasePool_1 = __importDefault(require("../databasePool"));
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var bcrypt_1 = __importDefault(require("bcrypt"));
-var FORBIDDEN_STATUS = 403;
-var INTERNAL_SERVER_ERROR_STATUS = 500;
+var constants_1 = require("../constants");
 var PRIVATE_KEY = process.env.privateKey;
 var ACCESS_TOKEN = "ACCESS_TOKEN";
 var REFRESH_TOKEN = "REFRESH_TOKEN";
@@ -69,15 +68,15 @@ var refreshToken = function (req, res) { return __awaiter(void 0, void 0, void 0
             //Validate token:
             jsonwebtoken_1.default.verify(refreshToken, PRIVATE_KEY, function (err, user) {
                 if (err)
-                    return res.sendStatus(FORBIDDEN_STATUS);
+                    return res.sendStatus(constants_1.FORBIDDEN_STATUS);
             });
             //Check if token is in database (in the case the attacker forged their own refresh token)
             databasePool_1.default.query("SELECT email, refresh_token FROM auth WHERE refresh_token = $1", [refreshToken], function (error, user) {
                 if (error) {
-                    return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+                    return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
                 }
                 if (user.rowCount === 0) {
-                    return res.sendStatus(FORBIDDEN_STATUS);
+                    return res.sendStatus(constants_1.FORBIDDEN_STATUS);
                 }
                 //If the refresh token matches the one in our database
                 //Generate a new access token for the user to use
@@ -97,7 +96,7 @@ var refreshToken = function (req, res) { return __awaiter(void 0, void 0, void 0
             });
         }
         else {
-            res.send(FORBIDDEN_STATUS);
+            res.send(constants_1.FORBIDDEN_STATUS);
         }
         return [2 /*return*/];
     });
@@ -116,11 +115,11 @@ var authenticateToken = function (req, res, next) { return __awaiter(void 0, voi
             }
             catch (error) {
                 console.log("authenticateTokenError", error);
-                return [2 /*return*/, res.sendStatus(FORBIDDEN_STATUS)];
+                return [2 /*return*/, res.sendStatus(constants_1.FORBIDDEN_STATUS)];
             }
         }
         else {
-            res.sendStatus(FORBIDDEN_STATUS);
+            res.sendStatus(constants_1.FORBIDDEN_STATUS);
         }
         return [2 /*return*/];
     });
@@ -134,14 +133,14 @@ var signOut = function (req, res) { return __awaiter(void 0, void 0, void 0, fun
         if (refreshToken) {
             databasePool_1.default.query("UPDATE auth SET refresh_token = null WHERE refresh_token = '" + refreshToken + "'", function (error, user) {
                 if (error)
-                    return res.send(INTERNAL_SERVER_ERROR_STATUS);
+                    return res.send(constants_1.INTERNAL_SERVER_ERROR_STATUS);
                 res.clearCookie(ACCESS_TOKEN);
                 res.clearCookie(REFRESH_TOKEN);
                 res.send({ token: "" });
             });
         }
         else {
-            res.sendStatus(FORBIDDEN_STATUS);
+            res.sendStatus(constants_1.FORBIDDEN_STATUS);
         }
         return [2 /*return*/];
     });
@@ -156,7 +155,7 @@ var signIn = function (req, res) {
         // Update Refresh token to database
         databasePool_1.default.query("UPDATE auth\n        SET refresh_token = $1 WHERE email = $2", [refreshToken_1, req.user.email], function (error, response) {
             if (error)
-                return res.send(FORBIDDEN_STATUS);
+                return res.send(constants_1.FORBIDDEN_STATUS);
             // For acces token,  flags should be "secure: true"
             //For refreshtoken "secure: true" and "httpOnly: true"
             //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
@@ -177,7 +176,7 @@ var signIn = function (req, res) {
         });
     }
     else {
-        res.send(FORBIDDEN_STATUS);
+        res.send(constants_1.FORBIDDEN_STATUS);
     }
 };
 exports.signIn = signIn;
@@ -242,15 +241,15 @@ var signUp = function (req, res, next) { return __awaiter(void 0, void 0, void 0
                 error_1 = _a.sent();
                 databasePool_1.default.query("ROLLBACK");
                 console.log("ROLLBACK TRIGGERED");
-                return [2 /*return*/, res.sendStatus(INTERNAL_SERVER_ERROR_STATUS)];
+                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
             case 9: return [3 /*break*/, 11];
             case 10:
                 error_2 = _a.sent();
                 //return next(error);
-                return [2 /*return*/, res.sendStatus(INTERNAL_SERVER_ERROR_STATUS)];
+                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
             case 11: return [3 /*break*/, 13];
             case 12:
-                res.send(FORBIDDEN_STATUS);
+                res.send(constants_1.FORBIDDEN_STATUS);
                 _a.label = 13;
             case 13: return [2 /*return*/];
         }
