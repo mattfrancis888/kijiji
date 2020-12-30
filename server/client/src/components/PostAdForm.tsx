@@ -170,9 +170,11 @@ const PostAdForm: React.FC<
                             name="image"
                             type="file"
                             component={renderImageUpload}
-                            style={{ display: "none" }}
                             ref={openFileExplorer}
+                            value={listingImage}
                             onChange={(event) => {
+                                //For some reason,
+                                //The input's text dosen't change but the input is actually inserted (do formValues.image below)
                                 setListingImage(
                                     URL.createObjectURL(event.target.files[0])
                                 );
@@ -183,23 +185,39 @@ const PostAdForm: React.FC<
                             }}
                             withRef
                         />
-                        <input
-                            type="button"
-                            value="Choose Files!"
-                            className="postAdChooseListingImage"
-                            onClick={() => openFileExplorer.current.click()}
-                            style={
-                                listingImage
-                                    ? {
-                                          backgroundImage: `url(${listingImage})`,
-                                          backgroundPosition: "cover",
-                                          backgroundColor: "white",
-                                      }
-                                    : {
-                                          backgroundImage: `url(${postAdListingImagePlaceHolder})`,
-                                      }
-                            }
-                        />
+                        <div className="imageUploadWrapper">
+                            <input
+                                type="button"
+                                value={listingImage ? "" : "Choose Files!"}
+                                className="postAdChooseListingImage"
+                                onClick={() => openFileExplorer.current.click()}
+                                style={
+                                    listingImage
+                                        ? {
+                                              backgroundImage: `url(${listingImage})`,
+                                              backgroundPosition: "center",
+                                              backgroundSize: "cover",
+                                              backgroundColor: "white",
+                                          }
+                                        : {
+                                              backgroundImage: `url(${postAdListingImagePlaceHolder})`,
+                                          }
+                                }
+                            />
+                            {listingImage && (
+                                <h3
+                                    className="removeUploadedImage"
+                                    onClick={() => {
+                                        setListingImage(null);
+                                        props.dispatch(
+                                            change("postAdForm", "image", null)
+                                        );
+                                    }}
+                                >
+                                    Remove
+                                </h3>
+                            )}
+                        </div>
                     </div>
 
                     <div className="postAdFieldSection">
@@ -269,6 +287,8 @@ const PostAdForm: React.FC<
 
     useEffect(() => {
         props.fetchCategoriesForListing();
+        //props.dispatch(change("postAdForm", "image", "hi"));
+        // props.dispatch(change("postAdForm", "description", "hi"));
     }, []);
 
     const renderImageUpload = ({
@@ -288,7 +308,15 @@ const PostAdForm: React.FC<
                 style={{ display: "none" }}
                 ref={openFileExplorer}
                 onChange={(...args) => {
+                    //The input's text dosen't change but the input is actually inserted (do formValues.image below)
+                    //  let event = args.map((val) => val.nativeEvent)[0];
                     input.onChange(...args);
+                    //@ts-ignore
+                    // setListingImage(URL.createObjectURL(event.target.files[0]));
+                    //chagne also dosen't change the textbox input
+                    // props.dispatch(
+                    //     change("postAdForm", "image", event.target.files[0])
+                    // );
                 }}
             />
         );
@@ -307,7 +335,7 @@ const validate = (
     //MUST BE NAMED VALIDATE! Other names would be ignored by reduxForm(..)
     const errors: FormErrors<PostAdFormValues> = {};
     //If you return an empty object, redux form will assume everything is ok
-
+    // console.log("FILE UPLOAD VALUE", formValues.image);
     if (!formValues.title) {
         //user did not enter title, so undefined
         errors.title = "You must enter a title";

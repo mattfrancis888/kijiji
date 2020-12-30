@@ -57,7 +57,6 @@ const renderPasswordInput = ({ input, label, meta, placeHolder }: any) => {
         <div>
             <label>{label}</label>
             <input
-                data-testid="registerPasswordInput"
                 className="createAuthInputs"
                 type="password"
                 {...input}

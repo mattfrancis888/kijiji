@@ -14,6 +14,7 @@ export interface PostAdFormProps {
     initialValues: Object;
     provinceValue: string;
     categories: [];
+    dispatch: any;
 }
 
 export interface PostAdProps {

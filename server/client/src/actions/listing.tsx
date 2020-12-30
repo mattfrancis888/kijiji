@@ -71,9 +71,9 @@ export const createListing = (formValues: any) => async (
         //We could get the cookie and decode it in node, but doing it in client looks nicer
         const cookieService = CookieService.getService();
         const jwtInfo: Object = jwt_decode(cookieService.getAccessToken());
-        console.log(formValues);
+
         let cloudinaryImagePath = {};
-        if (formValues.image !== "") {
+        if (formValues.image) {
             let formData = new FormData();
             formData.append("image", formValues.image[0]);
 
@@ -99,11 +99,13 @@ export const createListing = (formValues: any) => async (
             ...formValues,
             ...jwtInfo,
         });
+
         dispatch<CreateListingAction>({
             type: ActionTypes.CREATE_LISTING,
             payload: listingResponse.data,
         });
     } catch (error) {
+        console.log(error);
         dispatch<ListingErrorAction>({
             type: ActionTypes.LISTING_ERROR,
             payload: [],

@@ -80,17 +80,6 @@
     @media screen and (min-width: $sm_breakpoint) {
         font-size: 1.4rem;
     }
-    // @media screen and (min-width: $md_breakpoint) {
-    //     margin-top: 2rem;
-    //     padding: 0.8rem;
-    // }
-    // @media screen and (min-width: $lg_breakpoint) {
-    //     padding: 1rem;
-    // }
-    // @media screen and (min-width: $xl_breakpoint) {
-    //     margin-top: 3rem;
-    //     padding: 1.3rem;
-    // }
     background-color: $purple;
     color: white;
 }
@@ -142,13 +131,28 @@
     }
 }
 
-.postAdChooseListingImage {
-    width: 10rem;
-    padding: 2rem;
-    border: 1px solid $light-grey;
-    height: 10rem;
-    background-color: #f8f9f9;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+.imageUploadWrapper {
+    display: flex;
+    flex-direction: column;
+
+    .postAdChooseListingImage {
+        width: 10rem;
+        padding: 2rem;
+        border: 1px solid $light-grey;
+        border-radius: 0.5rem;
+        height: 10rem;
+        background-color: #f8f9f9;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        &:focus {
+            outline: none !important;
+            border: 1px solid #c5c6cb;
+        }
+    }
+
+    .removeUploadedImage {
+        color: red;
+        text-align: center;
+    }
 }
