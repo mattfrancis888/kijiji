@@ -4,7 +4,6 @@ import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import { signOut } from "../actions";
 import { StoreState } from "../reducers";
-import CookieService from "../CookieService";
 
 interface IHeader {
     authStatus?: string | null;

@@ -16,14 +16,16 @@ export const categoriesForListing = async (
     });
 };
 export const createListing = async (req: Request, res: Response) => {
+    console.log(req.body);
     const title = req.body.title;
     const description = req.body.description;
     const category = req.body.category;
-    const image = req.body.cloudinaryImagePath;
+    const image = req.body.cloudinaryImagePath; //can be null if cloduinaryImagePath is not given
     const province = req.body.province;
     const city = req.body.city;
     const street = req.body.street;
     const price = req.body.price;
+    const email = req.body.subject;
 
     try {
         //Using transactions with psql pool:
@@ -51,9 +53,22 @@ export const createListing = async (req: Request, res: Response) => {
             ]
         );
 
+        const userInfoResponse = await pool.query(
+            `SELECT user_id FROM  user_info WHERE email = $1`,
+            [email]
+        );
+        const userId = userInfoResponse.rows[0].user_id;
+
+        const listingId = response.rows[0].listing_id;
+
+        await pool.query(
+            `INSERT INTO lookup_listing_user(user_id, listing_id)VALUES($1, $2)`,
+            [userId, listingId]
+        );
+
         await pool.query("COMMIT");
         res.send({
-            id: response.rows[0].id,
+            id: listingId,
             title,
             description,
             category,

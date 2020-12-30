@@ -56,10 +56,11 @@ var categoriesForListing = function (req, res, next) { return __awaiter(void 0, 
 }); };
 exports.categoriesForListing = categoriesForListing;
 var createListing = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, description, category, image, province, city, street, price, categoryQuery, categoryId, response_1, error_1;
+    var title, description, category, image, province, city, street, price, email, categoryQuery, categoryId, response_1, userInfoResponse, userId, listingId, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                console.log(req.body);
                 title = req.body.title;
                 description = req.body.description;
                 category = req.body.category;
@@ -68,9 +69,10 @@ var createListing = function (req, res) { return __awaiter(void 0, void 0, void 
                 city = req.body.city;
                 street = req.body.street;
                 price = req.body.price;
+                email = req.body.subject;
                 _a.label = 1;
             case 1:
-                _a.trys.push([1, 6, , 7]);
+                _a.trys.push([1, 8, , 9]);
                 //Using transactions with psql pool:
                 //https://kb.objectrocket.com/postgresql/nodejs-and-the-postgres-transaction-968
                 return [4 /*yield*/, databasePool_1.default.query("BEGIN")];
@@ -94,11 +96,19 @@ var createListing = function (req, res) { return __awaiter(void 0, void 0, void 
                     ])];
             case 4:
                 response_1 = _a.sent();
-                return [4 /*yield*/, databasePool_1.default.query("COMMIT")];
+                return [4 /*yield*/, databasePool_1.default.query("SELECT user_id FROM  user_info WHERE email = $1", [email])];
             case 5:
+                userInfoResponse = _a.sent();
+                userId = userInfoResponse.rows[0].user_id;
+                listingId = response_1.rows[0].listing_id;
+                return [4 /*yield*/, databasePool_1.default.query("INSERT INTO lookup_listing_user(user_id, listing_id)VALUES($1, $2)", [userId, listingId])];
+            case 6:
+                _a.sent();
+                return [4 /*yield*/, databasePool_1.default.query("COMMIT")];
+            case 7:
                 _a.sent();
                 res.send({
-                    id: response_1.rows[0].id,
+                    id: listingId,
                     title: title,
                     description: description,
                     category: category,
@@ -108,13 +118,13 @@ var createListing = function (req, res) { return __awaiter(void 0, void 0, void 
                     street: street,
                     price: price,
                 });
-                return [3 /*break*/, 7];
-            case 6:
+                return [3 /*break*/, 9];
+            case 8:
                 error_1 = _a.sent();
                 databasePool_1.default.query("ROLLBACK");
                 console.log("ROLLBACK TRIGGERED", error_1);
                 return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
-            case 7: return [2 /*return*/];
+            case 9: return [2 /*return*/];
         }
     });
 }); };

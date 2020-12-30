@@ -11,6 +11,7 @@ import CookieService from "../CookieService";
 export interface PostAdFormProps {
     onSubmit(formValues: any): void;
     fetchCategoriesForListing(): void;
+    initialValues: Object;
     provinceValue: string;
     categories: [];
 }
@@ -32,7 +33,13 @@ const PostAd: React.FC<PostAdProps> = (props) => {
     return (
         <div className="postAdPageContainer">
             <h1>Post Your Ad, it's fast and easy</h1>
-            <PostAdForm onSubmit={onSubmitPostListing} />
+            <PostAdForm
+                onSubmit={onSubmitPostListing}
+                initialValues={{
+                    title: "bye",
+                    image: "",
+                }}
+            />
         </div>
     );
 };
