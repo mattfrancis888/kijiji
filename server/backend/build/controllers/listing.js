@@ -129,6 +129,8 @@ var createListing = function (req, res) { return __awaiter(void 0, void 0, void 
     });
 }); };
 exports.createListing = createListing;
+//Guide on uploading image with cloudinary and multer
+//https:medium.com/@lola.omolambe/image-upload-using-cloudinary-node-and-mongoose-2f6f0723c745
 var cloudinary = require("cloudinary").v2;
 cloudinary.config({
     cloud_name: process.env.cloudinary_cloud_name,

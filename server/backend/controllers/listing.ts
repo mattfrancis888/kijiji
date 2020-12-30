@@ -93,6 +93,8 @@ export const createListing = async (req: Request, res: Response) => {
     // COMMIT;
 };
 
+//Guide on uploading image with cloudinary and multer
+//https:medium.com/@lola.omolambe/image-upload-using-cloudinary-node-and-mongoose-2f6f0723c745
 var cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -108,7 +110,6 @@ const storage = new CloudinaryStorage({
         format: async (req, file) => "jpg",
     },
 });
-
 const multerUploader = multer({ storage });
 const upload = multerUploader.single("image");
 export const uploadImage = async (req: any, res: Response) => {
