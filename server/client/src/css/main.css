@@ -951,4 +951,148 @@ nav {
   text-align: center;
 }
 
+.listingPreviewContainer {
+  display: flex;
+  background: white;
+  border-radius: 3px;
+  background-clip: padding-box;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  padding: 1rem 2rem;
+}
+
+.listingPreviewImageContainer {
+  margin-right: 0.9rem;
+  border: 1px solid #e2e2e5;
+  width: 8rem;
+  height: 10rem;
+}
+.listingPreviewImageContainer img {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+}
+@media screen and (min-width: 520px) {
+  .listingPreviewImageContainer {
+    width: 13rem;
+  }
+}
+@media screen and (min-width: 768px) {
+  .listingPreviewImageContainer {
+    width: 20rem;
+    height: 16rem;
+  }
+}
+@media screen and (min-width: 992px) {
+  .listingPreviewImageContainer {
+    width: 23rem;
+    margin: 1rem 4rem;
+  }
+}
+
+.listingPreviewInfoWrap {
+  width: 100%;
+}
+
+.titleAndPriceWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.titleAndPriceWrap .title {
+  color: #373373;
+  font-size: 1.3rem;
+  margin: 0;
+  margin-bottom: 0.2rem;
+}
+@media screen and (min-width: 520px) {
+  .titleAndPriceWrap .title {
+    font-size: 1.8rem;
+  }
+}
+@media screen and (min-width: 768px) {
+  .titleAndPriceWrap .title {
+    font-size: 2.3rem;
+  }
+}
+.titleAndPriceWrap .price {
+  color: #37a864;
+  font-size: 1.3rem;
+  margin: 0;
+}
+@media screen and (min-width: 520px) {
+  .titleAndPriceWrap .price {
+    font-size: 1.8rem;
+  }
+}
+@media screen and (min-width: 768px) {
+  .titleAndPriceWrap .price {
+    font-size: 2.3rem;
+  }
+}
+
+.locationAndDateWrap {
+  display: flex;
+  flex-direction: column;
+  color: #6f727f;
+}
+.locationAndDateWrap .location {
+  margin-right: 3rem;
+  font-size: 1.3rem;
+  margin: 0;
+  margin-bottom: 0.2rem;
+  font-weight: normal;
+}
+@media screen and (min-width: 768px) {
+  .locationAndDateWrap .location {
+    font-size: 1.7rem;
+  }
+}
+.locationAndDateWrap .date {
+  font-size: 1.3rem;
+  margin: 0;
+  font-weight: normal;
+}
+@media screen and (min-width: 520px) {
+  .locationAndDateWrap .date {
+    border-left: 1px #e2e2e5 solid;
+    margin-left: 1rem;
+    padding-left: 1rem;
+  }
+}
+@media screen and (min-width: 768px) {
+  .locationAndDateWrap .date {
+    font-size: 1.7rem;
+  }
+}
+@media screen and (min-width: 520px) {
+  .locationAndDateWrap {
+    flex-direction: row;
+    margin: 1rem 0;
+  }
+}
+@media screen and (min-width: 768px) {
+  .locationAndDateWrap {
+    margin: 1.5rem 0;
+  }
+}
+
+.listingDescription {
+  display: none;
+  color: #3e4153;
+  line-height: 22px;
+}
+@media screen and (min-width: 520px) {
+  .listingDescription {
+    display: block;
+    margin: 0;
+    font-size: 1.5rem;
+  }
+}
+@media screen and (min-width: 768px) {
+  .listingDescription {
+    font-size: 1.8rem;
+  }
+}
+
 /*# sourceMappingURL=main.css.map */
