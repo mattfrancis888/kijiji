@@ -14,13 +14,35 @@ const Listings: React.FC<IListings> = (props) => {
     const history = useHistory();
     return (
         <div>
-            <h1>Ads </h1>
-
             <div className="listingsContainer">
-                <h1>Your Ads:</h1>
+                <h1 className="yourAdsTitle">Your Ads:</h1>
                 <Listing />
             </div>
-            <div className="listingsContainer"></div>
+            <div className="listingsContainer">
+                <div className="showingAdsTitleAndDropdownWrap">
+                    <h1 className="showingAdsTitle">
+                        Showing 1 out of x ads:{" "}
+                    </h1>
+                    <div className="dropdownWrap">
+                        <h3>Sort by</h3>
+                        <select className="sortByDropdown">
+                            <option value="Posted: oldest first">
+                                Posted: oldest first
+                            </option>
+                            <option value="Posted: newest first">
+                                Posted: newest first
+                            </option>
+                            <option value="Price: lowest first">
+                                Price: lowest first
+                            </option>
+                            <option value="Price: highest first">
+                                Price: highest first
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <Listing />
+            </div>
         </div>
     );
 };

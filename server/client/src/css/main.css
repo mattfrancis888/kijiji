@@ -554,6 +554,103 @@ body {
   margin-bottom: 3rem;
 }
 
+.listingsContainer {
+  margin: 1rem 2rem;
+  background: white;
+  border-radius: 0.3rem;
+  padding: 0.5rem 1rem;
+}
+@media screen and (min-width: 520px) {
+  .listingsContainer {
+    padding: 0.5rem 2rem;
+  }
+}
+@media screen and (min-width: 768px) {
+  .listingsContainer {
+    margin: 3rem 3rem;
+    padding: 2rem 4rem;
+  }
+}
+@media screen and (min-width: 992px) {
+  .listingsContainer {
+    margin: 3rem 5rem;
+    padding: 1rem 3rem;
+  }
+}
+
+.yourAdsTitle {
+  font-size: 1.8rem;
+  color: #373373;
+}
+
+.showingAdsTitleAndDropdownWrap {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #e2e2e5;
+  margin-bottom: 3rem;
+  align-items: center;
+}
+
+.showingAdsTitle {
+  font-size: 1.8rem;
+  color: #373373;
+  display: none;
+  margin: 0;
+}
+@media screen and (min-width: 768px) {
+  .showingAdsTitle {
+    display: block;
+  }
+}
+
+.dropdownWrap {
+  display: flex;
+  width: 100%;
+  padding: 1rem;
+  justify-content: space-between;
+  align-items: center;
+}
+.dropdownWrap h3 {
+  font-size: 1.4rem;
+}
+@media screen and (min-width: 520px) {
+  .dropdownWrap h3 {
+    font-size: 1.7rem;
+  }
+}
+@media screen and (min-width: 768px) {
+  .dropdownWrap h3 {
+    margin-right: 1.5rem;
+  }
+}
+.dropdownWrap .sortByDropdown {
+  width: 75%;
+  padding: 1rem;
+  border: 1px solid #e2e2e5;
+  border-radius: 0.4rem;
+  font-size: 1.3rem;
+  font-weight: normal;
+  margin: 0;
+}
+.dropdownWrap .sortByDropdown:focus {
+  outline: none;
+  border: 1px solid #2681db;
+  box-shadow: 0 0 5px #2681db;
+  background-color: white;
+}
+@media screen and (min-width: 768px) {
+  .dropdownWrap .sortByDropdown {
+    font-size: 1.5rem;
+    width: 70%;
+  }
+}
+@media screen and (min-width: 768px) {
+  .dropdownWrap {
+    justify-content: flex-end;
+    width: 50%;
+  }
+}
+
 .loadingCenter {
   display: flex;
   justify-content: center;
@@ -957,7 +1054,9 @@ nav {
   border-radius: 3px;
   background-clip: padding-box;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  align-items: center;
 }
 
 .listingPreviewImageContainer {
@@ -985,7 +1084,7 @@ nav {
 @media screen and (min-width: 992px) {
   .listingPreviewImageContainer {
     width: 23rem;
-    margin: 1rem 4rem;
+    margin-right: 2rem;
   }
 }
 
@@ -1012,7 +1111,7 @@ nav {
 }
 @media screen and (min-width: 768px) {
   .titleAndPriceWrap .title {
-    font-size: 2.3rem;
+    font-size: 2rem;
   }
 }
 .titleAndPriceWrap .price {
@@ -1027,7 +1126,7 @@ nav {
 }
 @media screen and (min-width: 768px) {
   .titleAndPriceWrap .price {
-    font-size: 2.3rem;
+    font-size: 2rem;
   }
 }
 
