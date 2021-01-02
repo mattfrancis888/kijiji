@@ -39,12 +39,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
+exports.getListingsSortedByHighestPrice = exports.getListingsSortedByLowestPrice = exports.getListingsSortedByNewestDate = exports.getListingsSortedByOldestDate = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
 var multer_1 = __importDefault(require("multer"));
-var categoriesForListing = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+var categoriesForListing = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         databasePool_1.default.query("SELECT category_name FROM category", function (error, category) {
             if (error)
@@ -60,7 +60,6 @@ var createListing = function (req, res) { return __awaiter(void 0, void 0, void 
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                console.log(req.body);
                 title = req.body.title;
                 description = req.body.description;
                 category = req.body.category;
@@ -168,3 +167,95 @@ var uploadImage = function (req, res) { return __awaiter(void 0, void 0, void 0,
     });
 }); };
 exports.uploadImage = uploadImage;
+var getListingsSortedByOldestDate = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var listing_name, category_id, query, values;
+    return __generator(this, function (_a) {
+        listing_name = req.body.listing_name || "";
+        category_id = req.body.category_id;
+        if (category_id) {
+            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC";
+            values = ["%" + listing_name + "%", category_id];
+        }
+        else {
+            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE ASC";
+            values = ["%" + listing_name + "%"];
+        }
+        databasePool_1.default.query(query, values, function (error, listing) {
+            if (error) {
+                return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
+            }
+            res.send(listing.rows);
+        });
+        return [2 /*return*/];
+    });
+}); };
+exports.getListingsSortedByOldestDate = getListingsSortedByOldestDate;
+var getListingsSortedByNewestDate = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var listing_name, category_id, query, values;
+    return __generator(this, function (_a) {
+        listing_name = req.body.listing_name || "";
+        category_id = req.body.category_id;
+        if (category_id) {
+            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE DESC";
+            values = ["%" + listing_name + "%", category_id];
+        }
+        else {
+            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE DESC";
+            values = ["%" + listing_name + "%"];
+        }
+        databasePool_1.default.query(query, values, function (error, listing) {
+            if (error) {
+                return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
+            }
+            res.send(listing.rows);
+        });
+        return [2 /*return*/];
+    });
+}); };
+exports.getListingsSortedByNewestDate = getListingsSortedByNewestDate;
+var getListingsSortedByLowestPrice = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var listing_name, category_id, query, values;
+    return __generator(this, function (_a) {
+        listing_name = req.body.listing_name || "";
+        category_id = req.body.category_id;
+        if (category_id) {
+            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY listing_price ASC";
+            values = ["%" + listing_name + "%", category_id];
+        }
+        else {
+            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY listing_price ASC";
+            values = ["%" + listing_name + "%"];
+        }
+        databasePool_1.default.query(query, values, function (error, listing) {
+            if (error) {
+                return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
+            }
+            res.send(listing.rows);
+        });
+        return [2 /*return*/];
+    });
+}); };
+exports.getListingsSortedByLowestPrice = getListingsSortedByLowestPrice;
+var getListingsSortedByHighestPrice = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var listing_name, category_id, query, values;
+    return __generator(this, function (_a) {
+        listing_name = req.body.listing_name || "";
+        category_id = req.body.category_id;
+        if (category_id) {
+            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY listing_price DESC";
+            values = ["%" + listing_name + "%", category_id];
+        }
+        else {
+            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY listing_price DESC";
+            values = ["%" + listing_name + "%"];
+        }
+        databasePool_1.default.query(query, values, function (error, listing) {
+            if (error) {
+                return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
+            }
+            res.send(listing.rows);
+        });
+        return [2 /*return*/];
+    });
+}); };
+exports.getListingsSortedByHighestPrice = getListingsSortedByHighestPrice;

@@ -4,11 +4,7 @@ import { FORBIDDEN_STATUS, INTERNAL_SERVER_ERROR_STATUS } from "../constants";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 
-export const categoriesForListing = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const categoriesForListing = async (req: Request, res: Response) => {
     pool.query(`SELECT category_name FROM category`, (error, category) => {
         if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
 
@@ -16,7 +12,7 @@ export const categoriesForListing = async (
     });
 };
 export const createListing = async (req: Request, res: Response) => {
-    console.log(req.body);
+    // console.log(req.body);
     const title = req.body.title;
     const description = req.body.description;
     const category = req.body.category;
@@ -126,5 +122,105 @@ export const uploadImage = async (req: any, res: Response) => {
         return res.send({ cloudinaryImagePath: req.file.path });
 
         // Everything went fine and save document in DB here.
+    });
+};
+
+export const getListingsSortedByOldestDate = async (
+    req: Request,
+    res: Response
+) => {
+    const listing_name = req.body.listing_name || "";
+    const category_id = req.body.category_id;
+    let query;
+    let values;
+
+    if (category_id) {
+        query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC`;
+        values = [`%${listing_name}%`, category_id];
+    } else {
+        query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE ASC`;
+        values = [`%${listing_name}%`];
+    }
+    pool.query(query, values, (error, listing) => {
+        if (error) {
+            return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+        }
+
+        res.send(listing.rows);
+    });
+};
+
+export const getListingsSortedByNewestDate = async (
+    req: Request,
+    res: Response
+) => {
+    const listing_name = req.body.listing_name || "";
+    const category_id = req.body.category_id;
+    let query;
+    let values;
+
+    if (category_id) {
+        query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE DESC`;
+        values = [`%${listing_name}%`, category_id];
+    } else {
+        query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE DESC`;
+        values = [`%${listing_name}%`];
+    }
+    pool.query(query, values, (error, listing) => {
+        if (error) {
+            return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+        }
+
+        res.send(listing.rows);
+    });
+};
+
+export const getListingsSortedByLowestPrice = async (
+    req: Request,
+    res: Response
+) => {
+    const listing_name = req.body.listing_name || "";
+    const category_id = req.body.category_id;
+    let query;
+    let values;
+
+    if (category_id) {
+        query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY listing_price ASC`;
+        values = [`%${listing_name}%`, category_id];
+    } else {
+        query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY listing_price ASC`;
+        values = [`%${listing_name}%`];
+    }
+    pool.query(query, values, (error, listing) => {
+        if (error) {
+            return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+        }
+
+        res.send(listing.rows);
+    });
+};
+
+export const getListingsSortedByHighestPrice = async (
+    req: Request,
+    res: Response
+) => {
+    const listing_name = req.body.listing_name || "";
+    const category_id = req.body.category_id;
+    let query;
+    let values;
+
+    if (category_id) {
+        query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY listing_price DESC`;
+        values = [`%${listing_name}%`, category_id];
+    } else {
+        query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY listing_price DESC`;
+        values = [`%${listing_name}%`];
+    }
+    pool.query(query, values, (error, listing) => {
+        if (error) {
+            return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+        }
+
+        res.send(listing.rows);
     });
 };
