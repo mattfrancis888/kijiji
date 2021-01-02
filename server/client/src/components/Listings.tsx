@@ -1,28 +1,42 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
-import { signOut } from "../actions";
+import { fetchListingsByOldestDate } from "../actions";
 import { StoreState } from "../reducers";
 import Listing from "./Listing";
+import Loading from "./Loading";
+
 interface IListings {
-    authStatus?: string | null;
-    signOut(): void;
+    fetchListingsByOldestDate(): void;
+    listings: any;
 }
 
 const Listings: React.FC<IListings> = (props) => {
-    const history = useHistory();
+    const renderListings = () => {
+        if (props.listings.length === 0) {
+            return (
+                <div className="loadingCenter">
+                    <Loading />
+                </div>
+            );
+        } else {
+            return props.listings.map((listing) => <Listing {...listing} />);
+        }
+    };
+    useEffect(() => {
+        props.fetchListingsByOldestDate();
+    }, []);
+    console.log(props.listings);
     return (
-        <div>
+        <React.Fragment>
             <div className="listingsContainer">
                 <h1 className="yourAdsTitle">Your Ads:</h1>
                 <Listing />
             </div>
             <div className="listingsContainer">
                 <div className="showingAdsTitleAndDropdownWrap">
-                    <h1 className="showingAdsTitle">
-                        Showing 1 out of x ads:{" "}
-                    </h1>
+                    <h1 className="showingAdsTitle">`Showing 1 out of ads:</h1>
                     <div className="dropdownWrap">
                         <h3>Sort by</h3>
                         <select className="sortByDropdown">
@@ -41,14 +55,17 @@ const Listings: React.FC<IListings> = (props) => {
                         </select>
                     </div>
                 </div>
-                <Listing />
+                {renderListings()}
             </div>
-        </div>
+        </React.Fragment>
     );
 };
 
 const mapStateToProps = (state: StoreState) => {
-    return {};
+    //@ts-ignore
+    return { listings: Object.values(state.listings) };
 };
 
-export default connect(mapStateToProps, {})(Listings);
+export default connect(mapStateToProps, { fetchListingsByOldestDate })(
+    Listings
+);

@@ -22,15 +22,16 @@ export interface UploadImageToCloudinaryAction {
     payload: CloudinaryImagePath;
 }
 export interface Listing {
-    id: number;
-    title: string;
-    description: string;
-    category: string;
-    image: string;
+    listing_id: number;
+    listing_name: string;
+    listing_description: string;
+    category_id: number;
+    listing_image: string;
     province: string;
     city: string;
     street: string;
-    price: string;
+    listing_price: string;
+    listing_date: Date;
 }
 
 export interface CreateListingAction {
@@ -41,6 +42,11 @@ export interface CreateListingAction {
 export interface ListingErrorAction {
     type: ActionTypes.LISTING_ERROR;
     payload: [];
+}
+
+export interface FetchListingsAction {
+    type: ActionTypes.FETCH_LISTINGS;
+    payload: Listing[];
 }
 
 export const fetchCategoriesForListing = () => async (dispatch: Dispatch) => {
@@ -105,9 +111,23 @@ export const createListing = (formValues: any) => async (
             payload: listingResponse.data,
         });
     } catch (error) {
-        console.log(error);
         dispatch<ListingErrorAction>({
             type: ActionTypes.LISTING_ERROR,
+            payload: [],
+        });
+    }
+};
+
+export const fetchListingsByOldestDate = () => async (dispatch: Dispatch) => {
+    try {
+        const response = await axios.get<[]>("/listing-oldest-date");
+        dispatch<FetchListingsAction>({
+            type: ActionTypes.FETCH_LISTINGS,
+            payload: response.data,
+        });
+    } catch (error) {
+        dispatch<FetchListingsAction>({
+            type: ActionTypes.FETCH_LISTINGS,
             payload: [],
         });
     }
