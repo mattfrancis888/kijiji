@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import { Listing as ListingType } from "../actions";
+import moment from "moment";
 
 const Listing: React.FC<ListingType> = ({
     listing_id,
@@ -17,7 +18,7 @@ const Listing: React.FC<ListingType> = ({
     street,
 }) => {
     return (
-        <div key={listing_id} className="listingPreviewContainer">
+        <div className="listingPreviewContainer">
             <div className="listingPreviewImageContainer">
                 <img src={listing_image} alt="listing" />
             </div>
@@ -29,7 +30,9 @@ const Listing: React.FC<ListingType> = ({
                 <div className="locationAndDateWrap">
                     <h3 className="location">{`${city}, ${province} at ${street} `}</h3>
 
-                    <h3 className="date">{listing_date}</h3>
+                    <h3 className="date">
+                        {moment(listing_date).format("YYYY/MM/DD")}
+                    </h3>
                 </div>
                 <p className="listingDescription">{listing_description}</p>
             </div>

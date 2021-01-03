@@ -2,17 +2,41 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
-import { fetchListingsByOldestDate } from "../actions";
+import {
+    fetchListingsByOldestDate,
+    fetchListingsByNewestDate,
+    fetchListingsByLowestPrice,
+    fetchListingsByHighestPrice,
+    Listing as ListingType,
+} from "../actions";
 import { StoreState } from "../reducers";
 import Listing from "./Listing";
 import Loading from "./Loading";
-
+const ORDER_BY_OLDEST_DATE = "Posted: oldest first";
+const ORDER_BY_NEWEST_DATE = "Posted: newest first";
+const ORDER_BY_LOWEST_PRICE = " Price: lowest first";
+const ORDER_BY_HIGHEST_PRICE = "Price: highest first";
 interface IListings {
     fetchListingsByOldestDate(): void;
+    fetchListingsByNewestDate(): void;
+    fetchListingsByLowestPrice(): void;
+    fetchListingsByHighestPrice(): void;
     listings: any;
 }
 
 const Listings: React.FC<IListings> = (props) => {
+    const handleDropdownChange = (event) => {
+        let valueOfSelectedOption = event.target.value;
+        if (valueOfSelectedOption === ORDER_BY_OLDEST_DATE) {
+            props.fetchListingsByOldestDate();
+        } else if (valueOfSelectedOption === ORDER_BY_NEWEST_DATE) {
+            props.fetchListingsByNewestDate();
+        } else if (valueOfSelectedOption === ORDER_BY_LOWEST_PRICE) {
+            props.fetchListingsByLowestPrice();
+        } else if (valueOfSelectedOption === ORDER_BY_HIGHEST_PRICE) {
+            props.fetchListingsByHighestPrice();
+        }
+    };
     const renderListings = () => {
         if (props.listings.length === 0) {
             return (
@@ -21,13 +45,15 @@ const Listings: React.FC<IListings> = (props) => {
                 </div>
             );
         } else {
-            return props.listings.map((listing) => <Listing {...listing} />);
+            return props.listings.data.map((listing: ListingType) => (
+                <Listing key={listing.listing_id} {...listing} />
+            ));
         }
     };
     useEffect(() => {
         props.fetchListingsByOldestDate();
     }, []);
-    console.log(props.listings);
+    console.log("LISTINGS VALUE", props.listings);
     return (
         <React.Fragment>
             <div className="listingsContainer">
@@ -39,18 +65,21 @@ const Listings: React.FC<IListings> = (props) => {
                     <h1 className="showingAdsTitle">`Showing 1 out of ads:</h1>
                     <div className="dropdownWrap">
                         <h3>Sort by</h3>
-                        <select className="sortByDropdown">
-                            <option value="Posted: oldest first">
-                                Posted: oldest first
+                        <select
+                            className="sortByDropdown"
+                            onChange={handleDropdownChange}
+                        >
+                            <option value={ORDER_BY_OLDEST_DATE}>
+                                {ORDER_BY_OLDEST_DATE}
                             </option>
-                            <option value="Posted: newest first">
-                                Posted: newest first
+                            <option value={ORDER_BY_NEWEST_DATE}>
+                                {ORDER_BY_NEWEST_DATE}
                             </option>
-                            <option value="Price: lowest first">
-                                Price: lowest first
+                            <option value={ORDER_BY_LOWEST_PRICE}>
+                                {ORDER_BY_LOWEST_PRICE}
                             </option>
-                            <option value="Price: highest first">
-                                Price: highest first
+                            <option value={ORDER_BY_HIGHEST_PRICE}>
+                                {ORDER_BY_HIGHEST_PRICE}
                             </option>
                         </select>
                     </div>
@@ -63,9 +92,13 @@ const Listings: React.FC<IListings> = (props) => {
 
 const mapStateToProps = (state: StoreState) => {
     //@ts-ignore
-    return { listings: Object.values(state.listings) };
+    // return { listings: Object.values(state.listings) };
+    return { listings: state.listings };
 };
 
-export default connect(mapStateToProps, { fetchListingsByOldestDate })(
-    Listings
-);
+export default connect(mapStateToProps, {
+    fetchListingsByOldestDate,
+    fetchListingsByNewestDate,
+    fetchListingsByLowestPrice,
+    fetchListingsByHighestPrice,
+})(Listings);

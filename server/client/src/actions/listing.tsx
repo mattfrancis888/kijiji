@@ -126,8 +126,53 @@ export const fetchListingsByOldestDate = () => async (dispatch: Dispatch) => {
             payload: response.data,
         });
     } catch (error) {
+        dispatch<ListingErrorAction>({
+            type: ActionTypes.LISTING_ERROR,
+            payload: [],
+        });
+    }
+};
+
+export const fetchListingsByNewestDate = () => async (dispatch: Dispatch) => {
+    try {
+        const response = await axios.get<[]>("/listing-newest-date");
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,
+            payload: response.data,
+        });
+    } catch (error) {
+        dispatch<ListingErrorAction>({
+            type: ActionTypes.LISTING_ERROR,
+            payload: [],
+        });
+    }
+};
+
+export const fetchListingsByLowestPrice = () => async (dispatch: Dispatch) => {
+    try {
+        const response = await axios.get<[]>("/listing-lowest-price");
+        dispatch<FetchListingsAction>({
+            type: ActionTypes.FETCH_LISTINGS,
+            payload: response.data,
+        });
+    } catch (error) {
+        dispatch<ListingErrorAction>({
+            type: ActionTypes.LISTING_ERROR,
+            payload: [],
+        });
+    }
+};
+
+export const fetchListingsByHighestPrice = () => async (dispatch: Dispatch) => {
+    try {
+        const response = await axios.get<[]>("/listing-highest-price");
+        dispatch<FetchListingsAction>({
+            type: ActionTypes.FETCH_LISTINGS,
+            payload: response.data,
+        });
+    } catch (error) {
+        dispatch<ListingErrorAction>({
+            type: ActionTypes.LISTING_ERROR,
             payload: [],
         });
     }
