@@ -125,6 +125,39 @@ export const uploadImage = async (req: any, res: Response) => {
     });
 };
 
+// export const getListingCount = async (
+//     req: any,
+//     res: Response,
+//     next: NextFunction
+// ) => {
+//     const listing_name = req.body.listing_name || "";
+//     const category_id = req.body.category_id;
+//     let query;
+//     let values = [`%${listing_name}%`, category_id];
+//     console.log(req.params);
+//     if (req.params.sort === "listing-oldest-date") {
+//         query = `SELECT COUNT(*) FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC`;
+//     } else if (req.params.sort === "listing-newest-date") {
+//     } else if (req.params.sort === "listing-lowest-price") {
+//     } else if (req.params.sort === "listing-highest-price") {
+//     }
+
+//     if (query) {
+//         pool.query(query, values, (error, listing) => {
+//             if (error) {
+//                 console.log(error);
+//                 return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+//             }
+
+//             res.send(listing.rows);
+//         });
+//     } else {
+//         console.log("eee");
+//         return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+//     }
+//     next();
+// };
+
 export const getListingsSortedByOldestDate = async (
     req: any,
     res: Response
@@ -133,27 +166,38 @@ export const getListingsSortedByOldestDate = async (
     const category_id = req.body.category_id;
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);
-    console.log(page);
 
     let query;
+    let countQuery;
     let values;
+    let countValues;
 
-    if (category_id) {
-        query = `SELECT  * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC`;
-        values = [`%${listing_name}%`, category_id];
-    } else {
-        query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE ASC 
-        LIMIT $2 OFFSET ($3 - 1) * $2`;
-        values = [`%${listing_name}%`, limit, page];
-    }
-    pool.query(query, values, (error, listing) => {
-        if (error) {
-            console.log(error);
-            return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+    try {
+        if (category_id) {
+            query = `SELECT  * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC`;
+            values = [`%${listing_name}%`, category_id];
+
+            countQuery = `SELECT COUNT(listing_id) FROM listing WHERE listing_name LIKE $1 AND category_id = $2`;
+            countValues = [`%${listing_name}%`, category_id];
+        } else {
+            query = `SELECT * FROM listing WHERE listing_name LIKE $1 ORDER BY LISTING_DATE ASC 
+            LIMIT $2 OFFSET ($3 - 1) * $2`;
+            values = [`%${listing_name}%`, limit, page];
+
+            countQuery = `SELECT COUNT(*) FROM listing WHERE listing_name LIKE $1`;
+            countValues = [`%${listing_name}%`];
         }
 
-        res.send(listing.rows);
-    });
+        const totalListingsResponse = await pool.query(countQuery, countValues);
+        const response = await pool.query(query, values);
+        let results = {};
+        Object.assign(results, totalListingsResponse.rows[0]);
+        results.listings = response.rows;
+        res.send(results);
+    } catch (err) {
+        console.log(err);
+        return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+    }
 };
 
 export const getListingsSortedByNewestDate = async (

@@ -22,7 +22,7 @@ interface IListings {
     fetchListingsByNewestDate(): void;
     fetchListingsByLowestPrice(): void;
     fetchListingsByHighestPrice(): void;
-    listings: any;
+    listingInfo: any;
 }
 
 const Listings: React.FC<IListings> = (props) => {
@@ -38,52 +38,64 @@ const Listings: React.FC<IListings> = (props) => {
             props.fetchListingsByHighestPrice();
         }
     };
+    const pageNumberClicked = (pageNumber: number) => {
+        console.log("Callback clicked", pageNumber);
+        //props.fetchListingsByOldestDate();
+    };
+
     const renderListings = () => {
-        if (props.listings.length === 0) {
+        if (!props.listingInfo) {
             return (
                 <div className="loadingCenter">
                     <Loading />
                 </div>
             );
         } else {
-            return props.listings.data.map((listing: ListingType) => (
-                <Listing key={listing.listing_id} {...listing} />
-            ));
+            return (
+                <React.Fragment>
+                    <Pagination
+                        totalItems={9}
+                        itemLimit={3}
+                        currentPage={1}
+                        onClickCallback={pageNumberClicked}
+                    />
+                    <div className="showingAdsTitleAndDropdownWrap">
+                        <h1 className="showingAdsTitle">{`Showing 1 out of ${props.listingInfo.count} ads:`}</h1>
+                        <div className="dropdownWrap">
+                            <h3>Sort by</h3>
+                            <select
+                                className="sortByDropdown"
+                                onChange={handleDropdownChange}
+                            >
+                                <option value={ORDER_BY_OLDEST_DATE}>
+                                    {ORDER_BY_OLDEST_DATE}
+                                </option>
+                                <option value={ORDER_BY_NEWEST_DATE}>
+                                    {ORDER_BY_NEWEST_DATE}
+                                </option>
+                                <option value={ORDER_BY_LOWEST_PRICE}>
+                                    {ORDER_BY_LOWEST_PRICE}
+                                </option>
+                                <option value={ORDER_BY_HIGHEST_PRICE}>
+                                    {ORDER_BY_HIGHEST_PRICE}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    {props.listingInfo.listings.map((listing: ListingType) => (
+                        <Listing key={listing.listing_id} {...listing} />
+                    ))}
+                </React.Fragment>
+            );
         }
     };
     useEffect(() => {
         props.fetchListingsByOldestDate();
     }, []);
-    console.log("LISTINGS VALUE", props.listings);
+    console.log("LISTINGS VALUE", props.listingInfo);
     return (
         <React.Fragment>
-            <div className="listingsContainer">
-                <Pagination />
-                <div className="showingAdsTitleAndDropdownWrap">
-                    <h1 className="showingAdsTitle">`Showing 1 out of ads:</h1>
-                    <div className="dropdownWrap">
-                        <h3>Sort by</h3>
-                        <select
-                            className="sortByDropdown"
-                            onChange={handleDropdownChange}
-                        >
-                            <option value={ORDER_BY_OLDEST_DATE}>
-                                {ORDER_BY_OLDEST_DATE}
-                            </option>
-                            <option value={ORDER_BY_NEWEST_DATE}>
-                                {ORDER_BY_NEWEST_DATE}
-                            </option>
-                            <option value={ORDER_BY_LOWEST_PRICE}>
-                                {ORDER_BY_LOWEST_PRICE}
-                            </option>
-                            <option value={ORDER_BY_HIGHEST_PRICE}>
-                                {ORDER_BY_HIGHEST_PRICE}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                {renderListings()}
-            </div>
+            <div className="listingsContainer">{renderListings()}</div>
         </React.Fragment>
     );
 };
@@ -91,7 +103,7 @@ const Listings: React.FC<IListings> = (props) => {
 const mapStateToProps = (state: StoreState) => {
     //@ts-ignore
     // return { listings: Object.values(state.listings) };
-    return { listings: state.listings };
+    return { listingInfo: state.listingInfo.data };
 };
 
 export default connect(mapStateToProps, {

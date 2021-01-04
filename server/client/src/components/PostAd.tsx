@@ -19,7 +19,6 @@ export interface PostAdFormProps {
 
 export interface PostAdProps {
     createListing(formValues: any): void;
-    listings: Listing[];
 }
 
 const PostAd: React.FC<PostAdProps> = (props) => {
@@ -45,10 +44,4 @@ const PostAd: React.FC<PostAdProps> = (props) => {
     );
 };
 
-const mapStateToProps = (state: StoreState) => {
-    return {
-        listings: state.listings,
-    };
-};
-
-export default connect(mapStateToProps, { createListing })(requireAuth(PostAd));
+export default connect(null, { createListing })(requireAuth(PostAd));

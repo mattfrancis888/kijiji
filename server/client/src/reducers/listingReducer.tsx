@@ -1,7 +1,11 @@
 import { ActionTypes, ListingAction } from "../actions";
-import { Listing } from "../actions";
+import { Listing, FetchListingResponse } from "../actions";
 import _ from "lodash";
-const listingReducer = (state: Listing[] = [], action: ListingAction) => {
+
+const listingReducer = (
+    state: FetchListingResponse = {},
+    action: ListingAction
+) => {
     switch (action.type) {
         case ActionTypes.CREATE_LISTING:
             return { ...state, [action.payload.listing_id]: action.payload };
