@@ -12,6 +12,7 @@ import {
 import { StoreState } from "../reducers";
 import Listing from "./Listing";
 import Loading from "./Loading";
+import Pagination from "./Pagination";
 const ORDER_BY_OLDEST_DATE = "Posted: oldest first";
 const ORDER_BY_NEWEST_DATE = "Posted: newest first";
 const ORDER_BY_LOWEST_PRICE = " Price: lowest first";
@@ -57,10 +58,7 @@ const Listings: React.FC<IListings> = (props) => {
     return (
         <React.Fragment>
             <div className="listingsContainer">
-                <h1 className="yourAdsTitle">Your Ads:</h1>
-                <Listing />
-            </div>
-            <div className="listingsContainer">
+                <Pagination />
                 <div className="showingAdsTitleAndDropdownWrap">
                     <h1 className="showingAdsTitle">`Showing 1 out of ads:</h1>
                     <div className="dropdownWrap">

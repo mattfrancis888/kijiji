@@ -126,23 +126,29 @@ export const uploadImage = async (req: any, res: Response) => {
 };
 
 export const getListingsSortedByOldestDate = async (
-    req: Request,
+    req: any,
     res: Response
 ) => {
     const listing_name = req.body.listing_name || "";
     const category_id = req.body.category_id;
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    console.log(page);
+
     let query;
     let values;
 
     if (category_id) {
-        query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC`;
+        query = `SELECT  * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC`;
         values = [`%${listing_name}%`, category_id];
     } else {
-        query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE ASC`;
-        values = [`%${listing_name}%`];
+        query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE ASC 
+        LIMIT $2 OFFSET ($3 - 1) * $2`;
+        values = [`%${listing_name}%`, limit, page];
     }
     pool.query(query, values, (error, listing) => {
         if (error) {
+            console.log(error);
             return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
         }
 
@@ -223,4 +229,18 @@ export const getListingsSortedByHighestPrice = async (
 
         res.send(listing.rows);
     });
+};
+
+export const paginatedResults = async (
+    req: any,
+    res: Response,
+    next: NextFunction
+) => {
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const results = {};
 };

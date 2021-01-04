@@ -578,11 +578,6 @@ body {
   }
 }
 
-.yourAdsTitle {
-  font-size: 1.8rem;
-  color: #373373;
-}
-
 .showingAdsTitleAndDropdownWrap {
   display: flex;
   justify-content: space-between;
@@ -1192,6 +1187,44 @@ nav {
   .listingDescription {
     font-size: 1.8rem;
   }
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+}
+
+.pageItem,
+.pageItemSelected {
+  padding: 0.5rem 1rem;
+  font-size: 1.3rem;
+}
+@media screen and (min-width: 520px) {
+  .pageItem,
+.pageItemSelected {
+    padding: 1rem 1.5rem;
+    font-size: 1.5rem;
+  }
+}
+@media screen and (min-width: 992px) {
+  .pageItem,
+.pageItemSelected {
+    padding: 1.3rem 1.8rem;
+    font-size: 1.8rem;
+  }
+}
+
+.pageItem {
+  background-color: white;
+  border: 1px solid #cacaea;
+  color: #373373;
+}
+
+.pageItemSelected {
+  background-color: purple;
+  color: white;
+  font-weight: bold;
 }
 
 /*# sourceMappingURL=main.css.map */

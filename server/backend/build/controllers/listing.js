@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getListingsSortedByHighestPrice = exports.getListingsSortedByLowestPrice = exports.getListingsSortedByNewestDate = exports.getListingsSortedByOldestDate = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
+exports.paginatedResults = exports.getListingsSortedByHighestPrice = exports.getListingsSortedByLowestPrice = exports.getListingsSortedByNewestDate = exports.getListingsSortedByOldestDate = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
@@ -168,20 +168,24 @@ var uploadImage = function (req, res) { return __awaiter(void 0, void 0, void 0,
 }); };
 exports.uploadImage = uploadImage;
 var getListingsSortedByOldestDate = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var listing_name, category_id, query, values;
+    var listing_name, category_id, page, limit, query, values;
     return __generator(this, function (_a) {
         listing_name = req.body.listing_name || "";
         category_id = req.body.category_id;
+        page = parseInt(req.query.page);
+        limit = parseInt(req.query.limit);
+        console.log(page);
         if (category_id) {
-            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC";
+            query = "SELECT  * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC";
             values = ["%" + listing_name + "%", category_id];
         }
         else {
-            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE ASC";
-            values = ["%" + listing_name + "%"];
+            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE ASC \n        LIMIT $2 OFFSET ($3 - 1) * $2";
+            values = ["%" + listing_name + "%", limit, page];
         }
         databasePool_1.default.query(query, values, function (error, listing) {
             if (error) {
+                console.log(error);
                 return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
             }
             res.send(listing.rows);
@@ -259,3 +263,15 @@ var getListingsSortedByHighestPrice = function (req, res) { return __awaiter(voi
     });
 }); };
 exports.getListingsSortedByHighestPrice = getListingsSortedByHighestPrice;
+var paginatedResults = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var page, limit, startIndex, endIndex, results;
+    return __generator(this, function (_a) {
+        page = parseInt(req.query.page);
+        limit = parseInt(req.query.limit);
+        startIndex = (page - 1) * limit;
+        endIndex = page * limit;
+        results = {};
+        return [2 /*return*/];
+    });
+}); };
+exports.paginatedResults = paginatedResults;
