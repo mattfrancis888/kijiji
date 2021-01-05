@@ -1193,6 +1193,12 @@ nav {
   display: flex;
   flex-wrap: wrap;
   list-style: none;
+  justify-content: center;
+}
+@media screen and (min-width: 768px) {
+  .pagination {
+    margin: 5rem 0;
+  }
 }
 
 .pageItem,

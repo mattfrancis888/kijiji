@@ -1,10 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { connect } from "react-redux";
-import { signOut } from "../actions";
-import { StoreState } from "../reducers";
-
-import history from "../browserHistory";
 
 interface PaginationProps {
     totalItems: number;
@@ -49,16 +44,10 @@ const Pagination: React.FC<PaginationProps> = (props) => {
         );
     };
     return (
-        <div className="paginationWrap">
+        <React.Fragment>
             {renderPageItems(props.totalItems, props.itemLimit)}
-        </div>
+        </React.Fragment>
     );
 };
 
-// const mapStateToProps = (state: StoreState) => {
-//     return {
-//         authStatus: state.authStatus.authenticated,
-//     };
-// };
-
-export default connect(null, {})(Pagination);
+export default Pagination;

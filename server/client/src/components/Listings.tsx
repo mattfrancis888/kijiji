@@ -54,7 +54,6 @@ const Listings: React.FC<IListings> = (props) => {
         }
     };
     const pageNumberClicked = (pageNumber: number) => {
-        console.log("Callback clicked", pageNumber);
         if (selectedSort === ORDER_BY_OLDEST_DATE) {
             props.fetchListingsByOldestDate(pageNumber);
         } else if (selectedSort === ORDER_BY_NEWEST_DATE) {
@@ -76,12 +75,6 @@ const Listings: React.FC<IListings> = (props) => {
         } else {
             return (
                 <React.Fragment>
-                    <Pagination
-                        totalItems={props.listingInfo.totalListings}
-                        itemLimit={props.listingInfo.limitPerPage}
-                        currentPage={currentPage}
-                        onClickCallback={pageNumberClicked}
-                    />
                     <div className="showingAdsTitleAndDropdownWrap">
                         <h1 className="showingAdsTitle">{`Showing ${
                             props.listingInfo.limitPerPage *
@@ -111,6 +104,12 @@ const Listings: React.FC<IListings> = (props) => {
                     {props.listingInfo.listings.map((listing: ListingType) => (
                         <Listing key={listing.listing_id} {...listing} />
                     ))}
+                    <Pagination
+                        totalItems={props.listingInfo.totalListings}
+                        itemLimit={props.listingInfo.limitPerPage}
+                        currentPage={currentPage}
+                        onClickCallback={pageNumberClicked}
+                    />
                 </React.Fragment>
             );
         }

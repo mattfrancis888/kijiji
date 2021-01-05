@@ -2,6 +2,10 @@
     display: flex;
     flex-wrap: wrap;
     list-style: none;
+    justify-content: center;
+    @media screen and (min-width: $md_breakpoint) {
+        margin: 5rem 0;
+    }
 }
 
 .pageItem,
