@@ -23,35 +23,47 @@ const ORDER_BY_HIGHEST_PRICE = "Price: highest first";
 //
 interface IListings {
     fetchListingsByOldestDate(pageNumber: number): void;
-    fetchListingsByNewestDate(): void;
-    fetchListingsByLowestPrice(): void;
-    fetchListingsByHighestPrice(): void;
+    fetchListingsByNewestDate(pageNumber: number): void;
+    fetchListingsByLowestPrice(pageNumber: number): void;
+    fetchListingsByHighestPrice(pageNumber: number): void;
     listingInfo: any;
     match: any;
 }
 
 const Listings: React.FC<IListings> = (props) => {
     //https://ui.dev/react-router-v5-query-strings/
-    const { search } = useLocation();
-    const values = queryString.parse(search);
-    // const currentPage = values;
+    //For Query Strings:
+    // const { search } = useLocation();
+    // const values = queryString.parse(search);
+
     const currentPage = parseInt(props.match.params.page);
+    const [selectedSort, setSelectedSort] = useState(ORDER_BY_OLDEST_DATE);
 
     const handleDropdownChange = (event) => {
         let valueOfSelectedOption = event.target.value;
         if (valueOfSelectedOption === ORDER_BY_OLDEST_DATE) {
-            props.fetchListingsByOldestDate(1);
+            setSelectedSort(ORDER_BY_OLDEST_DATE);
+            props.fetchListingsByOldestDate(currentPage);
         } else if (valueOfSelectedOption === ORDER_BY_NEWEST_DATE) {
-            props.fetchListingsByNewestDate();
+            props.fetchListingsByNewestDate(currentPage);
         } else if (valueOfSelectedOption === ORDER_BY_LOWEST_PRICE) {
-            props.fetchListingsByLowestPrice();
+            props.fetchListingsByLowestPrice(currentPage);
         } else if (valueOfSelectedOption === ORDER_BY_HIGHEST_PRICE) {
-            props.fetchListingsByHighestPrice();
+            setSelectedSort(ORDER_BY_HIGHEST_PRICE);
+            props.fetchListingsByHighestPrice(currentPage);
         }
     };
     const pageNumberClicked = (pageNumber: number) => {
         console.log("Callback clicked", pageNumber);
-        props.fetchListingsByOldestDate(pageNumber);
+        if (selectedSort === ORDER_BY_OLDEST_DATE) {
+            props.fetchListingsByOldestDate(pageNumber);
+        } else if (selectedSort === ORDER_BY_NEWEST_DATE) {
+            props.fetchListingsByNewestDate(pageNumber);
+        } else if (selectedSort === ORDER_BY_LOWEST_PRICE) {
+            props.fetchListingsByLowestPrice(pageNumber);
+        } else if (selectedSort === ORDER_BY_HIGHEST_PRICE) {
+            props.fetchListingsByHighestPrice(pageNumber);
+        }
     };
 
     const renderListings = () => {
@@ -71,7 +83,10 @@ const Listings: React.FC<IListings> = (props) => {
                         onClickCallback={pageNumberClicked}
                     />
                     <div className="showingAdsTitleAndDropdownWrap">
-                        <h1 className="showingAdsTitle">{`Showing 1 out of ${props.listingInfo.totalListingsunt} ads:`}</h1>
+                        <h1 className="showingAdsTitle">{`Showing ${
+                            props.listingInfo.limitPerPage *
+                            props.listingInfo.page
+                        } out of ${props.listingInfo.totalListings} ads:`}</h1>
                         <div className="dropdownWrap">
                             <h3>Sort by</h3>
                             <select

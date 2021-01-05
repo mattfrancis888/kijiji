@@ -29,6 +29,7 @@ const Pagination: React.FC<PaginationProps> = (props) => {
                 {pageItems.map((pageNumber) => {
                     return (
                         <li
+                            key={pageNumber}
                             onClick={() => {
                                 setSelectedPage(pageNumber);
                                 props.onClickCallback(pageNumber);

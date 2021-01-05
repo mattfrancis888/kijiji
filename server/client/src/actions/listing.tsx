@@ -144,10 +144,12 @@ export const fetchListingsByOldestDate = (pageNumber: number) => async (
     }
 };
 
-export const fetchListingsByNewestDate = () => async (dispatch: Dispatch) => {
+export const fetchListingsByNewestDate = (pageNumber: number) => async (
+    dispatch: Dispatch
+) => {
     try {
         const response = await axios.get<FetchListingResponse>(
-            "/listing-newest-date"
+            `/listing-newest-date/${pageNumber}`
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,
@@ -161,10 +163,12 @@ export const fetchListingsByNewestDate = () => async (dispatch: Dispatch) => {
     }
 };
 
-export const fetchListingsByLowestPrice = () => async (dispatch: Dispatch) => {
+export const fetchListingsByLowestPrice = (pageNumber: number) => async (
+    dispatch: Dispatch
+) => {
     try {
         const response = await axios.get<FetchListingResponse>(
-            "/listing-lowest-price"
+            `/listing-lowest-price/${pageNumber}`
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,
@@ -178,10 +182,12 @@ export const fetchListingsByLowestPrice = () => async (dispatch: Dispatch) => {
     }
 };
 
-export const fetchListingsByHighestPrice = () => async (dispatch: Dispatch) => {
+export const fetchListingsByHighestPrice = (pageNumber: number) => async (
+    dispatch: Dispatch
+) => {
     try {
         const response = await axios.get<FetchListingResponse>(
-            "/listing-highest-price"
+            `/listing-highest-price/${pageNumber}`
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,

@@ -3,6 +3,7 @@ import {
     createListing,
     uploadImage,
     categoriesForListing,
+    getSortedListingCount,
     getListingsSortedByOldestDate,
     getListingsSortedByNewestDate,
     getListingsSortedByLowestPrice,
@@ -13,8 +14,24 @@ const listingRouter = Router();
 listingRouter.post("/create-listing", createListing);
 listingRouter.get("/categories-for-listing", categoriesForListing);
 listingRouter.post("/upload-image", uploadImage);
-listingRouter.get("/listing-oldest-date/:page", getListingsSortedByOldestDate);
-listingRouter.get("/listing-newest-date", getListingsSortedByNewestDate);
-listingRouter.get("/listing-lowest-price", getListingsSortedByLowestPrice);
-listingRouter.get("/listing-highest-price", getListingsSortedByHighestPrice);
+listingRouter.get(
+    "/listing-oldest-date/:page",
+    getSortedListingCount,
+    getListingsSortedByOldestDate
+);
+listingRouter.get(
+    "/listing-newest-date/:page",
+    getSortedListingCount,
+    getListingsSortedByNewestDate
+);
+listingRouter.get(
+    "/listing-lowest-price/:page",
+    getSortedListingCount,
+    getListingsSortedByLowestPrice
+);
+listingRouter.get(
+    "/listing-highest-price/:page",
+    getSortedListingCount,
+    getListingsSortedByHighestPrice
+);
 export default listingRouter;

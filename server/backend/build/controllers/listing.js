@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.paginatedResults = exports.getListingsSortedByHighestPrice = exports.getListingsSortedByLowestPrice = exports.getListingsSortedByNewestDate = exports.getListingsSortedByOldestDate = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
+exports.getListingsSortedByHighestPrice = exports.getListingsSortedByLowestPrice = exports.getListingsSortedByNewestDate = exports.getListingsSortedByOldestDate = exports.getSortedListingCount = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
@@ -167,38 +167,50 @@ var uploadImage = function (req, res) { return __awaiter(void 0, void 0, void 0,
     });
 }); };
 exports.uploadImage = uploadImage;
-// export const getListingCount = async (
-//     req: any,
-//     res: Response,
-//     next: NextFunction
-// ) => {
-//     const listing_name = req.body.listing_name || "";
-//     const category_id = req.body.category_id;
-//     let query;
-//     let values = [`%${listing_name}%`, category_id];
-//     console.log(req.params);
-//     if (req.params.sort === "listing-oldest-date") {
-//         query = `SELECT COUNT(*) FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC`;
-//     } else if (req.params.sort === "listing-newest-date") {
-//     } else if (req.params.sort === "listing-lowest-price") {
-//     } else if (req.params.sort === "listing-highest-price") {
-//     }
-//     if (query) {
-//         pool.query(query, values, (error, listing) => {
-//             if (error) {
-//                 console.log(error);
-//                 return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
-//             }
-//             res.send(listing.rows);
-//         });
-//     } else {
-//         console.log("eee");
-//         return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
-//     }
-//     next();
-// };
+var getSortedListingCount = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var listing_name, category_id, countQuery, countValues, totalListingsResponse, err_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                listing_name = req.body.listing_name || "";
+                category_id = req.body.category_id;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                if (category_id) {
+                    countQuery = "SELECT COUNT(listing_id) FROM listing WHERE listing_name LIKE $1 AND category_id = $2";
+                    countValues = ["%" + listing_name + "%", category_id];
+                }
+                else {
+                    countQuery = "SELECT COUNT(*) FROM listing WHERE listing_name LIKE $1";
+                    countValues = ["%" + listing_name + "%"];
+                }
+                return [4 /*yield*/, databasePool_1.default.query(countQuery, countValues)];
+            case 2:
+                totalListingsResponse = _a.sent();
+                req.params.count = totalListingsResponse.rows[0].count;
+                return [3 /*break*/, 4];
+            case 3:
+                err_1 = _a.sent();
+                console.log(err_1);
+                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
+            case 4:
+                next();
+                return [2 /*return*/];
+        }
+    });
+}); };
+exports.getSortedListingCount = getSortedListingCount;
+var createSortedByResponse = function (count, page, limitPerPage, listings) {
+    var results = {};
+    results.totalListings = count;
+    results.page = page;
+    results.limitPerPage = limitPerPage;
+    results.listings = listings;
+    return results;
+};
 var getListingsSortedByOldestDate = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var listing_name, category_id, page, limitPerPage, query, countQuery, values, countValues, totalListingsResponse, response_2, results, err_1;
+    var listing_name, category_id, page, limitPerPage, count, query, values, response_2, finalResponse, err_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -206,121 +218,149 @@ var getListingsSortedByOldestDate = function (req, res) { return __awaiter(void 
                 category_id = req.body.category_id;
                 page = parseInt(req.params.page);
                 limitPerPage = 3;
+                count = parseInt(req.params.count);
                 _a.label = 1;
             case 1:
-                _a.trys.push([1, 4, , 5]);
+                _a.trys.push([1, 3, , 4]);
                 if (category_id) {
-                    query = "SELECT  * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC";
-                    values = ["%" + listing_name + "%", category_id];
-                    countQuery = "SELECT COUNT(listing_id) FROM listing WHERE listing_name LIKE $1 AND category_id = $2";
-                    countValues = ["%" + listing_name + "%", category_id];
+                    query = "SELECT  * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC\n            LIMIT $3 OFFSET ($4 - 1) * $3";
+                    values = ["%" + listing_name + "%", category_id, limitPerPage, page];
                 }
                 else {
                     query = "SELECT * FROM listing WHERE listing_name LIKE $1 ORDER BY LISTING_DATE ASC \n            LIMIT $2 OFFSET ($3 - 1) * $2";
                     values = ["%" + listing_name + "%", limitPerPage, page];
-                    countQuery = "SELECT COUNT(*) FROM listing WHERE listing_name LIKE $1";
-                    countValues = ["%" + listing_name + "%"];
                 }
-                return [4 /*yield*/, databasePool_1.default.query(countQuery, countValues)];
-            case 2:
-                totalListingsResponse = _a.sent();
                 return [4 /*yield*/, databasePool_1.default.query(query, values)];
-            case 3:
+            case 2:
                 response_2 = _a.sent();
-                results = {};
-                results.totalListings = parseInt(totalListingsResponse.rows[0].count);
-                results.page = page;
-                results.limitPerPage = limitPerPage;
-                results.listings = response_2.rows;
-                res.send(results);
-                return [3 /*break*/, 5];
-            case 4:
-                err_1 = _a.sent();
-                console.log(err_1);
+                finalResponse = createSortedByResponse(count, page, limitPerPage, response_2.rows);
+                res.send(finalResponse);
+                return [3 /*break*/, 4];
+            case 3:
+                err_2 = _a.sent();
+                console.log(err_2);
                 return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
-            case 5: return [2 /*return*/];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
 exports.getListingsSortedByOldestDate = getListingsSortedByOldestDate;
 var getListingsSortedByNewestDate = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var listing_name, category_id, query, values;
+    var listing_name, category_id, page, limitPerPage, count, query, values, response_3, finalResponse, err_3;
     return __generator(this, function (_a) {
-        listing_name = req.body.listing_name || "";
-        category_id = req.body.category_id;
-        if (category_id) {
-            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE DESC";
-            values = ["%" + listing_name + "%", category_id];
+        switch (_a.label) {
+            case 0:
+                listing_name = req.body.listing_name || "";
+                category_id = req.body.category_id;
+                page = parseInt(req.params.page);
+                limitPerPage = 3;
+                count = parseInt(req.params.count);
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                if (category_id) {
+                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE DESC\n            LIMIT $3 OFFSET ($4 - 1) * $3";
+                    values = ["%" + listing_name + "%", category_id, limitPerPage, page];
+                }
+                else {
+                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE DESC\n            LIMIT $2 OFFSET ($3 - 1) * $2";
+                    values = ["%" + listing_name + "%", limitPerPage, page];
+                }
+                return [4 /*yield*/, databasePool_1.default.query(query, values)];
+            case 2:
+                response_3 = _a.sent();
+                finalResponse = createSortedByResponse(count, page, limitPerPage, response_3.rows);
+                res.send(finalResponse);
+                return [3 /*break*/, 4];
+            case 3:
+                err_3 = _a.sent();
+                console.log(err_3);
+                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
+            case 4: return [2 /*return*/];
         }
-        else {
-            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE DESC";
-            values = ["%" + listing_name + "%"];
-        }
-        databasePool_1.default.query(query, values, function (error, listing) {
-            if (error) {
-                return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
-            }
-            res.send(listing.rows);
-        });
-        return [2 /*return*/];
     });
 }); };
 exports.getListingsSortedByNewestDate = getListingsSortedByNewestDate;
 var getListingsSortedByLowestPrice = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var listing_name, category_id, query, values;
+    var listing_name, category_id, page, limitPerPage, count, query, values, response_4, finalResponse, err_4;
     return __generator(this, function (_a) {
-        listing_name = req.body.listing_name || "";
-        category_id = req.body.category_id;
-        if (category_id) {
-            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY listing_price ASC";
-            values = ["%" + listing_name + "%", category_id];
+        switch (_a.label) {
+            case 0:
+                listing_name = req.body.listing_name || "";
+                category_id = req.body.category_id;
+                page = parseInt(req.params.page);
+                limitPerPage = 3;
+                count = parseInt(req.params.count);
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                if (category_id) {
+                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY listing_price ASC\n            LIMIT $3 OFFSET ($4 - 1) * $3";
+                    values = ["%" + listing_name + "%", category_id, limitPerPage, page];
+                }
+                else {
+                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY listing_price ASC\n            LIMIT $2 OFFSET ($3 - 1) * $2";
+                    values = ["%" + listing_name + "%", limitPerPage, page];
+                }
+                return [4 /*yield*/, databasePool_1.default.query(query, values)];
+            case 2:
+                response_4 = _a.sent();
+                finalResponse = createSortedByResponse(count, page, limitPerPage, response_4.rows);
+                res.send(finalResponse);
+                return [3 /*break*/, 4];
+            case 3:
+                err_4 = _a.sent();
+                console.log(err_4);
+                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
+            case 4: return [2 /*return*/];
         }
-        else {
-            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY listing_price ASC";
-            values = ["%" + listing_name + "%"];
-        }
-        databasePool_1.default.query(query, values, function (error, listing) {
-            if (error) {
-                return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
-            }
-            res.send(listing.rows);
-        });
-        return [2 /*return*/];
     });
 }); };
 exports.getListingsSortedByLowestPrice = getListingsSortedByLowestPrice;
 var getListingsSortedByHighestPrice = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var listing_name, category_id, query, values;
+    var listing_name, category_id, page, limitPerPage, count, query, values, response_5, finalResponse, err_5;
     return __generator(this, function (_a) {
-        listing_name = req.body.listing_name || "";
-        category_id = req.body.category_id;
-        if (category_id) {
-            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY listing_price DESC";
-            values = ["%" + listing_name + "%", category_id];
+        switch (_a.label) {
+            case 0:
+                listing_name = req.body.listing_name || "";
+                category_id = req.body.category_id;
+                page = parseInt(req.params.page);
+                limitPerPage = 3;
+                count = parseInt(req.params.count);
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                if (category_id) {
+                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY listing_price DESC\n            LIMIT $3 OFFSET ($4 - 1) * $3";
+                    values = ["%" + listing_name + "%", category_id, limitPerPage, page];
+                }
+                else {
+                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY listing_price DESC\n            LIMIT $2 OFFSET ($3 - 1) * $2";
+                    values = ["%" + listing_name + "%", limitPerPage, page];
+                }
+                return [4 /*yield*/, databasePool_1.default.query(query, values)];
+            case 2:
+                response_5 = _a.sent();
+                finalResponse = createSortedByResponse(count, page, limitPerPage, response_5.rows);
+                res.send(finalResponse);
+                return [3 /*break*/, 4];
+            case 3:
+                err_5 = _a.sent();
+                console.log(err_5);
+                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
+            case 4: return [2 /*return*/];
         }
-        else {
-            query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY listing_price DESC";
-            values = ["%" + listing_name + "%"];
-        }
-        databasePool_1.default.query(query, values, function (error, listing) {
-            if (error) {
-                return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
-            }
-            res.send(listing.rows);
-        });
-        return [2 /*return*/];
     });
 }); };
 exports.getListingsSortedByHighestPrice = getListingsSortedByHighestPrice;
-var paginatedResults = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var page, limit, startIndex, endIndex, results;
-    return __generator(this, function (_a) {
-        page = parseInt(req.query.page);
-        limit = parseInt(req.query.limit);
-        startIndex = (page - 1) * limit;
-        endIndex = page * limit;
-        results = {};
-        return [2 /*return*/];
-    });
-}); };
-exports.paginatedResults = paginatedResults;
+// export const paginatedResults = async (
+//     req: any,
+//     res: Response,
+//     next: NextFunction
+// ) => {
+//     const page = parseInt(req.query.page);
+//     const limit = parseInt(req.query.limit);
+//     const startIndex = (page - 1) * limit;
+//     const endIndex = page * limit;
+//     const results = {};
+// };
