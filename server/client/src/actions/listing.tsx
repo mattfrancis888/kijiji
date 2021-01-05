@@ -35,7 +35,9 @@ export interface Listing {
 }
 
 export interface FetchListingResponse {
-    count?: string;
+    totalListings?: number;
+    page?: number;
+    limitPerPage?: number;
     listings?: Listing[];
 }
 
@@ -123,10 +125,12 @@ export const createListing = (formValues: any) => async (
     }
 };
 
-export const fetchListingsByOldestDate = () => async (dispatch: Dispatch) => {
+export const fetchListingsByOldestDate = (pageNumber: number) => async (
+    dispatch: Dispatch
+) => {
     try {
         const response = await axios.get<FetchListingResponse>(
-            "/listing-oldest-date?page=1&limit=3"
+            `/listing-oldest-date/${pageNumber}`
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,

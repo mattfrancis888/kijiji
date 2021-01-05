@@ -13,23 +13,34 @@ import { StoreState } from "../reducers";
 import Listing from "./Listing";
 import Loading from "./Loading";
 import Pagination from "./Pagination";
+import queryString from "query-string";
+import { useLocation } from "react-router-dom";
 const ORDER_BY_OLDEST_DATE = "Posted: oldest first";
 const ORDER_BY_NEWEST_DATE = "Posted: newest first";
 const ORDER_BY_LOWEST_PRICE = " Price: lowest first";
 const ORDER_BY_HIGHEST_PRICE = "Price: highest first";
+
+//
 interface IListings {
-    fetchListingsByOldestDate(): void;
+    fetchListingsByOldestDate(pageNumber: number): void;
     fetchListingsByNewestDate(): void;
     fetchListingsByLowestPrice(): void;
     fetchListingsByHighestPrice(): void;
     listingInfo: any;
+    match: any;
 }
 
 const Listings: React.FC<IListings> = (props) => {
+    //https://ui.dev/react-router-v5-query-strings/
+    const { search } = useLocation();
+    const values = queryString.parse(search);
+    // const currentPage = values;
+    const currentPage = parseInt(props.match.params.page);
+
     const handleDropdownChange = (event) => {
         let valueOfSelectedOption = event.target.value;
         if (valueOfSelectedOption === ORDER_BY_OLDEST_DATE) {
-            props.fetchListingsByOldestDate();
+            props.fetchListingsByOldestDate(1);
         } else if (valueOfSelectedOption === ORDER_BY_NEWEST_DATE) {
             props.fetchListingsByNewestDate();
         } else if (valueOfSelectedOption === ORDER_BY_LOWEST_PRICE) {
@@ -40,7 +51,7 @@ const Listings: React.FC<IListings> = (props) => {
     };
     const pageNumberClicked = (pageNumber: number) => {
         console.log("Callback clicked", pageNumber);
-        //props.fetchListingsByOldestDate();
+        props.fetchListingsByOldestDate(pageNumber);
     };
 
     const renderListings = () => {
@@ -54,13 +65,13 @@ const Listings: React.FC<IListings> = (props) => {
             return (
                 <React.Fragment>
                     <Pagination
-                        totalItems={9}
-                        itemLimit={3}
-                        currentPage={1}
+                        totalItems={props.listingInfo.totalListings}
+                        itemLimit={props.listingInfo.limitPerPage}
+                        currentPage={currentPage}
                         onClickCallback={pageNumberClicked}
                     />
                     <div className="showingAdsTitleAndDropdownWrap">
-                        <h1 className="showingAdsTitle">{`Showing 1 out of ${props.listingInfo.count} ads:`}</h1>
+                        <h1 className="showingAdsTitle">{`Showing 1 out of ${props.listingInfo.totalListingsunt} ads:`}</h1>
                         <div className="dropdownWrap">
                             <h3>Sort by</h3>
                             <select
@@ -90,7 +101,7 @@ const Listings: React.FC<IListings> = (props) => {
         }
     };
     useEffect(() => {
-        props.fetchListingsByOldestDate();
+        props.fetchListingsByOldestDate(1);
     }, []);
     console.log("LISTINGS VALUE", props.listingInfo);
     return (

@@ -198,14 +198,14 @@ exports.uploadImage = uploadImage;
 //     next();
 // };
 var getListingsSortedByOldestDate = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var listing_name, category_id, page, limit, query, countQuery, values, countValues, totalListingsResponse, response_2, results, err_1;
+    var listing_name, category_id, page, limitPerPage, query, countQuery, values, countValues, totalListingsResponse, response_2, results, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 listing_name = req.body.listing_name || "";
                 category_id = req.body.category_id;
-                page = parseInt(req.query.page);
-                limit = parseInt(req.query.limit);
+                page = parseInt(req.params.page);
+                limitPerPage = 3;
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 4, , 5]);
@@ -217,7 +217,7 @@ var getListingsSortedByOldestDate = function (req, res) { return __awaiter(void 
                 }
                 else {
                     query = "SELECT * FROM listing WHERE listing_name LIKE $1 ORDER BY LISTING_DATE ASC \n            LIMIT $2 OFFSET ($3 - 1) * $2";
-                    values = ["%" + listing_name + "%", limit, page];
+                    values = ["%" + listing_name + "%", limitPerPage, page];
                     countQuery = "SELECT COUNT(*) FROM listing WHERE listing_name LIKE $1";
                     countValues = ["%" + listing_name + "%"];
                 }
@@ -228,7 +228,9 @@ var getListingsSortedByOldestDate = function (req, res) { return __awaiter(void 
             case 3:
                 response_2 = _a.sent();
                 results = {};
-                Object.assign(results, totalListingsResponse.rows[0]);
+                results.totalListings = parseInt(totalListingsResponse.rows[0].count);
+                results.page = page;
+                results.limitPerPage = limitPerPage;
                 results.listings = response_2.rows;
                 res.send(results);
                 return [3 /*break*/, 5];

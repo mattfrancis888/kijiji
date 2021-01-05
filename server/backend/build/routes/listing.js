@@ -6,7 +6,7 @@ var listingRouter = express_1.Router();
 listingRouter.post("/create-listing", listing_1.createListing);
 listingRouter.get("/categories-for-listing", listing_1.categoriesForListing);
 listingRouter.post("/upload-image", listing_1.uploadImage);
-listingRouter.get("/listing-oldest-date", listing_1.getListingsSortedByOldestDate);
+listingRouter.get("/listing-oldest-date/:page", listing_1.getListingsSortedByOldestDate);
 listingRouter.get("/listing-newest-date", listing_1.getListingsSortedByNewestDate);
 listingRouter.get("/listing-lowest-price", listing_1.getListingsSortedByLowestPrice);
 listingRouter.get("/listing-highest-price", listing_1.getListingsSortedByHighestPrice);

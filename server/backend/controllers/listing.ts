@@ -164,8 +164,8 @@ export const getListingsSortedByOldestDate = async (
 ) => {
     const listing_name = req.body.listing_name || "";
     const category_id = req.body.category_id;
-    const page = parseInt(req.query.page);
-    const limit = parseInt(req.query.limit);
+    const page = parseInt(req.params.page);
+    const limitPerPage = 3;
 
     let query;
     let countQuery;
@@ -182,7 +182,7 @@ export const getListingsSortedByOldestDate = async (
         } else {
             query = `SELECT * FROM listing WHERE listing_name LIKE $1 ORDER BY LISTING_DATE ASC 
             LIMIT $2 OFFSET ($3 - 1) * $2`;
-            values = [`%${listing_name}%`, limit, page];
+            values = [`%${listing_name}%`, limitPerPage, page];
 
             countQuery = `SELECT COUNT(*) FROM listing WHERE listing_name LIKE $1`;
             countValues = [`%${listing_name}%`];
@@ -191,7 +191,9 @@ export const getListingsSortedByOldestDate = async (
         const totalListingsResponse = await pool.query(countQuery, countValues);
         const response = await pool.query(query, values);
         let results = {};
-        Object.assign(results, totalListingsResponse.rows[0]);
+        results.totalListings = parseInt(totalListingsResponse.rows[0].count);
+        results.page = page;
+        results.limitPerPage = limitPerPage;
         results.listings = response.rows;
         res.send(results);
     } catch (err) {

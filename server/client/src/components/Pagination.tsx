@@ -4,6 +4,8 @@ import { connect } from "react-redux";
 import { signOut } from "../actions";
 import { StoreState } from "../reducers";
 
+import history from "../browserHistory";
+
 interface PaginationProps {
     totalItems: number;
     itemLimit: number;
@@ -12,6 +14,7 @@ interface PaginationProps {
 }
 
 const Pagination: React.FC<PaginationProps> = (props) => {
+    const history = useHistory();
     const [selectedPage, setSelectedPage] = useState(props.currentPage);
 
     const renderPageItems = (totalItems: number, itemLimit: number) => {
@@ -20,7 +23,7 @@ const Pagination: React.FC<PaginationProps> = (props) => {
         for (let i = 0; i < numberOfPageItems; i++) {
             pageItems.push(i + 1);
         }
-        console.log("PAGEITEMS LIST", pageItems);
+
         return (
             <ul className="pagination">
                 {pageItems.map((pageNumber) => {
@@ -29,6 +32,7 @@ const Pagination: React.FC<PaginationProps> = (props) => {
                             onClick={() => {
                                 setSelectedPage(pageNumber);
                                 props.onClickCallback(pageNumber);
+                                history.push(`/listings/${pageNumber}`);
                             }}
                             className={
                                 selectedPage === pageNumber
