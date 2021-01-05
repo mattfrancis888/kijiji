@@ -109,6 +109,16 @@ const normalizeAmount = (val) => {
     return val.replace(/,/g, "");
 };
 
+const renderFieldSectionLayout = (title: string, children: JSX.Element) => {
+    return (
+        <div className="postAdFieldSection">
+            <div className="postAdFieldTitleWrap">
+                <h1>{title}</h1>
+            </div>
+            {children}
+        </div>
+    );
+};
 const PostAdForm: React.FC<
     PostAdFormProps & InjectedFormProps<{}, PostAdFormProps>
 > = (props) => {
@@ -116,7 +126,7 @@ const PostAdForm: React.FC<
         props.onSubmit(formValues);
     };
 
-    const renderFields = (): JSX.Element | JSX.Element[] => {
+    const renderFields = (): JSX.Element => {
         if (props.categories.length === 0)
             return (
                 <div className="loadingCenter">
@@ -129,101 +139,101 @@ const PostAdForm: React.FC<
                     className="postAdForm"
                     onSubmit={props.handleSubmit(onSubmit)}
                 >
-                    <div className="postAdFieldSection">
-                        <div className="postAdFieldTitleWrap">
-                            <h1>Ad Title</h1>
-                        </div>
+                    {renderFieldSectionLayout(
+                        "Ad Title",
                         <Field
                             name="title"
                             type="text"
                             // label="Ad Title"
                             component={renderTextInput}
                         />
-                    </div>
-                    <div className="postAdFieldSection">
-                        <div className="postAdFieldTitleWrap">
-                            <h1>Description</h1>
-                        </div>
+                    )}
+
+                    {renderFieldSectionLayout(
+                        "Description",
                         <Field
                             name="description"
                             type="text"
                             component={renderTextArea}
                         />
-                    </div>
-                    <div className="postAdFieldSection">
-                        <div className="postAdFieldTitleWrap">
-                            <h1>Category</h1>
-                        </div>
+                    )}
+
+                    {renderFieldSectionLayout(
+                        "Category",
                         <Field
                             name="category"
                             component={renderDropDown}
                             optionValues={props.categories}
                         ></Field>
-                    </div>
+                    )}
 
-                    <div className="postAdFieldSection">
-                        <div className="postAdFieldTitleWrap">
-                            <h1>Add a photo for your ad</h1>
-                        </div>
-
-                        <Field
-                            name="image"
-                            type="file"
-                            component={renderImageUpload}
-                            ref={openFileExplorer}
-                            value={listingImage}
-                            onChange={(event) => {
-                                //For some reason,
-                                //The input's text dosen't change but the input is actually inserted (do formValues.image below)
-                                setListingImage(
-                                    URL.createObjectURL(event.target.files[0])
-                                );
-                                // console.log(
-                                //     `Selected file - ${event.target.files[0].name}`
-                                // );
-                                //https://medium.com/@650egor/react-30-day-challenge-day-2-image-upload-preview-2d534f8eaaa
-                            }}
-                            withRef
-                        />
-                        <div className="imageUploadWrapper">
-                            <input
-                                type="button"
-                                value={listingImage ? "" : "Choose Files!"}
-                                className="postAdChooseListingImage"
-                                onClick={() => openFileExplorer.current.click()}
-                                style={
-                                    listingImage
-                                        ? {
-                                              backgroundImage: `url(${listingImage})`,
-                                              backgroundPosition: "center",
-                                              backgroundSize: "cover",
-                                              backgroundColor: "white",
-                                          }
-                                        : {
-                                              backgroundImage: `url(${postAdListingImagePlaceHolder})`,
-                                          }
-                                }
+                    {renderFieldSectionLayout(
+                        "Add a photo for your ad",
+                        <React.Fragment>
+                            <Field
+                                name="image"
+                                type="file"
+                                component={renderImageUpload}
+                                ref={openFileExplorer}
+                                value={listingImage}
+                                onChange={(event) => {
+                                    //For some reason,
+                                    //The input's text dosen't change but the input is actually inserted (do formValues.image below)
+                                    setListingImage(
+                                        URL.createObjectURL(
+                                            event.target.files[0]
+                                        )
+                                    );
+                                    // console.log(
+                                    //     `Selected file - ${event.target.files[0].name}`
+                                    // );
+                                    //https://medium.com/@650egor/react-30-day-challenge-day-2-image-upload-preview-2d534f8eaaa
+                                }}
+                                withRef
                             />
-                            {listingImage && (
-                                <h3
-                                    className="removeUploadedImage"
-                                    onClick={() => {
-                                        setListingImage(null);
-                                        props.dispatch(
-                                            change("postAdForm", "image", null)
-                                        );
-                                    }}
-                                >
-                                    Remove
-                                </h3>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="postAdFieldSection">
-                        <div className="postAdFieldTitleWrap">
-                            <h1>Province</h1>
-                        </div>
+                            <div className="imageUploadWrapper">
+                                <input
+                                    type="button"
+                                    value={listingImage ? "" : "Choose Files!"}
+                                    className="postAdChooseListingImage"
+                                    onClick={() =>
+                                        openFileExplorer.current.click()
+                                    }
+                                    style={
+                                        listingImage
+                                            ? {
+                                                  backgroundImage: `url(${listingImage})`,
+                                                  backgroundPosition: "center",
+                                                  backgroundSize: "cover",
+                                                  backgroundColor: "white",
+                                              }
+                                            : {
+                                                  backgroundImage: `url(${postAdListingImagePlaceHolder})`,
+                                              }
+                                    }
+                                />
+                                {listingImage && (
+                                    <h3
+                                        className="removeUploadedImage"
+                                        onClick={() => {
+                                            setListingImage(null);
+                                            props.dispatch(
+                                                change(
+                                                    "postAdForm",
+                                                    "image",
+                                                    null
+                                                )
+                                            );
+                                        }}
+                                    >
+                                        Remove
+                                    </h3>
+                                )}
+                            </div>
+                        </React.Fragment>
+                    )}
+                    {renderFieldSectionLayout(
+                        "Province",
                         <Field
                             name="province"
                             type="text"
@@ -232,12 +242,10 @@ const PostAdForm: React.FC<
                                 return province.name;
                             })}
                         />
-                    </div>
+                    )}
 
-                    <div className="postAdFieldSection">
-                        <div className="postAdFieldTitleWrap">
-                            <h1>City</h1>
-                        </div>
+                    {renderFieldSectionLayout(
+                        "City",
                         <Field
                             name="city"
                             type="text"
@@ -252,24 +260,18 @@ const PostAdForm: React.FC<
                                       )[0].cities
                             }
                         />
-                    </div>
+                    )}
 
-                    <div className="postAdFieldSection">
-                        <div className="postAdFieldTitleWrap">
-                            <h1>Street</h1>
-                        </div>
+                    {renderFieldSectionLayout(
+                        "Street",
                         <Field
                             name="street"
                             type="text"
                             component={renderTextInput}
                         />
-                    </div>
-
-                    <div className="postAdFieldSection">
-                        <div className="postAdFieldTitleWrap">
-                            <h1>Price ($ CAD) </h1>
-                        </div>
-
+                    )}
+                    {renderFieldSectionLayout(
+                        "Price ($ CAD)",
                         <Field
                             name="price"
                             type="text"
@@ -277,7 +279,7 @@ const PostAdForm: React.FC<
                             normalize={normalizeAmount}
                             component={renderTextInput}
                         />
-                    </div>
+                    )}
 
                     <button className="postAdFormSubmit">Post Your Ad</button>
                 </form>

@@ -6,6 +6,7 @@ import {
     UploadImageToCloudinaryAction,
     CreateListingAction,
     ListingErrorAction,
+    FetchListingsAction,
 } from "../actions";
 export enum ActionTypes {
     AUTH_USER,
@@ -15,6 +16,7 @@ export enum ActionTypes {
     UPLOAD_IMAGE_TO_CLOUDINARY,
     CREATE_LISTING,
     LISTING_ERROR,
+    FETCH_LISTINGS,
 }
 export type AuthActions = AuthUserAction | AuthErrorAction;
 export type FetchCategoriesActions =
@@ -22,4 +24,4 @@ export type FetchCategoriesActions =
     | FetchCategoriesForListingErrorAction;
 export type ListingAction =
     // | UploadImageToCloudinaryAction
-    CreateListingAction | ListingErrorAction;
+    CreateListingAction | ListingErrorAction | FetchListingsAction;

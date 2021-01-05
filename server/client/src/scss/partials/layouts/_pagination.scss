@@ -1,0 +1,35 @@
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    justify-content: center;
+    @media screen and (min-width: $md_breakpoint) {
+        margin: 5rem 0;
+    }
+}
+
+.pageItem,
+.pageItemSelected {
+    padding: 0.5rem 1rem;
+    font-size: 1.3rem;
+
+    @media screen and (min-width: $sm_breakpoint) {
+        padding: 1rem 1.5rem;
+        font-size: 1.5rem;
+    }
+
+    @media screen and (min-width: $lg_breakpoint) {
+        padding: 1.3rem 1.8rem;
+        font-size: 1.8rem;
+    }
+}
+.pageItem {
+    background-color: white;
+    border: 1px solid #cacaea;
+    color: $purple;
+}
+.pageItemSelected {
+    background-color: purple;
+    color: white;
+    font-weight: bold;
+}

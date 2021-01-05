@@ -22,15 +22,23 @@ export interface UploadImageToCloudinaryAction {
     payload: CloudinaryImagePath;
 }
 export interface Listing {
-    id: number;
-    title: string;
-    description: string;
-    category: string;
-    image: string;
+    listing_id: number;
+    listing_name: string;
+    listing_description: string;
+    category_id: number;
+    listing_image: string;
     province: string;
     city: string;
     street: string;
-    price: string;
+    listing_price: string;
+    listing_date: Date;
+}
+
+export interface FetchListingResponse {
+    totalListings?: number;
+    page?: number;
+    limitPerPage?: number;
+    listings?: Listing[];
 }
 
 export interface CreateListingAction {
@@ -40,7 +48,12 @@ export interface CreateListingAction {
 
 export interface ListingErrorAction {
     type: ActionTypes.LISTING_ERROR;
-    payload: [];
+    payload: {};
+}
+
+export interface FetchListingsAction {
+    type: ActionTypes.FETCH_LISTINGS;
+    payload: FetchListingResponse;
 }
 
 export const fetchCategoriesForListing = () => async (dispatch: Dispatch) => {
@@ -105,10 +118,85 @@ export const createListing = (formValues: any) => async (
             payload: listingResponse.data,
         });
     } catch (error) {
-        console.log(error);
         dispatch<ListingErrorAction>({
             type: ActionTypes.LISTING_ERROR,
-            payload: [],
+            payload: {},
+        });
+    }
+};
+
+export const fetchListingsByOldestDate = (pageNumber: number) => async (
+    dispatch: Dispatch
+) => {
+    try {
+        const response = await axios.get<FetchListingResponse>(
+            `/listing-oldest-date/${pageNumber}`
+        );
+        dispatch<FetchListingsAction>({
+            type: ActionTypes.FETCH_LISTINGS,
+            payload: response.data,
+        });
+    } catch (error) {
+        dispatch<ListingErrorAction>({
+            type: ActionTypes.LISTING_ERROR,
+            payload: {},
+        });
+    }
+};
+
+export const fetchListingsByNewestDate = (pageNumber: number) => async (
+    dispatch: Dispatch
+) => {
+    try {
+        const response = await axios.get<FetchListingResponse>(
+            `/listing-newest-date/${pageNumber}`
+        );
+        dispatch<FetchListingsAction>({
+            type: ActionTypes.FETCH_LISTINGS,
+            payload: response.data,
+        });
+    } catch (error) {
+        dispatch<ListingErrorAction>({
+            type: ActionTypes.LISTING_ERROR,
+            payload: {},
+        });
+    }
+};
+
+export const fetchListingsByLowestPrice = (pageNumber: number) => async (
+    dispatch: Dispatch
+) => {
+    try {
+        const response = await axios.get<FetchListingResponse>(
+            `/listing-lowest-price/${pageNumber}`
+        );
+        dispatch<FetchListingsAction>({
+            type: ActionTypes.FETCH_LISTINGS,
+            payload: response.data,
+        });
+    } catch (error) {
+        dispatch<ListingErrorAction>({
+            type: ActionTypes.LISTING_ERROR,
+            payload: {},
+        });
+    }
+};
+
+export const fetchListingsByHighestPrice = (pageNumber: number) => async (
+    dispatch: Dispatch
+) => {
+    try {
+        const response = await axios.get<FetchListingResponse>(
+            `/listing-highest-price/${pageNumber}`
+        );
+        dispatch<FetchListingsAction>({
+            type: ActionTypes.FETCH_LISTINGS,
+            payload: response.data,
+        });
+    } catch (error) {
+        dispatch<ListingErrorAction>({
+            type: ActionTypes.LISTING_ERROR,
+            payload: {},
         });
     }
 };

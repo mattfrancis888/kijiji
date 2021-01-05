@@ -1,0 +1,76 @@
+.listingsContainer {
+    margin: 1rem 2rem;
+    background: white;
+    border-radius: 0.3rem;
+    padding: 0.5rem 1rem;
+    @media screen and (min-width: $sm_breakpoint) {
+        padding: 0.5rem 2rem;
+    }
+    @media screen and (min-width: $md_breakpoint) {
+        margin: 3rem 3rem;
+        padding: 2rem 4rem;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        margin: 3rem 5rem;
+        padding: 1rem 3rem;
+    }
+}
+
+.showingAdsTitleAndDropdownWrap {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid $light-grey;
+    margin-bottom: 3rem;
+    align-items: center;
+}
+
+.showingAdsTitle {
+    font-size: 1.8rem;
+    color: $purple;
+    display: none;
+    margin: 0;
+    @media screen and (min-width: $md_breakpoint) {
+        display: block;
+    }
+}
+
+.dropdownWrap {
+    display: flex;
+    width: 100%;
+    padding: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    h3 {
+        font-size: 1.4rem;
+        @media screen and (min-width: $sm_breakpoint) {
+            font-size: 1.7rem;
+        }
+        @media screen and (min-width: $md_breakpoint) {
+            margin-right: 1.5rem;
+        }
+    }
+    .sortByDropdown {
+        width: 75%;
+        padding: 1rem;
+        border: 1px solid $light-grey;
+        border-radius: 0.4rem;
+        font-size: 1.3rem;
+        font-weight: normal;
+        margin: 0;
+        &:focus {
+            outline: none;
+            border: 1px solid $light-blue;
+            box-shadow: 0 0 5px $light-blue;
+            background-color: white;
+        }
+
+        @media screen and (min-width: $md_breakpoint) {
+            font-size: 1.5rem;
+            width: 70%;
+        }
+    }
+    @media screen and (min-width: $md_breakpoint) {
+        justify-content: flex-end;
+        width: 50%;
+    }
+}
