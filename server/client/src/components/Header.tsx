@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import { signOut } from "../actions";
 import { StoreState } from "../reducers";
-
+import Searchbar from "./Searchbar";
 interface IHeader {
     authStatus?: string | null;
     signOut(): void;
@@ -22,6 +22,7 @@ const Header: React.FC<IHeader> = (props) => {
                         alt="logo"
                     />
                 </Link>
+                {/* <Searchbar /> */}
                 <div className="headerProfileAndPostWrap">
                     <h1
                         className={
@@ -69,6 +70,7 @@ const Header: React.FC<IHeader> = (props) => {
                         Post Ad
                     </button>
                 </div>
+                <Searchbar />
             </div>
         </nav>
     );
