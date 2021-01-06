@@ -680,6 +680,11 @@ nav {
   justify-content: space-between;
   flex-wrap: wrap;
 }
+@media screen and (min-width: 768px) {
+  .headerInfoWrap {
+    flex-wrap: nowrap;
+  }
+}
 
 .headerProfileAndPostWrap {
   display: flex;
@@ -1245,6 +1250,11 @@ nav {
   padding: 1rem;
   margin: 1rem 0;
 }
+@media screen and (min-width: 768px) {
+  .searchBarForm {
+    width: 65%;
+  }
+}
 
 .searchBarIcons {
   font-size: 1.3rem;
@@ -1258,16 +1268,17 @@ nav {
 .searchBarInput {
   font-size: 1.2rem;
   border: none;
+  outline: none;
   margin: none;
   width: 100%;
-  margin-left: 0.8rem;
+  margin: 0 0.8rem;
 }
 .searchBarInput:focus {
   box-shadow: none;
 }
 @media screen and (min-width: 520px) {
   .searchBarInput {
-    margin-left: 1rem;
+    margin: 0 1rem;
     font-size: 1.7rem;
   }
 }

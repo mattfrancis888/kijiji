@@ -8,6 +8,9 @@
     width: 100%;
     padding: 1rem;
     margin: 1rem 0;
+    @media screen and (min-width: $md_breakpoint) {
+        width: 65%;
+    }
 }
 
 .searchBarIcons {
@@ -23,11 +26,12 @@
         box-shadow: none;
     }
     border: none;
+    outline: none;
     margin: none;
     width: 100%;
-    margin-left: 0.8rem;
+    margin: 0 0.8rem;
     @media screen and (min-width: $sm_breakpoint) {
-        margin-left: 1rem;
+        margin: 0 1rem;
         font-size: 1.7rem;
     }
 }

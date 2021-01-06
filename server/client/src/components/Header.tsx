@@ -5,12 +5,16 @@ import { connect } from "react-redux";
 import { signOut } from "../actions";
 import { StoreState } from "../reducers";
 import Searchbar from "./Searchbar";
+import useWindowDimensions from "../windowDimensions";
+import { MED_SCREEN_SIZE } from "../constants";
 interface IHeader {
     authStatus?: string | null;
     signOut(): void;
 }
 
 const Header: React.FC<IHeader> = (props) => {
+    const { width } = useWindowDimensions();
+
     const history = useHistory();
     return (
         <nav>
@@ -22,7 +26,8 @@ const Header: React.FC<IHeader> = (props) => {
                         alt="logo"
                     />
                 </Link>
-                {/* <Searchbar /> */}
+                {width > MED_SCREEN_SIZE ? <Searchbar /> : null}
+
                 <div className="headerProfileAndPostWrap">
                     <h1
                         className={
@@ -70,7 +75,7 @@ const Header: React.FC<IHeader> = (props) => {
                         Post Ad
                     </button>
                 </div>
-                <Searchbar />
+                {width < MED_SCREEN_SIZE ? <Searchbar /> : null}
             </div>
         </nav>
     );

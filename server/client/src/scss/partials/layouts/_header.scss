@@ -16,6 +16,9 @@ nav {
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
+    @media screen and (min-width: $md_breakpoint) {
+        flex-wrap: nowrap;
+    }
 }
 
 .headerProfileAndPostWrap {

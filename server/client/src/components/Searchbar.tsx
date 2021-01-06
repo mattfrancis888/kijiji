@@ -22,7 +22,6 @@ const Searchbar: React.FC<{}> = (props) => {
                 placeholder="Search..."
                 aria-label="Search"
                 name="search"
-                // ref={this.searchRef}
             />
             <FontAwesomeIcon className="searchBarIcons" icon={faSearch} />
         </form>
