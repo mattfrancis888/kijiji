@@ -15,6 +15,7 @@
 
 .searchBarIcons {
     font-size: 1.3rem;
+    cursor: pointer;
     @media screen and (min-width: $sm_breakpoint) {
         font-size: 1.7rem;
     }

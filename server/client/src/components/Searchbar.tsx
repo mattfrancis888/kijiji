@@ -2,99 +2,94 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
-import { fetchCategoriesForListing } from "../actions";
+import {
+    fetchCategoriesForListing,
+    fetchListingsByOldestDate,
+} from "../actions";
 import { StoreState } from "../reducers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSlidersH, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./Modal";
-import Loading from "./Loading";
 import LoadingDots from "./LoadingDots";
+import SearchFilterForm from "./SearchFilterForm";
 interface ISearchBar {
     categories?: [];
     fetchCategoriesForListing(): void;
+    fetchListingsByOldestDate(): void;
+}
+
+export interface SearchFilterFormProps {
+    handleSubmit(formValues: any): void;
+    onCancel(): void;
+    categories: [];
 }
 
 const Searchbar: React.FC<ISearchBar> = (props) => {
     const history = useHistory();
-    useEffect(() => {
-        props.fetchCategoriesForListing();
-    }, []);
-
-    const renderModalActions = () => {
-        if (props.categories.length === 0) {
-        } else {
-            return (
-                <React.Fragment>
-                    <button className="modalAcceptButton">
-                        <h5>Accept</h5>
-                    </button>
-
-                    <button className="modalCancelButton">
-                        <h5>Cancel</h5>
-                    </button>
-                </React.Fragment>
-            );
-        }
+    const [showFilterModal, setShowFilterModal] = useState(null);
+    const onSubmitFilter = async (formValues: any) => {
+        console.log("onsubmitfilter", formValues);
+    };
+    const onCancelFilter = () => {
+        setShowFilterModal(false);
     };
 
+    // const renderModalActions = () => {
+    //     if (props.categories.length === 0) {
+    //     } else {
+    //         return (
+    //             <React.Fragment>
+    //                 <button
+    //                     className="modalAcceptButton"
+    //                     onClick={() => {
+    //                         // props.fetchListingsByOldestDate();
+    //                         history.push("/listings/1");
+    //                         setShowFilterModal(false);
+    //                     }}
+    //                 >
+    //                     <h5>Accept</h5>
+    //                 </button>
+
+    //                 <button
+    //                     className="modalCancelButton"
+    //                     onClick={() => setShowFilterModal(false)}
+    //                 >
+    //                     <h5>Cancel</h5>
+    //                 </button>
+    //             </React.Fragment>
+    //         );
+    //     }
+    // };
     const renderModalContent = () => {
-        if (props.categories.length === 0) {
+        return (
+            <SearchFilterForm
+                onSubmit={onSubmitFilter}
+                onCancel={onCancelFilter}
+            />
+        );
+    };
+
+    const renderModal = () => {
+        if (!showFilterModal) return null;
+        else {
             return (
-                <div className="centerLoadingForModal">
-                    <LoadingDots />
-                </div>
-            );
-        } else {
-            return (
-                <div>
-                    <h3>Categories</h3>
-                    <select
-                        className="modalFilterCategoriesDropdown"
-                        autoComplete="off"
-                    >
-                        <option value="" selected></option>
-                        {props.categories.map((val) => (
-                            <option key={val} value={val}>
-                                {val}
-                            </option>
-                        ))}
-                    </select>
-                    <div className="modalFilterLocationWrap">
-                        <div className="modalLocationInputWrap">
-                            <h3>Province</h3>
-                            <input
-                                name="province"
-                                className="modalFilterInput"
-                                placeholder="Any"
-                                autoComplete="off"
-                            />
-                        </div>
-                        <div className="modalLocationInputWrap">
-                            <h3>City</h3>
-                            <input
-                                name="city"
-                                className="modalFilterInput"
-                                placeholder="Any"
-                                autoComplete="off"
-                            />
-                        </div>
-                        <div className="modalLocationInputWrap">
-                            <h3>Street</h3>
-                            <input
-                                name="street"
-                                className="modalFilterInput"
-                                placeholder="Any"
-                                autoComplete="off"
-                            />
-                        </div>
-                    </div>
-                </div>
+                <Modal
+                    title="Filter Your Results"
+                    content={renderModalContent()}
+                    // actions={renderModalActions()}
+                    onDismiss={() => onCancelFilter}
+                />
             );
         }
     };
+
     return (
         <form className="searchBarForm">
-            <FontAwesomeIcon className="searchBarIcons" icon={faSlidersH} />
+            <FontAwesomeIcon
+                className="searchBarIcons"
+                icon={faSlidersH}
+                onClick={() => setShowFilterModal(true)}
+            />
             <input
                 className="searchBarInput"
                 type="search"
@@ -103,23 +98,9 @@ const Searchbar: React.FC<ISearchBar> = (props) => {
                 name="search"
             />
             <FontAwesomeIcon className="searchBarIcons" icon={faSearch} />
-
-            <Modal
-                title="Filter Your Results"
-                content={renderModalContent()}
-                actions={renderModalActions()}
-                // onDismiss={() => setShowDeleteModal(null)}
-            />
+            {renderModal()}
         </form>
     );
 };
 
-const mapStateToProps = (state: StoreState) => {
-    return {
-        categories: state.categories,
-    };
-};
-
-export default connect(mapStateToProps, { fetchCategoriesForListing })(
-    Searchbar
-);
+export default Searchbar;

@@ -302,7 +302,7 @@ const PostAdForm: React.FC<
     }: any) => {
         //We cannot pass in {...input} (so that the input is submited when onSubmit button is clicked) like our other renders because <input> has type="file"
         //Must do this instead: https://github.com/redux-form/redux-form/issues/3686
-
+        //We do not have a name in <input> so that redux won't complain with validate (thus making this input optional)
         return (
             <input
                 type="file"
