@@ -7,6 +7,7 @@ import { StoreState } from "../reducers";
 import Searchbar from "./Searchbar";
 import useWindowDimensions from "../windowDimensions";
 import { MED_SCREEN_SIZE } from "../constants";
+
 interface IHeader {
     authStatus?: string | null;
     signOut(): void;
@@ -14,8 +15,8 @@ interface IHeader {
 
 const Header: React.FC<IHeader> = (props) => {
     const { width } = useWindowDimensions();
-
     const history = useHistory();
+
     return (
         <nav>
             <div className="headerInfoWrap">

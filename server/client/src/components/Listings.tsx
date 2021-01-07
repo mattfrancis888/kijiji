@@ -117,7 +117,7 @@ const Listings: React.FC<IListings> = (props) => {
     useEffect(() => {
         props.fetchListingsByOldestDate(1);
     }, []);
-    console.log("LISTINGS VALUE", props.listingInfo);
+
     return (
         <React.Fragment>
             <div className="listingsContainer">{renderListings()}</div>

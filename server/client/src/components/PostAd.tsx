@@ -22,10 +22,10 @@ export interface PostAdProps {
 }
 
 const PostAd: React.FC<PostAdProps> = (props) => {
-    useEffect(() => {
-        const cookieService = CookieService.getService();
-        console.log("JWT DECODE", jwt_decode(cookieService.getAccessToken()));
-    }, []);
+    // useEffect(() => {
+    //     const cookieService = CookieService.getService();
+    //     console.log("JWT DECODE", jwt_decode(cookieService.getAccessToken()));
+    // }, []);
     const onSubmitPostListing = async (formValues: any) => {
         props.createListing(formValues);
     };

@@ -1283,4 +1283,122 @@ nav {
   }
 }
 
+.modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(52, 49, 49, 0.4);
+}
+
+.modalBox {
+  background-color: white;
+  width: 90%;
+  border-radius: 0.8rem 0.8rem;
+  padding: 5rem 3rem;
+}
+@media screen and (min-width: 768px) {
+  .modalBox {
+    width: 80%;
+    padding: 5rem 9rem;
+  }
+}
+.modalBox > h2 {
+  color: #373373;
+  font-size: 2rem;
+  margin-bottom: 3rem;
+}
+@media screen and (min-width: 768px) {
+  .modalBox > h2 {
+    font-size: 2.5rem;
+  }
+}
+.modalBox button {
+  margin-right: 1rem;
+  text-transform: uppercase;
+  border-radius: 0.4rem;
+  font: 1.4rem "Larsseit-Bold";
+  padding: 1.4rem 1.8rem;
+  border: none;
+}
+.modalBox button h5 {
+  margin: 0;
+}
+@media screen and (min-width: 768px) {
+  .modalBox button {
+    padding: 1.6rem 2.5rem;
+  }
+}
+.modalBox h3 {
+  font-weight: 300;
+  letter-spacing: 0.1rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.centerLoadingForModal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalFilterLocationWrap {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.modalLocationInputWrap {
+  width: 100%;
+}
+@media screen and (min-width: 768px) {
+  .modalLocationInputWrap {
+    width: 50%;
+  }
+}
+@media screen and (min-width: 768px) {
+  .modalLocationInputWrap:nth-child(2n+1) {
+    padding-right: 1rem;
+  }
+}
+
+.modalFilterCategoriesDropdown,
+.modalFilterInput {
+  border: 1px solid #e2e2e5;
+  border-radius: 0.5rem;
+  outline: none;
+  padding: 1rem;
+  font-size: 1.2rem;
+  width: 100%;
+}
+.modalFilterCategoriesDropdown:focus,
+.modalFilterInput:focus {
+  outline: none;
+  border: 1px solid #2681db;
+  box-shadow: 0 0 5px #2681db;
+  background-color: white;
+}
+@media screen and (min-width: 768px) {
+  .modalFilterCategoriesDropdown,
+.modalFilterInput {
+    padding: 1.7rem;
+    font-size: 1.7rem;
+  }
+}
+
+.modalAcceptButton {
+  background-color: #373373;
+  color: white;
+}
+
+.modalCancelButton {
+  background-color: #e2e2e5;
+  color: black;
+}
+
 /*# sourceMappingURL=main.css.map */
