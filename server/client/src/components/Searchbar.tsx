@@ -1,65 +1,39 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
-import { connect } from "react-redux";
-import {
-    fetchCategoriesForListing,
-    fetchListingsByOldestDate,
-} from "../actions";
-import { StoreState } from "../reducers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSlidersH, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./Modal";
-import LoadingDots from "./LoadingDots";
-import SearchFilterForm from "./SearchFilterForm";
-interface ISearchBar {
-    categories?: [];
-    fetchCategoriesForListing(): void;
-    fetchListingsByOldestDate(): void;
-}
+import SearchFilterForm, { SearchFilterFormValues } from "./SearchFilterForm";
 
 export interface SearchFilterFormProps {
-    handleSubmit(formValues: any): void;
+    handleSubmit(formValues: SearchFilterFormValues): void;
     onCancel(): void;
     categories: [];
 }
 
-const Searchbar: React.FC<ISearchBar> = (props) => {
+const Searchbar: React.FC<{}> = () => {
     const history = useHistory();
     const [showFilterModal, setShowFilterModal] = useState(null);
-    const onSubmitFilter = async (formValues: any) => {
+    const [filterQueries, setFilterQueries] = useState(null);
+    const [searchValue, setSearchValue] = useState(null);
+
+    const onSubmitFilter = async (formValues: SearchFilterFormValues) => {
         console.log("onsubmitfilter", formValues);
+        const keyNames = Object.keys(formValues);
+        let filterQuery = "";
+        keyNames.map((name) => {
+            filterQuery += `${name}=${formValues[name]}&`;
+        });
+        const editedFilterQuery = filterQuery.slice(0, -1); //remove last &
+        setFilterQueries(editedFilterQuery);
+
+        setShowFilterModal(false);
     };
     const onCancelFilter = () => {
         setShowFilterModal(false);
     };
 
-    // const renderModalActions = () => {
-    //     if (props.categories.length === 0) {
-    //     } else {
-    //         return (
-    //             <React.Fragment>
-    //                 <button
-    //                     className="modalAcceptButton"
-    //                     onClick={() => {
-    //                         // props.fetchListingsByOldestDate();
-    //                         history.push("/listings/1");
-    //                         setShowFilterModal(false);
-    //                     }}
-    //                 >
-    //                     <h5>Accept</h5>
-    //                 </button>
-
-    //                 <button
-    //                     className="modalCancelButton"
-    //                     onClick={() => setShowFilterModal(false)}
-    //                 >
-    //                     <h5>Cancel</h5>
-    //                 </button>
-    //             </React.Fragment>
-    //         );
-    //     }
-    // };
     const renderModalContent = () => {
         return (
             <SearchFilterForm
@@ -83,6 +57,26 @@ const Searchbar: React.FC<ISearchBar> = (props) => {
         }
     };
 
+    const directToListingsPage = () => {
+        if (filterQueries && searchValue) {
+            history.push(`/listings/1?search=${searchValue}&${filterQueries}`);
+        } else if (filterQueries) {
+            history.push(`/listings/1?${searchValue}`);
+        } else if (searchValue) {
+            history.push(`/listings/1?search=${searchValue}`);
+        } else {
+            history.push(`/listings/1`);
+        }
+    };
+
+    const handleKeyDown = (event) => {
+        //https://stackoverflow.com/questions/31272207/to-call-onchange-event-after-pressing-enter-key
+        if (event.key === "Enter") {
+            event.preventDefault(); //so ?search= won't automatically be inserted in the query when enter is clicked
+            directToListingsPage();
+        }
+    };
+
     return (
         <form className="searchBarForm">
             <FontAwesomeIcon
@@ -94,10 +88,18 @@ const Searchbar: React.FC<ISearchBar> = (props) => {
                 className="searchBarInput"
                 type="search"
                 placeholder="Search..."
-                aria-label="Search"
+                // aria-label="Search"
                 name="search"
+                onChange={(event) => setSearchValue(event.target.value.trim())}
+                onKeyDown={handleKeyDown}
             />
-            <FontAwesomeIcon className="searchBarIcons" icon={faSearch} />
+            <FontAwesomeIcon
+                className="searchBarIcons"
+                icon={faSearch}
+                onClick={() => {
+                    directToListingsPage();
+                }}
+            />
             {renderModal()}
         </form>
     );
