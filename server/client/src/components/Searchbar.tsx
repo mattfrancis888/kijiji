@@ -61,7 +61,7 @@ const Searchbar: React.FC<{}> = () => {
         if (filterQueries && searchValue) {
             history.push(`/listings/1?search=${searchValue}&${filterQueries}`);
         } else if (filterQueries) {
-            history.push(`/listings/1?${searchValue}`);
+            history.push(`/listings/1?${filterQueries}`);
         } else if (searchValue) {
             history.push(`/listings/1?search=${searchValue}`);
         } else {

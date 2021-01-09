@@ -125,12 +125,13 @@ export const createListing = (formValues: any) => async (
     }
 };
 
-export const fetchListingsByOldestDate = (pageNumber: number) => async (
-    dispatch: Dispatch
-) => {
+export const fetchListingsByOldestDate = (
+    pageNumber: number,
+    queryPath: string
+) => async (dispatch: Dispatch) => {
     try {
         const response = await axios.get<FetchListingResponse>(
-            `/listing-oldest-date/${pageNumber}`
+            `/listing-oldest-date/${pageNumber}${queryPath}`
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,
@@ -144,12 +145,13 @@ export const fetchListingsByOldestDate = (pageNumber: number) => async (
     }
 };
 
-export const fetchListingsByNewestDate = (pageNumber: number) => async (
-    dispatch: Dispatch
-) => {
+export const fetchListingsByNewestDate = (
+    pageNumber: number,
+    queryPath: string
+) => async (dispatch: Dispatch) => {
     try {
         const response = await axios.get<FetchListingResponse>(
-            `/listing-newest-date/${pageNumber}`
+            `/listing-newest-date/${pageNumber}${queryPath}`
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,
@@ -163,12 +165,13 @@ export const fetchListingsByNewestDate = (pageNumber: number) => async (
     }
 };
 
-export const fetchListingsByLowestPrice = (pageNumber: number) => async (
-    dispatch: Dispatch
-) => {
+export const fetchListingsByLowestPrice = (
+    pageNumber: number,
+    queryPath: string
+) => async (dispatch: Dispatch) => {
     try {
         const response = await axios.get<FetchListingResponse>(
-            `/listing-lowest-price/${pageNumber}`
+            `/listing-lowest-price/${pageNumber}${queryPath}`
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,
@@ -182,12 +185,13 @@ export const fetchListingsByLowestPrice = (pageNumber: number) => async (
     }
 };
 
-export const fetchListingsByHighestPrice = (pageNumber: number) => async (
-    dispatch: Dispatch
-) => {
+export const fetchListingsByHighestPrice = (
+    pageNumber: number,
+    queryPath: string
+) => async (dispatch: Dispatch) => {
     try {
         const response = await axios.get<FetchListingResponse>(
-            `/listing-highest-price/${pageNumber}`
+            `/listing-highest-price/${pageNumber}${queryPath}`
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,

@@ -130,20 +130,44 @@ export const getSortedListingCount = async (
     res: Response,
     next: NextFunction
 ) => {
-    const listing_name = req.body.listing_name || "";
-    const category_id = req.body.category_id;
+    const listing_name = req.query.search || "";
+    const category_id = req.params.category_id;
     let countQuery;
     let countValues;
     try {
         if (category_id) {
-            countQuery = `SELECT COUNT(listing_id) FROM listing WHERE listing_name LIKE $1 AND category_id = $2`;
+            countQuery = `SELECT COUNT(listing_id) FROM listing WHERE name_tokens @@ to_tsquery($1)
+             AND category_id = $2`;
             countValues = [`%${listing_name}%`, category_id];
         } else {
-            countQuery = `SELECT COUNT(*) FROM listing WHERE listing_name LIKE $1`;
+            countQuery = `SELECT COUNT(*) FROM listing WHERE name_tokens @@ to_tsquery($1)`;
             countValues = [`%${listing_name}%`];
         }
         const totalListingsResponse = await pool.query(countQuery, countValues);
         req.params.count = totalListingsResponse.rows[0].count;
+    } catch (err) {
+        console.log(err);
+        return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+    }
+
+    next();
+};
+
+export const getCategoryId = async (
+    req: any,
+    res: Response,
+    next: NextFunction
+) => {
+    const category = req.query.category;
+    let categoryQueryResponse;
+    try {
+        if (category) {
+            categoryQueryResponse = await pool.query(
+                `SELECT category_id FROM category WHERE category_name = $1;`,
+                [category]
+            );
+            req.params.category_id = categoryQueryResponse.rows[0].category_id;
+        }
     } catch (err) {
         console.log(err);
         return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
@@ -177,8 +201,13 @@ export const getListingsSortedByOldestDate = async (
     req: any,
     res: Response
 ) => {
-    const listing_name = req.body.listing_name || "";
-    const category_id = req.body.category_id;
+    console.log("req.query", req.query);
+    console.log("req.params", req.params);
+    const listing_name = req.query.search || "";
+    const category_id = req.params.category_id;
+    const province = req.query.province;
+    const city = req.query.city;
+
     const page = parseInt(req.params.page);
     const limitPerPage = 3;
     //From getSortedListingCount middleware:
@@ -189,11 +218,12 @@ export const getListingsSortedByOldestDate = async (
 
     try {
         if (category_id) {
-            query = `SELECT  * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC
+            query = `SELECT  * FROM listing WHERE name_tokens @@ to_tsquery($1)
+             AND category_id = $2 ORDER BY LISTING_DATE ASC
             LIMIT $3 OFFSET ($4 - 1) * $3`;
             values = [`%${listing_name}%`, category_id, limitPerPage, page];
         } else {
-            query = `SELECT * FROM listing WHERE listing_name LIKE $1 ORDER BY LISTING_DATE ASC 
+            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) ORDER BY LISTING_DATE ASC 
             LIMIT $2 OFFSET ($3 - 1) * $2`;
             values = [`%${listing_name}%`, limitPerPage, page];
         }
@@ -216,8 +246,11 @@ export const getListingsSortedByNewestDate = async (
     req: Request,
     res: Response
 ) => {
-    const listing_name = req.body.listing_name || "";
-    const category_id = req.body.category_id;
+    const listing_name = req.query.search || "";
+    const category_id = req.params.category_id;
+    const province = req.query.province;
+    const city = req.query.city;
+
     const page = parseInt(req.params.page);
     const limitPerPage = 3;
     const count = parseInt(req.params.count);
@@ -226,11 +259,11 @@ export const getListingsSortedByNewestDate = async (
 
     try {
         if (category_id) {
-            query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE DESC
+            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) AND category_id = $2 ORDER BY LISTING_DATE DESC
             LIMIT $3 OFFSET ($4 - 1) * $3`;
             values = [`%${listing_name}%`, category_id, limitPerPage, page];
         } else {
-            query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE DESC
+            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) AND category_id = category_id ORDER BY LISTING_DATE DESC
             LIMIT $2 OFFSET ($3 - 1) * $2`;
             values = [`%${listing_name}%`, limitPerPage, page];
         }
@@ -254,8 +287,11 @@ export const getListingsSortedByLowestPrice = async (
     req: Request,
     res: Response
 ) => {
-    const listing_name = req.body.listing_name || "";
-    const category_id = req.body.category_id;
+    const listing_name = req.query.search || "";
+    const category_id = req.params.category_id;
+    const province = req.query.province;
+    const city = req.query.city;
+
     const page = parseInt(req.params.page);
     const limitPerPage = 3;
     const count = parseInt(req.params.count);
@@ -264,11 +300,11 @@ export const getListingsSortedByLowestPrice = async (
     let values;
     try {
         if (category_id) {
-            query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY listing_price ASC
+            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) AND category_id = $2 ORDER BY listing_price ASC
             LIMIT $3 OFFSET ($4 - 1) * $3`;
             values = [`%${listing_name}%`, category_id, limitPerPage, page];
         } else {
-            query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY listing_price ASC
+            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) AND category_id = category_id ORDER BY listing_price ASC
             LIMIT $2 OFFSET ($3 - 1) * $2`;
             values = [`%${listing_name}%`, limitPerPage, page];
         }
@@ -291,8 +327,11 @@ export const getListingsSortedByHighestPrice = async (
     req: Request,
     res: Response
 ) => {
-    const listing_name = req.body.listing_name || "";
-    const category_id = req.body.category_id;
+    const listing_name = req.query.search || "";
+    const category_id = req.params.category_id;
+    const province = req.query.province;
+    const city = req.query.city;
+
     const page = parseInt(req.params.page);
     const limitPerPage = 3;
     const count = parseInt(req.params.count);
@@ -300,11 +339,11 @@ export const getListingsSortedByHighestPrice = async (
     let values;
     try {
         if (category_id) {
-            query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY listing_price DESC
+            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) AND category_id = $2 ORDER BY listing_price DESC
             LIMIT $3 OFFSET ($4 - 1) * $3`;
             values = [`%${listing_name}%`, category_id, limitPerPage, page];
         } else {
-            query = `SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY listing_price DESC
+            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) AND category_id = category_id ORDER BY listing_price DESC
             LIMIT $2 OFFSET ($3 - 1) * $2`;
             values = [`%${listing_name}%`, limitPerPage, page];
         }
