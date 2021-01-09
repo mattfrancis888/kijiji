@@ -4,6 +4,9 @@ import { FORBIDDEN_STATUS, INTERNAL_SERVER_ERROR_STATUS } from "../constants";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 
+//TODO:
+//1. Post ad token for text search
+//2. Fix back button and pagination
 export const categoriesForListing = async (req: Request, res: Response) => {
     pool.query(`SELECT category_name FROM category`, (error, category) => {
         if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
@@ -125,34 +128,6 @@ export const uploadImage = async (req: any, res: Response) => {
     });
 };
 
-export const getSortedListingCount = async (
-    req: any,
-    res: Response,
-    next: NextFunction
-) => {
-    const listing_name = req.query.search || "";
-    const category_id = req.params.category_id;
-    let countQuery;
-    let countValues;
-    try {
-        if (category_id) {
-            countQuery = `SELECT COUNT(listing_id) FROM listing WHERE name_tokens @@ to_tsquery($1)
-             AND category_id = $2`;
-            countValues = [`%${listing_name}%`, category_id];
-        } else {
-            countQuery = `SELECT COUNT(*) FROM listing WHERE name_tokens @@ to_tsquery($1)`;
-            countValues = [`%${listing_name}%`];
-        }
-        const totalListingsResponse = await pool.query(countQuery, countValues);
-        req.params.count = totalListingsResponse.rows[0].count;
-    } catch (err) {
-        console.log(err);
-        return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
-    }
-
-    next();
-};
-
 export const getCategoryId = async (
     req: any,
     res: Response,
@@ -168,6 +143,39 @@ export const getCategoryId = async (
             );
             req.params.category_id = categoryQueryResponse.rows[0].category_id;
         }
+    } catch (err) {
+        console.log(err);
+        return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+    }
+
+    next();
+};
+
+export const getSortedListingCount = async (
+    req: any,
+    res: Response,
+    next: NextFunction
+) => {
+    const listing_name = req.query.search || "";
+    const category_id = req.params.category_id;
+    let countQuery;
+    let countValues: any[] = [];
+    try {
+        if (listing_name && category_id) {
+            countQuery = `SELECT COUNT(listing_id) FROM listing WHERE name_tokens @@ to_tsquery($1)
+            AND category_id = $2`;
+            countValues = [listing_name, category_id];
+        } else if (listing_name) {
+            countQuery = `SELECT COUNT(*) FROM listing WHERE name_tokens @@ to_tsquery($1)`;
+            countValues = [listing_name];
+        } else if (category_id) {
+            countQuery = `SELECT COUNT(*) FROM listing WHERE category_id = $1`;
+            countValues = [category_id];
+        } else {
+            countQuery = `SELECT COUNT(*) FROM listing`;
+        }
+        const totalListingsResponse = await pool.query(countQuery, countValues);
+        req.params.count = totalListingsResponse.rows[0].count;
     } catch (err) {
         console.log(err);
         return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
@@ -197,181 +205,57 @@ const createSortedByResponse = (
     return results;
 };
 
-export const getListingsSortedByOldestDate = async (
-    req: any,
-    res: Response
-) => {
-    console.log("req.query", req.query);
-    console.log("req.params", req.params);
-    const listing_name = req.query.search || "";
-    const category_id = req.params.category_id;
-    const province = req.query.province;
-    const city = req.query.city;
+export const sortByHelper = (columnName: string, order: string) => {
+    return async function (req: any, res: any) {
+        console.log("req.query", req.query);
+        console.log("req.params", req.params);
+        const listing_name = req.query.search || "";
+        const category_id = req.params.category_id;
+        const province = req.query.province || "";
+        const city = req.query.city || "";
 
-    const page = parseInt(req.params.page);
-    const limitPerPage = 3;
-    //From getSortedListingCount middleware:
-    const count = parseInt(req.params.count);
+        const page = parseInt(req.params.page);
+        const limitPerPage = 3;
+        //From getSortedListingCount middleware:
+        const count = parseInt(req.params.count);
 
-    let query;
-    let values;
+        let query;
+        let values;
+        try {
+            if (listing_name && category_id) {
+                //User enters filters and entered words on search bar
+                query = `SELECT  * FROM listing WHERE name_tokens @@ to_tsquery($1)
+                 AND category_id = $2 ORDER BY ${columnName} ${order}
+                LIMIT $3 OFFSET ($4 - 1) * $3`;
+                values = [`%${listing_name}%`, category_id, limitPerPage, page];
+            } else if (listing_name) {
+                //User only enters word on search bar
+                query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) ORDER BY  ${columnName} ${order}
+                LIMIT $2 OFFSET ($3 - 1) * $2`;
+                values = [`%${listing_name}%`, limitPerPage, page];
+            } else if (category_id) {
+                //User has category filter but enters nothing on search bar
+                query = `SELECT * FROM listing WHERE category_id = $1 ORDER BY  ${columnName} ${order} 
+                LIMIT $2 OFFSET ($3 - 1) * $2`;
+                values = [category_id, limitPerPage, page];
+            } else {
+                //User has no category filter and enters nothing on search bar
+                query = `SELECT * FROM listing ORDER BY ${columnName} ${order} 
+                LIMIT $1 OFFSET ($2 - 1) * $1`;
+                values = [limitPerPage, page];
+            }
 
-    try {
-        if (category_id) {
-            query = `SELECT  * FROM listing WHERE name_tokens @@ to_tsquery($1)
-             AND category_id = $2 ORDER BY LISTING_DATE ASC
-            LIMIT $3 OFFSET ($4 - 1) * $3`;
-            values = [`%${listing_name}%`, category_id, limitPerPage, page];
-        } else {
-            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) ORDER BY LISTING_DATE ASC 
-            LIMIT $2 OFFSET ($3 - 1) * $2`;
-            values = [`%${listing_name}%`, limitPerPage, page];
+            const response = await pool.query(query, values);
+            const finalResponse = createSortedByResponse(
+                count,
+                page,
+                limitPerPage,
+                response.rows
+            );
+            res.send(finalResponse);
+        } catch (err) {
+            console.log(err);
+            return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
         }
-
-        const response = await pool.query(query, values);
-        const finalResponse = createSortedByResponse(
-            count,
-            page,
-            limitPerPage,
-            response.rows
-        );
-        res.send(finalResponse);
-    } catch (err) {
-        console.log(err);
-        return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
-    }
+    };
 };
-
-export const getListingsSortedByNewestDate = async (
-    req: Request,
-    res: Response
-) => {
-    const listing_name = req.query.search || "";
-    const category_id = req.params.category_id;
-    const province = req.query.province;
-    const city = req.query.city;
-
-    const page = parseInt(req.params.page);
-    const limitPerPage = 3;
-    const count = parseInt(req.params.count);
-    let query;
-    let values;
-
-    try {
-        if (category_id) {
-            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) AND category_id = $2 ORDER BY LISTING_DATE DESC
-            LIMIT $3 OFFSET ($4 - 1) * $3`;
-            values = [`%${listing_name}%`, category_id, limitPerPage, page];
-        } else {
-            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) AND category_id = category_id ORDER BY LISTING_DATE DESC
-            LIMIT $2 OFFSET ($3 - 1) * $2`;
-            values = [`%${listing_name}%`, limitPerPage, page];
-        }
-
-        const response = await pool.query(query, values);
-        const finalResponse = createSortedByResponse(
-            count,
-            page,
-            limitPerPage,
-            response.rows
-        );
-
-        res.send(finalResponse);
-    } catch (err) {
-        console.log(err);
-        return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
-    }
-};
-
-export const getListingsSortedByLowestPrice = async (
-    req: Request,
-    res: Response
-) => {
-    const listing_name = req.query.search || "";
-    const category_id = req.params.category_id;
-    const province = req.query.province;
-    const city = req.query.city;
-
-    const page = parseInt(req.params.page);
-    const limitPerPage = 3;
-    const count = parseInt(req.params.count);
-
-    let query;
-    let values;
-    try {
-        if (category_id) {
-            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) AND category_id = $2 ORDER BY listing_price ASC
-            LIMIT $3 OFFSET ($4 - 1) * $3`;
-            values = [`%${listing_name}%`, category_id, limitPerPage, page];
-        } else {
-            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) AND category_id = category_id ORDER BY listing_price ASC
-            LIMIT $2 OFFSET ($3 - 1) * $2`;
-            values = [`%${listing_name}%`, limitPerPage, page];
-        }
-        const response = await pool.query(query, values);
-        const finalResponse = createSortedByResponse(
-            count,
-            page,
-            limitPerPage,
-            response.rows
-        );
-
-        res.send(finalResponse);
-    } catch (err) {
-        console.log(err);
-        return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
-    }
-};
-
-export const getListingsSortedByHighestPrice = async (
-    req: Request,
-    res: Response
-) => {
-    const listing_name = req.query.search || "";
-    const category_id = req.params.category_id;
-    const province = req.query.province;
-    const city = req.query.city;
-
-    const page = parseInt(req.params.page);
-    const limitPerPage = 3;
-    const count = parseInt(req.params.count);
-    let query;
-    let values;
-    try {
-        if (category_id) {
-            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) AND category_id = $2 ORDER BY listing_price DESC
-            LIMIT $3 OFFSET ($4 - 1) * $3`;
-            values = [`%${listing_name}%`, category_id, limitPerPage, page];
-        } else {
-            query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) AND category_id = category_id ORDER BY listing_price DESC
-            LIMIT $2 OFFSET ($3 - 1) * $2`;
-            values = [`%${listing_name}%`, limitPerPage, page];
-        }
-        const response = await pool.query(query, values);
-        const finalResponse = createSortedByResponse(
-            count,
-            page,
-            limitPerPage,
-            response.rows
-        );
-
-        res.send(finalResponse);
-    } catch (err) {
-        console.log(err);
-        return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
-    }
-};
-
-// export const paginatedResults = async (
-//     req: any,
-//     res: Response,
-//     next: NextFunction
-// ) => {
-//     const page = parseInt(req.query.page);
-//     const limit = parseInt(req.query.limit);
-
-//     const startIndex = (page - 1) * limit;
-//     const endIndex = page * limit;
-
-//     const results = {};
-// };

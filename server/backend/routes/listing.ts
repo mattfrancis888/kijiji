@@ -5,10 +5,7 @@ import {
     categoriesForListing,
     getSortedListingCount,
     getCategoryId,
-    getListingsSortedByOldestDate,
-    getListingsSortedByNewestDate,
-    getListingsSortedByLowestPrice,
-    getListingsSortedByHighestPrice,
+    sortByHelper,
 } from "../controllers/listing";
 const listingRouter = Router();
 
@@ -19,24 +16,25 @@ listingRouter.get(
     "/listing-oldest-date/:page",
     getCategoryId,
     getSortedListingCount,
-    getListingsSortedByOldestDate
+    sortByHelper("listing_date", "ASC")
 );
 listingRouter.get(
     "/listing-newest-date/:page",
     getCategoryId,
     getSortedListingCount,
-    getListingsSortedByNewestDate
+    sortByHelper("listing_date", "DESC")
 );
+
 listingRouter.get(
     "/listing-lowest-price/:page",
     getCategoryId,
     getSortedListingCount,
-    getListingsSortedByLowestPrice
+    sortByHelper("listing_price", "ASC")
 );
 listingRouter.get(
     "/listing-highest-price/:page",
     getCategoryId,
     getSortedListingCount,
-    getListingsSortedByHighestPrice
+    sortByHelper("listing_price", "DESC")
 );
 export default listingRouter;
