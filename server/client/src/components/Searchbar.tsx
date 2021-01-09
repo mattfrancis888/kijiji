@@ -51,7 +51,7 @@ const Searchbar: React.FC<{}> = () => {
                     title="Filter Your Results"
                     content={renderModalContent()}
                     // actions={renderModalActions()}
-                    onDismiss={() => onCancelFilter}
+                    onDismiss={onCancelFilter}
                 />
             );
         }

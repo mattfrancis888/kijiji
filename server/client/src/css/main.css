@@ -728,6 +728,20 @@ nav {
   }
 }
 
+.displaySearchbar {
+  display: block;
+  width: 100%;
+}
+@media screen and (min-width: 768px) {
+  .displaySearchbar {
+    width: 65%;
+  }
+}
+
+.hideSearchbar {
+  display: none;
+}
+
 .authForm {
   text-align: left;
 }
@@ -1250,11 +1264,6 @@ nav {
   padding: 1rem;
   margin: 1rem 0;
 }
-@media screen and (min-width: 768px) {
-  .searchBarForm {
-    width: 65%;
-  }
-}
 
 .searchBarIcons {
   font-size: 1.3rem;
@@ -1351,22 +1360,21 @@ nav {
   margin-bottom: 3rem;
 }
 
-.modalLocationInputWrap {
+.modalLocationDropdownWrap {
   width: 100%;
 }
 @media screen and (min-width: 768px) {
-  .modalLocationInputWrap {
+  .modalLocationDropdownWrap {
     width: 50%;
   }
 }
 @media screen and (min-width: 768px) {
-  .modalLocationInputWrap:nth-child(2n+1) {
+  .modalLocationDropdownWrap:nth-child(2n+1) {
     padding-right: 1rem;
   }
 }
 
-.modalFilterCategoriesDropdown,
-.modalFilterInput {
+.modalFilterCategoriesDropdown {
   border: 1px solid #e2e2e5;
   border-radius: 0.5rem;
   outline: none;
@@ -1374,16 +1382,14 @@ nav {
   font-size: 1.2rem;
   width: 100%;
 }
-.modalFilterCategoriesDropdown:focus,
-.modalFilterInput:focus {
+.modalFilterCategoriesDropdown:focus {
   outline: none;
   border: 1px solid #2681db;
   box-shadow: 0 0 5px #2681db;
   background-color: white;
 }
 @media screen and (min-width: 768px) {
-  .modalFilterCategoriesDropdown,
-.modalFilterInput {
+  .modalFilterCategoriesDropdown {
     padding: 1.7rem;
     font-size: 1.7rem;
   }

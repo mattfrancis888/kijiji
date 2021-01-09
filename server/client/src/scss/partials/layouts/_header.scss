@@ -56,3 +56,14 @@ nav {
     border-radius: 0.4rem;
     transition: background-color 0.2s linear;
 }
+
+.displaySearchbar {
+    display: block;
+    width: 100%;
+    @media screen and (min-width: $md_breakpoint) {
+        width: 65%;
+    }
+}
+.hideSearchbar {
+    display: none;
+}

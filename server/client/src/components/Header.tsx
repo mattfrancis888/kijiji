@@ -27,7 +27,16 @@ const Header: React.FC<IHeader> = (props) => {
                         alt="logo"
                     />
                 </Link>
-                {width > MED_SCREEN_SIZE ? <Searchbar /> : null}
+                <div
+                    className={
+                        width > MED_SCREEN_SIZE
+                            ? "displaySearchbar"
+                            : "hideSearchbar"
+                    }
+                >
+                    <Searchbar />
+                </div>
+                {/* {width > MED_SCREEN_SIZE ? <Searchbar /> : null} */}
 
                 <div className="headerProfileAndPostWrap">
                     <h1
@@ -76,7 +85,18 @@ const Header: React.FC<IHeader> = (props) => {
                         Post Ad
                     </button>
                 </div>
-                {width < MED_SCREEN_SIZE ? <Searchbar /> : null}
+
+                <div
+                    className={
+                        width < MED_SCREEN_SIZE
+                            ? "displaySearchbar"
+                            : "hideSearchbar"
+                    }
+                >
+                    <Searchbar />
+                </div>
+
+                {/* {width < MED_SCREEN_SIZE ? <Searchbar /> : null} */}
             </div>
         </nav>
     );

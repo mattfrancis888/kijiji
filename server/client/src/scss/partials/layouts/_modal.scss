@@ -59,7 +59,7 @@
     flex-wrap: wrap;
     margin-bottom: 3rem;
 }
-.modalLocationInputWrap {
+.modalLocationDropdownWrap {
     width: 100%;
 
     @media screen and (min-width: $md_breakpoint) {
@@ -71,8 +71,7 @@
         }
     }
 }
-.modalFilterCategoriesDropdown,
-.modalFilterInput {
+.modalFilterCategoriesDropdown {
     border: 1px solid $light-grey;
     border-radius: 0.5rem;
     outline: none;

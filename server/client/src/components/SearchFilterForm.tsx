@@ -1,11 +1,17 @@
 import React, { ComponentType, useEffect } from "react";
-import { Field, reduxForm, InjectedFormProps } from "redux-form";
+import {
+    Field,
+    reduxForm,
+    InjectedFormProps,
+    formValueSelector,
+} from "redux-form";
 //compose is used to make it easier to "organize" mapStateToProps and redux form
 import { StoreState } from "../reducers";
 import { connect } from "react-redux";
 import { SearchFilterFormProps } from "./Searchbar";
 import { fetchCategoriesForListing } from "../actions";
 import LoadingDots from "./LoadingDots";
+import { CANADIAN_PROVINCES, CANADIAN_PROVINCE_AND_CITIES } from "../constants";
 //Typescriptand redux form:
 //https://levelup.gitconnected.com/react-js-typescript-redux-redux-form-jest-e522995ebe36
 
@@ -25,23 +31,6 @@ const renderError = ({ error, touched }: any) => {
         //When clicked and then clicked otuside of the input, it will be true
         return <div className="errorText">{error}</div>;
     }
-};
-
-const renderTextInput = ({ input, label, meta, placeHolder }: any) => {
-    //"component" property automatically passes props to argument, it has {input properties and meta properties}
-    //"label" automatically passes props to arguments
-    return (
-        <div>
-            <h3>{label}</h3>
-            <input
-                className="modalFilterInput"
-                {...input}
-                placeholder="Any"
-                autoComplete="off"
-            />
-            {renderError(meta)}
-        </div>
-    );
 };
 
 const renderDropDown = ({
@@ -95,28 +84,34 @@ const SearchFilterForm: React.FC<
                         optionValues={props.categories}
                     />
                     <div className="modalFilterLocationWrap">
-                        <div className="modalLocationInputWrap">
+                        <div className="modalLocationDropdownWrap">
                             <h3>Province</h3>
                             <Field
                                 name="province"
                                 type="text"
-                                component={renderTextInput}
+                                component={renderDropDown}
+                                optionValues={CANADIAN_PROVINCES.map(
+                                    (province) => {
+                                        return province.name;
+                                    }
+                                )}
                             />
                         </div>
-                        <div className="modalLocationInputWrap">
+                        <div className="modalLocationDropdownWrap">
                             <h3>City</h3>
                             <Field
                                 name="city"
                                 type="text"
-                                component={renderTextInput}
-                            />
-                        </div>
-                        <div className="modalLocationInputWrap">
-                            <h3>Street</h3>
-                            <Field
-                                name="street"
-                                type="text"
-                                component={renderTextInput}
+                                component={renderDropDown}
+                                optionValues={
+                                    !props.provinceValue
+                                        ? []
+                                        : CANADIAN_PROVINCE_AND_CITIES.filter(
+                                              (provinceAndCity) =>
+                                                  provinceAndCity.province ===
+                                                  props.provinceValue
+                                          )[0].cities
+                                }
                             />
                         </div>
                     </div>
@@ -137,9 +132,11 @@ const SearchFilterForm: React.FC<
     return <React.Fragment>{renderFields()}</React.Fragment>;
 };
 
+const selector = formValueSelector("searchFilterForm");
 const mapStateToProps = (state: StoreState) => {
     return {
         categories: state.categories,
+        provinceValue: selector(state, "province"),
     };
 };
 
