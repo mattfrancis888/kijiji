@@ -30,17 +30,12 @@ interface IListings {
     match: any;
 }
 
-interface ListingsQueryValues extends SearchFilterFormValues {
-    search?: string;
-}
 const Listings: React.FC<IListings> = (props) => {
     const currentPage = parseInt(props.match.params.page);
     const [selectedSort, setSelectedSort] = useState(ORDER_BY_OLDEST_DATE);
 
     //For Query Strings:
     const { search } = useLocation();
-    console.log(search);
-    const queryValues: ListingsQueryValues = queryString.parse(search);
 
     const handleDropdownChange = (event) => {
         let valueOfSelectedOption = event.target.value;
@@ -123,8 +118,6 @@ const Listings: React.FC<IListings> = (props) => {
 
     useEffect(() => {
         //https://ui.dev/react-router-v5-query-strings/
-
-        console.log(queryValues);
         props.fetchListingsByOldestDate(1, search);
     }, [search]);
 

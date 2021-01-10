@@ -47,6 +47,7 @@ var multer_1 = __importDefault(require("multer"));
 //TODO:
 //1. Post ad token for text search
 //2. Fix back button and pagination
+//3. Province and city filter
 var categoriesForListing = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         databasePool_1.default.query("SELECT category_name FROM category", function (error, category) {

@@ -1,4 +1,4 @@
-import React, { ComponentType, useEffect } from "react";
+import React, { ComponentType, useState, useEffect } from "react";
 import {
     Field,
     reduxForm,
@@ -12,54 +12,52 @@ import { SearchFilterFormProps } from "./Searchbar";
 import { fetchCategoriesForListing } from "../actions";
 import LoadingDots from "./LoadingDots";
 import { CANADIAN_PROVINCES, CANADIAN_PROVINCE_AND_CITIES } from "../constants";
+
 //Typescriptand redux form:
 //https://levelup.gitconnected.com/react-js-typescript-redux-redux-form-jest-e522995ebe36
 
 //Need to hoist render methods up or else it will give error where it will unfocus after first characther is typed
 //https://stackoverflow.com/questions/39839051/using-redux-form-im-losing-focus-after-typing-the-first-character
 
+export const CATEGORY_DROPDOWN = "CATEGORY_DROPDOWN";
+export const PROVINCE_DROPDOWN = "PROVINCE_DROPDOWN";
+export const CITY_DROPDOWN = "CITY_DROPDOWN";
+
 export interface SearchFilterFormValues {
     category?: string;
     province?: string;
     city?: string;
-    street?: string;
 }
-
-const renderError = ({ error, touched }: any) => {
-    if (touched && error) {
-        //Touched (for input) will be false at first
-        //When clicked and then clicked otuside of the input, it will be true
-        return <div className="errorText">{error}</div>;
-    }
-};
-
-const renderDropDown = ({
-    input,
-    label,
-    meta,
-    placeHolder,
-    optionValues,
-}: any) => {
-    return (
-        <select
-            className="modalFilterCategoriesDropdown"
-            autoComplete="off"
-            {...input}
-        >
-            <option value=""></option>
-            {optionValues.map((val) => (
-                <option key={val} value={val}>
-                    {val}
-                </option>
-            ))}
-        </select>
-    );
-};
 
 const SearchFilterForm: React.FC<
     SearchFilterFormProps & InjectedFormProps<{}, SearchFilterFormProps>
 > = (props) => {
+    const renderDropDown = ({
+        name,
+        input,
+        label,
+        meta,
+        placeHolder,
+        optionValues,
+    }: any) => {
+        return (
+            <select
+                className="modalFilterCategoriesDropdown"
+                autoComplete="off"
+                {...input}
+            >
+                <option value=""></option>
+                {optionValues.map((val) => (
+                    <option key={val} value={val}>
+                        {val}
+                    </option>
+                ))}
+            </select>
+        );
+    };
+
     const onSubmit = (formValues: any, dispatch: any) => {
+        props.onDropdownChange(formValues);
         props.onSubmit(formValues);
     };
 
@@ -79,7 +77,9 @@ const SearchFilterForm: React.FC<
                 <form onSubmit={props.handleSubmit(onSubmit)}>
                     <h3>Categories</h3>
                     <Field
+                        type="text"
                         name="category"
+                        label="category"
                         component={renderDropDown}
                         optionValues={props.categories}
                     />
@@ -88,6 +88,7 @@ const SearchFilterForm: React.FC<
                             <h3>Province</h3>
                             <Field
                                 name="province"
+                                label="province"
                                 type="text"
                                 component={renderDropDown}
                                 optionValues={CANADIAN_PROVINCES.map(
@@ -101,6 +102,7 @@ const SearchFilterForm: React.FC<
                             <h3>City</h3>
                             <Field
                                 name="city"
+                                label="city"
                                 type="text"
                                 component={renderDropDown}
                                 optionValues={
@@ -132,6 +134,13 @@ const SearchFilterForm: React.FC<
     return <React.Fragment>{renderFields()}</React.Fragment>;
 };
 
+const validate = (formValues: any) => {
+    //MUST BE NAMED VALIDATE! Other names would be ignored by reduxForm(..)
+    const errors = {};
+    //If you return an empty object, redux form will assume everything is ok
+    return errors;
+};
+
 const selector = formValueSelector("searchFilterForm");
 const mapStateToProps = (state: StoreState) => {
     return {
@@ -143,5 +152,6 @@ const mapStateToProps = (state: StoreState) => {
 export default connect(mapStateToProps, { fetchCategoriesForListing })(
     reduxForm<{}, SearchFilterFormProps>({
         form: "searchFilterForm",
+        validate,
     })(SearchFilterForm)
 );

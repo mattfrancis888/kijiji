@@ -7,6 +7,7 @@ import multer from "multer";
 //TODO:
 //1. Post ad token for text search
 //2. Fix back button and pagination
+//3. Province and city filter
 export const categoriesForListing = async (req: Request, res: Response) => {
     pool.query(`SELECT category_name FROM category`, (error, category) => {
         if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);

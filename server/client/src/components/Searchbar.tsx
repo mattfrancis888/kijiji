@@ -6,10 +6,20 @@ import { faSlidersH, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./Modal";
 import SearchFilterForm, { SearchFilterFormValues } from "./SearchFilterForm";
 
+import {
+    CATEGORY_DROPDOWN,
+    PROVINCE_DROPDOWN,
+    CITY_DROPDOWN,
+} from "./SearchFilterForm";
+
+import queryString from "query-string";
+import { useLocation } from "react-router-dom";
+
 export interface SearchFilterFormProps {
     handleSubmit(formValues: SearchFilterFormValues): void;
     onCancel(): void;
     categories: [];
+    onDropdownChange(): void;
 }
 
 const Searchbar: React.FC<{}> = () => {
@@ -20,6 +30,15 @@ const Searchbar: React.FC<{}> = () => {
 
     const onSubmitFilter = async (formValues: SearchFilterFormValues) => {
         console.log("onsubmitfilter", formValues);
+
+        if (formValues.category) {
+            setFilterCategory(formValues.category);
+        } else if (formValues.province) {
+            setFilterProvince(formValues.province);
+        } else if (formValues.city) {
+            setFilterCity(formValues.city);
+        }
+
         const keyNames = Object.keys(formValues);
         let filterQuery = "";
         keyNames.map((name) => {
@@ -39,6 +58,11 @@ const Searchbar: React.FC<{}> = () => {
             <SearchFilterForm
                 onSubmit={onSubmitFilter}
                 onCancel={onCancelFilter}
+                initialValues={{
+                    category: filterCategory,
+                    province: filterProvince,
+                    city: filterCity,
+                }}
             />
         );
     };
@@ -56,6 +80,20 @@ const Searchbar: React.FC<{}> = () => {
             );
         }
     };
+
+    const [filterCategory, setFilterCategory] = useState(null);
+    const [filterProvince, setFilterProvince] = useState(null);
+    const [filterCity, setFilterCity] = useState(null);
+
+    //For Query Strings:
+    const { search } = useLocation();
+    const queryValues: SearchFilterFormValues = queryString.parse(search);
+
+    useEffect(() => {
+        setFilterCategory(queryValues.category);
+        setFilterProvince(queryValues.province);
+        setFilterCity(queryValues.city);
+    }, [search]);
 
     const directToListingsPage = () => {
         if (filterQueries && searchValue) {
