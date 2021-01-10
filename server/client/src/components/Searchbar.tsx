@@ -6,12 +6,6 @@ import { faSlidersH, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./Modal";
 import SearchFilterForm, { SearchFilterFormValues } from "./SearchFilterForm";
 
-import {
-    CATEGORY_DROPDOWN,
-    PROVINCE_DROPDOWN,
-    CITY_DROPDOWN,
-} from "./SearchFilterForm";
-
 import queryString from "query-string";
 import { useLocation } from "react-router-dom";
 
@@ -24,25 +18,28 @@ export interface SearchFilterFormProps {
 
 const Searchbar: React.FC<{}> = () => {
     const history = useHistory();
-    const [showFilterModal, setShowFilterModal] = useState(null);
+    const [showFilterModal, setShowFilterModal] = useState(false);
     const [filterQueries, setFilterQueries] = useState(null);
     const [searchValue, setSearchValue] = useState(null);
 
     const onSubmitFilter = async (formValues: SearchFilterFormValues) => {
         console.log("onsubmitfilter", formValues);
 
-        if (formValues.category) {
+        if (!formValues.category) {
             setFilterCategory(formValues.category);
-        } else if (formValues.province) {
+        } else if (!formValues.province) {
             setFilterProvince(formValues.province);
-        } else if (formValues.city) {
+        } else if (!formValues.city) {
             setFilterCity(formValues.city);
         }
 
         const keyNames = Object.keys(formValues);
         let filterQuery = "";
         keyNames.map((name) => {
-            filterQuery += `${name}=${formValues[name]}&`;
+            if (formValues[name] != "") {
+                //if(!formValues[name]) does not work due to syntax
+                filterQuery += `${name}=${formValues[name]}&`;
+            }
         });
         const editedFilterQuery = filterQuery.slice(0, -1); //remove last &
         setFilterQueries(editedFilterQuery);
@@ -58,11 +55,7 @@ const Searchbar: React.FC<{}> = () => {
             <SearchFilterForm
                 onSubmit={onSubmitFilter}
                 onCancel={onCancelFilter}
-                initialValues={{
-                    category: filterCategory,
-                    province: filterProvince,
-                    city: filterCity,
-                }}
+                initialValues={renderInitialValuesForFilter()}
             />
         );
     };
@@ -94,6 +87,21 @@ const Searchbar: React.FC<{}> = () => {
         setFilterProvince(queryValues.province);
         setFilterCity(queryValues.city);
     }, [search]);
+
+    const renderInitialValuesForFilter = () => {
+        const initialValues: any = {};
+        console.log("QueryVal", queryValues);
+        Object.keys(queryValues).map((val) => {
+            if (val === "category") {
+                initialValues.category = filterCategory;
+            } else if (val === "province") {
+                initialValues.province = filterProvince;
+            } else if (val === "city") {
+                initialValues.city = filterCity;
+            }
+        });
+        return initialValues;
+    };
 
     const directToListingsPage = () => {
         if (filterQueries && searchValue) {

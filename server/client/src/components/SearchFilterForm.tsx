@@ -19,10 +19,6 @@ import { CANADIAN_PROVINCES, CANADIAN_PROVINCE_AND_CITIES } from "../constants";
 //Need to hoist render methods up or else it will give error where it will unfocus after first characther is typed
 //https://stackoverflow.com/questions/39839051/using-redux-form-im-losing-focus-after-typing-the-first-character
 
-export const CATEGORY_DROPDOWN = "CATEGORY_DROPDOWN";
-export const PROVINCE_DROPDOWN = "PROVINCE_DROPDOWN";
-export const CITY_DROPDOWN = "CITY_DROPDOWN";
-
 export interface SearchFilterFormValues {
     category?: string;
     province?: string;
@@ -56,8 +52,11 @@ const SearchFilterForm: React.FC<
         );
     };
 
-    const onSubmit = (formValues: any, dispatch: any) => {
-        props.onDropdownChange(formValues);
+    const onSubmit = (formValues: SearchFilterFormValues, dispatch: any) => {
+        if (!formValues.province) {
+            //City field does not get reseted to " " if user makes province an empty field first
+            formValues.city = "";
+        }
         props.onSubmit(formValues);
     };
 
@@ -134,7 +133,7 @@ const SearchFilterForm: React.FC<
     return <React.Fragment>{renderFields()}</React.Fragment>;
 };
 
-const validate = (formValues: any) => {
+const validate = (formValues: SearchFilterFormValues) => {
     //MUST BE NAMED VALIDATE! Other names would be ignored by reduxForm(..)
     const errors = {};
     //If you return an empty object, redux form will assume everything is ok
