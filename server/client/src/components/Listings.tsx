@@ -36,7 +36,9 @@ const Listings: React.FC<IListings> = (props) => {
 
     //For Query Strings:
     const { search } = useLocation();
+    const queryValues: SearchFilterFormValues = queryString.parse(search);
 
+    console.log("hi matt", search);
     const handleDropdownChange = (event) => {
         let valueOfSelectedOption = event.target.value;
         if (valueOfSelectedOption === ORDER_BY_OLDEST_DATE) {
@@ -71,6 +73,10 @@ const Listings: React.FC<IListings> = (props) => {
                 </div>
             );
         } else {
+            if (props.listingInfo.listings.length === 0) {
+                //When users enter an invalid page number in the url
+                return <h2>There seems to be nothing to show here...</h2>;
+            }
             return (
                 <React.Fragment>
                     <div className="showingAdsTitleAndDropdownWrap">
@@ -110,6 +116,7 @@ const Listings: React.FC<IListings> = (props) => {
                         itemLimit={props.listingInfo.limitPerPage}
                         currentPage={currentPage}
                         onClickCallback={pageNumberClicked}
+                        query={search}
                     />
                 </React.Fragment>
             );
@@ -118,8 +125,8 @@ const Listings: React.FC<IListings> = (props) => {
 
     useEffect(() => {
         //https://ui.dev/react-router-v5-query-strings/
-        props.fetchListingsByOldestDate(1, search);
-    }, [search]);
+        props.fetchListingsByOldestDate(currentPage, search);
+    }, [currentPage]);
 
     return (
         <React.Fragment>

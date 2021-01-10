@@ -6,6 +6,7 @@ interface PaginationProps {
     itemLimit: number;
     currentPage: number;
     onClickCallback(pageNumber: number): void;
+    query: string;
 }
 
 const Pagination: React.FC<PaginationProps> = (props) => {
@@ -28,7 +29,11 @@ const Pagination: React.FC<PaginationProps> = (props) => {
                             onClick={() => {
                                 setSelectedPage(pageNumber);
                                 props.onClickCallback(pageNumber);
-                                history.push(`/listings/${pageNumber}`);
+                                // history.push(`/listings/${pageNumber}`);
+                                history.push({
+                                    pathname: `/listings/${pageNumber}`,
+                                    search: `${props.query}`,
+                                });
                             }}
                             className={
                                 selectedPage === pageNumber

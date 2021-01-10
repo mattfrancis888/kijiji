@@ -20,6 +20,7 @@ import { CANADIAN_PROVINCES, CANADIAN_PROVINCE_AND_CITIES } from "../constants";
 //https://stackoverflow.com/questions/39839051/using-redux-form-im-losing-focus-after-typing-the-first-character
 
 export interface SearchFilterFormValues {
+    search?: string;
     category?: string;
     province?: string;
     city?: string;

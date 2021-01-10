@@ -8,6 +8,7 @@ import SearchFilterForm, { SearchFilterFormValues } from "./SearchFilterForm";
 
 import queryString from "query-string";
 import { useLocation } from "react-router-dom";
+import { filter, initial } from "lodash";
 
 export interface SearchFilterFormProps {
     handleSubmit(formValues: SearchFilterFormValues): void;
@@ -21,23 +22,30 @@ const Searchbar: React.FC<{}> = () => {
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [filterQueries, setFilterQueries] = useState(null);
     const [searchValue, setSearchValue] = useState(null);
+    const [initialLoad, setInitialLoad] = useState(true);
 
     const onSubmitFilter = async (formValues: SearchFilterFormValues) => {
         console.log("onsubmitfilter", formValues);
+        //If we didn't fill out the city field:
+        //{category: "Sportings Goods", province: "Manitoba"}
 
-        if (!formValues.category) {
+        //If we entered the city field, but then change it back to an empty field
+        //{category: "Sportings Goods", province: "Alberta", city: ""}
+
+        if (formValues.category || formValues.category === "") {
             setFilterCategory(formValues.category);
-        } else if (!formValues.province) {
+        }
+        if (formValues.province || formValues.province === "") {
             setFilterProvince(formValues.province);
-        } else if (!formValues.city) {
+        }
+        if (formValues.city || formValues.city === "") {
             setFilterCity(formValues.city);
         }
 
         const keyNames = Object.keys(formValues);
         let filterQuery = "";
         keyNames.map((name) => {
-            if (formValues[name] != "") {
-                //if(!formValues[name]) does not work due to syntax
+            if (formValues[name] !== "") {
                 filterQuery += `${name}=${formValues[name]}&`;
             }
         });
@@ -86,30 +94,55 @@ const Searchbar: React.FC<{}> = () => {
         setFilterCategory(queryValues.category);
         setFilterProvince(queryValues.province);
         setFilterCity(queryValues.city);
-    }, [search]);
+    }, []);
 
     const renderInitialValuesForFilter = () => {
+        console.log("renderInitialVal", filterProvince);
         const initialValues: any = {};
-        console.log("QueryVal", queryValues);
-        Object.keys(queryValues).map((val) => {
-            if (val === "category") {
+        if (initialLoad) {
+            Object.keys(queryValues).map((val) => {
+                if (val === "category") {
+                    initialValues.category = filterCategory;
+                } else if (val === "province") {
+                    initialValues.province = filterProvince;
+                } else if (val === "city") {
+                    initialValues.city = filterCity;
+                }
+            });
+            setInitialLoad(false);
+        } else {
+            if (filterCategory || filterCategory === "") {
                 initialValues.category = filterCategory;
-            } else if (val === "province") {
+            }
+            if (filterProvince || filterProvince === "") {
                 initialValues.province = filterProvince;
-            } else if (val === "city") {
+            }
+            if (filterCity || filterCity === "") {
                 initialValues.city = filterCity;
             }
-        });
+        }
         return initialValues;
     };
 
     const directToListingsPage = () => {
         if (filterQueries && searchValue) {
-            history.push(`/listings/1?search=${searchValue}&${filterQueries}`);
+            // history.push(`/listings/1?search=${searchValue}&${filterQueries}`);
+            history.push({
+                pathname: "/listings/1",
+                search: `?search=${searchValue}&${filterQueries}`,
+            });
         } else if (filterQueries) {
-            history.push(`/listings/1?${filterQueries}`);
+            // history.push(`/listings/1?${filterQueries}`);
+            history.push({
+                pathname: "/listings/1",
+                search: `?${filterQueries}`,
+            });
         } else if (searchValue) {
-            history.push(`/listings/1?search=${searchValue}`);
+            //history.push(`/listings/1?search=${searchValue}`);
+            history.push({
+                pathname: "/listings/1",
+                search: `?search=${searchValue}`,
+            });
         } else {
             history.push(`/listings/1`);
         }
