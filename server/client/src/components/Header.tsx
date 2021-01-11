@@ -1,9 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import history from "../browserHistory";
 import { connect } from "react-redux";
 import { signOut } from "../actions";
 import { StoreState } from "../reducers";
+import Searchbar from "./Searchbar";
+import useWindowDimensions from "../windowDimensions";
+import { MED_SCREEN_SIZE } from "../constants";
 
 interface IHeader {
     authStatus?: string | null;
@@ -11,7 +14,8 @@ interface IHeader {
 }
 
 const Header: React.FC<IHeader> = (props) => {
-    const history = useHistory();
+    const { width } = useWindowDimensions();
+
     return (
         <nav>
             <div className="headerInfoWrap">
@@ -22,6 +26,17 @@ const Header: React.FC<IHeader> = (props) => {
                         alt="logo"
                     />
                 </Link>
+                <div
+                    className={
+                        width > MED_SCREEN_SIZE
+                            ? "displaySearchbar"
+                            : "hideSearchbar"
+                    }
+                >
+                    <Searchbar />
+                </div>
+                {/* {width > MED_SCREEN_SIZE ? <Searchbar /> : null} */}
+
                 <div className="headerProfileAndPostWrap">
                     <h1
                         className={
@@ -69,6 +84,18 @@ const Header: React.FC<IHeader> = (props) => {
                         Post Ad
                     </button>
                 </div>
+
+                <div
+                    className={
+                        width < MED_SCREEN_SIZE
+                            ? "displaySearchbar"
+                            : "hideSearchbar"
+                    }
+                >
+                    <Searchbar />
+                </div>
+
+                {/* {width < MED_SCREEN_SIZE ? <Searchbar /> : null} */}
             </div>
         </nav>
     );

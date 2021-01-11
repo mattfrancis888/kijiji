@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import history from "../browserHistory";
 import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import { Listing as ListingType } from "../actions";

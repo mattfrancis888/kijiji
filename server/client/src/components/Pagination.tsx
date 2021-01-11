@@ -1,17 +1,15 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import history from "../browserHistory";
 
 interface PaginationProps {
     totalItems: number;
     itemLimit: number;
     currentPage: number;
     onClickCallback(pageNumber: number): void;
+    query: string;
 }
 
 const Pagination: React.FC<PaginationProps> = (props) => {
-    const history = useHistory();
-    const [selectedPage, setSelectedPage] = useState(props.currentPage);
-
     const renderPageItems = (totalItems: number, itemLimit: number) => {
         let numberOfPageItems = Math.ceil(totalItems / itemLimit); //rounds up
         let pageItems = [];
@@ -26,12 +24,14 @@ const Pagination: React.FC<PaginationProps> = (props) => {
                         <li
                             key={pageNumber}
                             onClick={() => {
-                                setSelectedPage(pageNumber);
                                 props.onClickCallback(pageNumber);
-                                history.push(`/listings/${pageNumber}`);
+                                history.push({
+                                    pathname: `/listings/${pageNumber}`,
+                                    search: `${props.query}`,
+                                });
                             }}
                             className={
-                                selectedPage === pageNumber
+                                props.currentPage == pageNumber
                                     ? "pageItemSelected"
                                     : "pageItem"
                             }

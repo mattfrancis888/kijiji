@@ -15,6 +15,10 @@ nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    @media screen and (min-width: $md_breakpoint) {
+        flex-wrap: nowrap;
+    }
 }
 
 .headerProfileAndPostWrap {
@@ -51,4 +55,15 @@ nav {
     box-shadow: 0 2px 10px 0 rgba(55, 51, 115, 0.3);
     border-radius: 0.4rem;
     transition: background-color 0.2s linear;
+}
+
+.displaySearchbar {
+    display: block;
+    width: 100%;
+    @media screen and (min-width: $md_breakpoint) {
+        width: 65%;
+    }
+}
+.hideSearchbar {
+    display: none;
 }

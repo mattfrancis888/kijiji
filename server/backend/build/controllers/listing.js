@@ -39,11 +39,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getListingsSortedByHighestPrice = exports.getListingsSortedByLowestPrice = exports.getListingsSortedByNewestDate = exports.getListingsSortedByOldestDate = exports.getSortedListingCount = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
+exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
 var multer_1 = __importDefault(require("multer"));
+//TODO:
 var categoriesForListing = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         databasePool_1.default.query("SELECT category_name FROM category", function (error, category) {
@@ -71,7 +72,7 @@ var createListing = function (req, res) { return __awaiter(void 0, void 0, void 
                 email = req.body.subject;
                 _a.label = 1;
             case 1:
-                _a.trys.push([1, 8, , 9]);
+                _a.trys.push([1, 9, , 10]);
                 //Using transactions with psql pool:
                 //https://kb.objectrocket.com/postgresql/nodejs-and-the-postgres-transaction-968
                 return [4 /*yield*/, databasePool_1.default.query("BEGIN")];
@@ -103,8 +104,17 @@ var createListing = function (req, res) { return __awaiter(void 0, void 0, void 
                 return [4 /*yield*/, databasePool_1.default.query("INSERT INTO lookup_listing_user(user_id, listing_id)VALUES($1, $2)", [userId, listingId])];
             case 6:
                 _a.sent();
-                return [4 /*yield*/, databasePool_1.default.query("COMMIT")];
+                //For our full-text-search; if user mispelt words in the search bar, we would still give them the intended word they
+                //are trying to search
+                //https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
+                return [4 /*yield*/, databasePool_1.default.query("UPDATE listing d1  \n            SET name_tokens = to_tsvector(d1.listing_name)  \n            FROM listing d2 WHERE d1.listing_id = $1;", [listingId])];
             case 7:
+                //For our full-text-search; if user mispelt words in the search bar, we would still give them the intended word they
+                //are trying to search
+                //https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
+                _a.sent();
+                return [4 /*yield*/, databasePool_1.default.query("COMMIT")];
+            case 8:
                 _a.sent();
                 res.send({
                     id: listingId,
@@ -117,13 +127,13 @@ var createListing = function (req, res) { return __awaiter(void 0, void 0, void 
                     street: street,
                     price: price,
                 });
-                return [3 /*break*/, 9];
-            case 8:
+                return [3 /*break*/, 10];
+            case 9:
                 error_1 = _a.sent();
                 databasePool_1.default.query("ROLLBACK");
                 console.log("ROLLBACK TRIGGERED", error_1);
                 return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
-            case 9: return [2 /*return*/];
+            case 10: return [2 /*return*/];
         }
     });
 }); };
@@ -167,23 +177,70 @@ var uploadImage = function (req, res) { return __awaiter(void 0, void 0, void 0,
     });
 }); };
 exports.uploadImage = uploadImage;
-var getSortedListingCount = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var listing_name, category_id, countQuery, countValues, totalListingsResponse, err_1;
+var getCategoryId = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var category, categoryQueryResponse, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                listing_name = req.body.listing_name || "";
-                category_id = req.body.category_id;
+                category = req.query.category;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 4, , 5]);
+                if (!category) return [3 /*break*/, 3];
+                return [4 /*yield*/, databasePool_1.default.query("SELECT category_id FROM category WHERE category_name = $1;", [category])];
+            case 2:
+                categoryQueryResponse = _a.sent();
+                req.params.category_id = categoryQueryResponse.rows[0].category_id;
+                _a.label = 3;
+            case 3: return [3 /*break*/, 5];
+            case 4:
+                err_1 = _a.sent();
+                console.log(err_1);
+                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
+            case 5:
+                next();
+                return [2 /*return*/];
+        }
+    });
+}); };
+exports.getCategoryId = getCategoryId;
+var getSortedListingCount = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var listing_name, category_id, province, city, countQuery, countValues, totalListingsResponse, err_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                listing_name = req.query.search || "";
+                category_id = req.params.category_id;
+                province = req.query.province || "";
+                city = req.query.city || "";
+                countValues = [];
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 4]);
-                if (category_id) {
-                    countQuery = "SELECT COUNT(listing_id) FROM listing WHERE listing_name LIKE $1 AND category_id = $2";
-                    countValues = ["%" + listing_name + "%", category_id];
+                if (listing_name && category_id) {
+                    //User enters filters and entered words on search bar, possibly has province and city filter
+                    countQuery = "SELECT COUNT(listing_id) FROM listing WHERE name_tokens @@ to_tsquery($1)\n            AND category_id = $2 AND province LIKE $3 AND city LIKE $4";
+                    countValues = [
+                        listing_name,
+                        category_id,
+                        "%" + province + "%",
+                        "%" + city + "%",
+                    ];
+                }
+                else if (listing_name) {
+                    //User only enters word on search bar, possibly has province and city filter
+                    countQuery = "SELECT COUNT(*) FROM listing WHERE name_tokens @@ to_tsquery($1)\n            AND province LIKE $2 AND city LIKE $3 ";
+                    countValues = [listing_name, "%" + province + "%", "%" + city + "%"];
+                }
+                else if (category_id) {
+                    //User has category filter but enters nothing on search bar, possibly has province and city filter
+                    countQuery = "SELECT COUNT(*) FROM listing WHERE category_id = $1\n            AND province LIKE $2 AND city LIKE $3";
+                    countValues = [category_id, "%" + province + "%", "%" + city + "%"];
                 }
                 else {
-                    countQuery = "SELECT COUNT(*) FROM listing WHERE listing_name LIKE $1";
-                    countValues = ["%" + listing_name + "%"];
+                    //User has no category filter and enters nothing on search bar, possibly has province and city filter
+                    countQuery = "SELECT COUNT(*) FROM listing WHERE province LIKE $1 AND city LIKE $2 ";
+                    countValues = ["%" + province + "%", "%" + city + "%"];
                 }
                 return [4 /*yield*/, databasePool_1.default.query(countQuery, countValues)];
             case 2:
@@ -191,8 +248,8 @@ var getSortedListingCount = function (req, res, next) { return __awaiter(void 0,
                 req.params.count = totalListingsResponse.rows[0].count;
                 return [3 /*break*/, 4];
             case 3:
-                err_1 = _a.sent();
-                console.log(err_1);
+                err_2 = _a.sent();
+                console.log(err_2);
                 return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
             case 4:
                 next();
@@ -209,158 +266,95 @@ var createSortedByResponse = function (count, page, limitPerPage, listings) {
     results.listings = listings;
     return results;
 };
-var getListingsSortedByOldestDate = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var listing_name, category_id, page, limitPerPage, count, query, values, response_2, finalResponse, err_2;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                listing_name = req.body.listing_name || "";
-                category_id = req.body.category_id;
-                page = parseInt(req.params.page);
-                limitPerPage = 3;
-                count = parseInt(req.params.count);
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 4]);
-                if (category_id) {
-                    query = "SELECT  * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE ASC\n            LIMIT $3 OFFSET ($4 - 1) * $3";
-                    values = ["%" + listing_name + "%", category_id, limitPerPage, page];
+var sortByHelper = function (columnName, order) {
+    return function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var listing_name, category_id, province, city, page, limitPerPage, count, query, values, response_2, finalResponse, err_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        console.log("req.query", req.query);
+                        console.log("req.params", req.params);
+                        listing_name = req.query.search || "";
+                        category_id = req.params.category_id;
+                        province = req.query.province || "";
+                        city = req.query.city || "";
+                        page = parseInt(req.params.page);
+                        limitPerPage = 3;
+                        count = parseInt(req.params.count);
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        //@to_tsquery is
+                        //for our full-text-search; if user mispelt words in the search bar, we would still give them the intended word they
+                        //are trying to search
+                        //https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
+                        if (listing_name && category_id) {
+                            //User enters filters and entered words on search bar, possibly has province and city filter
+                            // query = `SELECT  * FROM listing WHERE name_tokens @@ to_tsquery($1)
+                            //  AND category_id = $2 ORDER BY ${columnName} ${order}
+                            // LIMIT $3 OFFSET ($4 - 1) * $3`;
+                            // values = [`%${listing_name}%`, category_id, limitPerPage, page];
+                            query = "SELECT  * FROM listing WHERE name_tokens @@ to_tsquery($1)\n                AND category_id = $2 AND province LIKE $3 AND city like $4 ORDER BY " + columnName + " " + order + "\n               LIMIT $5 OFFSET ($6 - 1) * $5";
+                            values = [
+                                listing_name,
+                                category_id,
+                                "%" + province + "%",
+                                "%" + city + "%",
+                                limitPerPage,
+                                page,
+                            ];
+                        }
+                        else if (listing_name) {
+                            //User only enters word on search bar, possibly has province and city filter
+                            // query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) ORDER BY  ${columnName} ${order}
+                            // LIMIT $2 OFFSET ($3 - 1) * $2`;
+                            // values = [`%${listing_name}%`, limitPerPage, page];
+                            query = "SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) \n                AND province LIKE $2 AND city LIKE $3 ORDER BY  " + columnName + " " + order + "\n                LIMIT $4 OFFSET ($5 - 1) * $4";
+                            values = [
+                                listing_name,
+                                "%" + province + "%",
+                                "%" + city + "%",
+                                limitPerPage,
+                                page,
+                            ];
+                        }
+                        else if (category_id) {
+                            //User has category filter but enters nothing on search bar, possibly has province and city filter
+                            // query = `SELECT * FROM listing WHERE category_id = $1 ORDER BY  ${columnName} ${order}
+                            // LIMIT $2 OFFSET ($3 - 1) * $2`;
+                            // values = [category_id, limitPerPage, page];
+                            query = "SELECT * FROM listing WHERE category_id = $1 AND province LIKE $2 \n                AND city LIKE $3 ORDER BY  " + columnName + " " + order + " \n                LIMIT $4 OFFSET ($5 - 1) * $4";
+                            values = [
+                                category_id,
+                                "%" + province + "%",
+                                "%" + city,
+                                limitPerPage,
+                                page,
+                            ];
+                        }
+                        else {
+                            //User has no category filter and enters nothing on search bar, possibly has province and city filter
+                            // query = `SELECT * FROM listing ORDER BY ${columnName} ${order}
+                            // LIMIT $1 OFFSET ($2 - 1) * $1`;
+                            // values = [limitPerPage, page];
+                            query = "SELECT * FROM listing WHERE province LIKE $1 \n                and city LIKE $2 ORDER BY " + columnName + " " + order + " \n                LIMIT $3 OFFSET ($4 - 1) * $3";
+                            values = ["%" + province + "%", "%" + city, limitPerPage, page];
+                        }
+                        return [4 /*yield*/, databasePool_1.default.query(query, values)];
+                    case 2:
+                        response_2 = _a.sent();
+                        finalResponse = createSortedByResponse(count, page, limitPerPage, response_2.rows);
+                        res.send(finalResponse);
+                        return [3 /*break*/, 4];
+                    case 3:
+                        err_3 = _a.sent();
+                        console.log(err_3);
+                        return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
+                    case 4: return [2 /*return*/];
                 }
-                else {
-                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 ORDER BY LISTING_DATE ASC \n            LIMIT $2 OFFSET ($3 - 1) * $2";
-                    values = ["%" + listing_name + "%", limitPerPage, page];
-                }
-                return [4 /*yield*/, databasePool_1.default.query(query, values)];
-            case 2:
-                response_2 = _a.sent();
-                finalResponse = createSortedByResponse(count, page, limitPerPage, response_2.rows);
-                res.send(finalResponse);
-                return [3 /*break*/, 4];
-            case 3:
-                err_2 = _a.sent();
-                console.log(err_2);
-                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
-            case 4: return [2 /*return*/];
-        }
-    });
-}); };
-exports.getListingsSortedByOldestDate = getListingsSortedByOldestDate;
-var getListingsSortedByNewestDate = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var listing_name, category_id, page, limitPerPage, count, query, values, response_3, finalResponse, err_3;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                listing_name = req.body.listing_name || "";
-                category_id = req.body.category_id;
-                page = parseInt(req.params.page);
-                limitPerPage = 3;
-                count = parseInt(req.params.count);
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 4]);
-                if (category_id) {
-                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY LISTING_DATE DESC\n            LIMIT $3 OFFSET ($4 - 1) * $3";
-                    values = ["%" + listing_name + "%", category_id, limitPerPage, page];
-                }
-                else {
-                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY LISTING_DATE DESC\n            LIMIT $2 OFFSET ($3 - 1) * $2";
-                    values = ["%" + listing_name + "%", limitPerPage, page];
-                }
-                return [4 /*yield*/, databasePool_1.default.query(query, values)];
-            case 2:
-                response_3 = _a.sent();
-                finalResponse = createSortedByResponse(count, page, limitPerPage, response_3.rows);
-                res.send(finalResponse);
-                return [3 /*break*/, 4];
-            case 3:
-                err_3 = _a.sent();
-                console.log(err_3);
-                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
-            case 4: return [2 /*return*/];
-        }
-    });
-}); };
-exports.getListingsSortedByNewestDate = getListingsSortedByNewestDate;
-var getListingsSortedByLowestPrice = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var listing_name, category_id, page, limitPerPage, count, query, values, response_4, finalResponse, err_4;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                listing_name = req.body.listing_name || "";
-                category_id = req.body.category_id;
-                page = parseInt(req.params.page);
-                limitPerPage = 3;
-                count = parseInt(req.params.count);
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 4]);
-                if (category_id) {
-                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY listing_price ASC\n            LIMIT $3 OFFSET ($4 - 1) * $3";
-                    values = ["%" + listing_name + "%", category_id, limitPerPage, page];
-                }
-                else {
-                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY listing_price ASC\n            LIMIT $2 OFFSET ($3 - 1) * $2";
-                    values = ["%" + listing_name + "%", limitPerPage, page];
-                }
-                return [4 /*yield*/, databasePool_1.default.query(query, values)];
-            case 2:
-                response_4 = _a.sent();
-                finalResponse = createSortedByResponse(count, page, limitPerPage, response_4.rows);
-                res.send(finalResponse);
-                return [3 /*break*/, 4];
-            case 3:
-                err_4 = _a.sent();
-                console.log(err_4);
-                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
-            case 4: return [2 /*return*/];
-        }
-    });
-}); };
-exports.getListingsSortedByLowestPrice = getListingsSortedByLowestPrice;
-var getListingsSortedByHighestPrice = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var listing_name, category_id, page, limitPerPage, count, query, values, response_5, finalResponse, err_5;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                listing_name = req.body.listing_name || "";
-                category_id = req.body.category_id;
-                page = parseInt(req.params.page);
-                limitPerPage = 3;
-                count = parseInt(req.params.count);
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 4]);
-                if (category_id) {
-                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = $2 ORDER BY listing_price DESC\n            LIMIT $3 OFFSET ($4 - 1) * $3";
-                    values = ["%" + listing_name + "%", category_id, limitPerPage, page];
-                }
-                else {
-                    query = "SELECT * FROM listing WHERE listing_name LIKE $1 AND category_id = category_id ORDER BY listing_price DESC\n            LIMIT $2 OFFSET ($3 - 1) * $2";
-                    values = ["%" + listing_name + "%", limitPerPage, page];
-                }
-                return [4 /*yield*/, databasePool_1.default.query(query, values)];
-            case 2:
-                response_5 = _a.sent();
-                finalResponse = createSortedByResponse(count, page, limitPerPage, response_5.rows);
-                res.send(finalResponse);
-                return [3 /*break*/, 4];
-            case 3:
-                err_5 = _a.sent();
-                console.log(err_5);
-                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
-            case 4: return [2 /*return*/];
-        }
-    });
-}); };
-exports.getListingsSortedByHighestPrice = getListingsSortedByHighestPrice;
-// export const paginatedResults = async (
-//     req: any,
-//     res: Response,
-//     next: NextFunction
-// ) => {
-//     const page = parseInt(req.query.page);
-//     const limit = parseInt(req.query.limit);
-//     const startIndex = (page - 1) * limit;
-//     const endIndex = page * limit;
-//     const results = {};
-// };
+            });
+        });
+    };
+};
+exports.sortByHelper = sortByHelper;

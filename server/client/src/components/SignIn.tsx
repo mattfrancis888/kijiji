@@ -1,5 +1,5 @@
 import React from "react";
-import SignInForm from "./SignInForm";
+import SignInForm, { SignInFormValues } from "./SignInForm";
 import { signIn } from "../actions";
 import { StoreState } from "../reducers";
 import { connect } from "react-redux";
@@ -15,7 +15,7 @@ export interface SignInProps {
 
 const SignIn: React.FC<SignInProps> = (props) => {
     //const history = useHistory();
-    const onSubmitSignIn = async (formValues: any) => {
+    const onSubmitSignIn = async (formValues: SignInFormValues) => {
         props.signIn(formValues);
     };
 

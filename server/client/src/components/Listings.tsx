@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import history from "../browserHistory";
 import { connect } from "react-redux";
 import {
     fetchListingsByOldestDate,
@@ -14,54 +14,65 @@ import Listing from "./Listing";
 import Loading from "./Loading";
 import Pagination from "./Pagination";
 import queryString from "query-string";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 const ORDER_BY_OLDEST_DATE = "Posted: oldest first";
 const ORDER_BY_NEWEST_DATE = "Posted: newest first";
 const ORDER_BY_LOWEST_PRICE = " Price: lowest first";
 const ORDER_BY_HIGHEST_PRICE = "Price: highest first";
 
-//
 interface IListings {
-    fetchListingsByOldestDate(pageNumber: number): void;
-    fetchListingsByNewestDate(pageNumber: number): void;
-    fetchListingsByLowestPrice(pageNumber: number): void;
-    fetchListingsByHighestPrice(pageNumber: number): void;
+    fetchListingsByOldestDate(pageNumber: number, queryPath: string): void;
+    fetchListingsByNewestDate(pageNumber: number, queryPath: string): void;
+    fetchListingsByLowestPrice(pageNumber: number, queryPath: string): void;
+    fetchListingsByHighestPrice(pageNumber: number, queryPath: string): void;
     listingInfo: any;
     match: any;
 }
 
 const Listings: React.FC<IListings> = (props) => {
-    //https://ui.dev/react-router-v5-query-strings/
-    //For Query Strings:
-    // const { search } = useLocation();
-    // const values = queryString.parse(search);
-
-    const currentPage = parseInt(props.match.params.page);
+    const [currentPage, setCurrentPage] = useState(props.match.params.page);
     const [selectedSort, setSelectedSort] = useState(ORDER_BY_OLDEST_DATE);
+    //For Query Strings:
+    const { search } = useLocation();
+
+    const renderShowingText = () => {
+        if (props.listingInfo.totalListings < props.listingInfo.limitPerPage) {
+            return props.listingInfo.totalListings;
+        } else if (
+            props.listingInfo.limitPerPage * props.listingInfo.page >
+            props.listingInfo.totalListings
+        ) {
+            return props.listingInfo.totalListings;
+        } else {
+            return props.listingInfo.limitPerPage * props.listingInfo.page;
+        }
+    };
 
     const handleDropdownChange = (event) => {
         let valueOfSelectedOption = event.target.value;
         if (valueOfSelectedOption === ORDER_BY_OLDEST_DATE) {
             setSelectedSort(ORDER_BY_OLDEST_DATE);
-            props.fetchListingsByOldestDate(currentPage);
+            props.fetchListingsByOldestDate(currentPage, search);
         } else if (valueOfSelectedOption === ORDER_BY_NEWEST_DATE) {
-            props.fetchListingsByNewestDate(currentPage);
+            setSelectedSort(ORDER_BY_NEWEST_DATE);
+            props.fetchListingsByNewestDate(currentPage, search);
         } else if (valueOfSelectedOption === ORDER_BY_LOWEST_PRICE) {
-            props.fetchListingsByLowestPrice(currentPage);
+            setSelectedSort(ORDER_BY_LOWEST_PRICE);
+            props.fetchListingsByLowestPrice(currentPage, search);
         } else if (valueOfSelectedOption === ORDER_BY_HIGHEST_PRICE) {
             setSelectedSort(ORDER_BY_HIGHEST_PRICE);
-            props.fetchListingsByHighestPrice(currentPage);
+            props.fetchListingsByHighestPrice(currentPage, search);
         }
     };
     const pageNumberClicked = (pageNumber: number) => {
         if (selectedSort === ORDER_BY_OLDEST_DATE) {
-            props.fetchListingsByOldestDate(pageNumber);
+            props.fetchListingsByOldestDate(pageNumber, search);
         } else if (selectedSort === ORDER_BY_NEWEST_DATE) {
-            props.fetchListingsByNewestDate(pageNumber);
+            props.fetchListingsByNewestDate(pageNumber, search);
         } else if (selectedSort === ORDER_BY_LOWEST_PRICE) {
-            props.fetchListingsByLowestPrice(pageNumber);
+            props.fetchListingsByLowestPrice(pageNumber, search);
         } else if (selectedSort === ORDER_BY_HIGHEST_PRICE) {
-            props.fetchListingsByHighestPrice(pageNumber);
+            props.fetchListingsByHighestPrice(pageNumber, search);
         }
     };
 
@@ -73,13 +84,16 @@ const Listings: React.FC<IListings> = (props) => {
                 </div>
             );
         } else {
+            if (props.listingInfo.listings.length === 0) {
+                //When users enter an invalid page number in the url
+                return <h2>There seems to be nothing to show here...</h2>;
+            }
             return (
                 <React.Fragment>
                     <div className="showingAdsTitleAndDropdownWrap">
-                        <h1 className="showingAdsTitle">{`Showing ${
-                            props.listingInfo.limitPerPage *
-                            props.listingInfo.page
-                        } out of ${props.listingInfo.totalListings} ads:`}</h1>
+                        <h1 className="showingAdsTitle">{`Showing ${renderShowingText()} out of ${
+                            props.listingInfo.totalListings
+                        } ads:`}</h1>
                         <div className="dropdownWrap">
                             <h3>Sort by</h3>
                             <select
@@ -109,15 +123,34 @@ const Listings: React.FC<IListings> = (props) => {
                         itemLimit={props.listingInfo.limitPerPage}
                         currentPage={currentPage}
                         onClickCallback={pageNumberClicked}
+                        query={search}
                     />
                 </React.Fragment>
             );
         }
     };
+
     useEffect(() => {
-        props.fetchListingsByOldestDate(1);
-    }, []);
-    console.log("LISTINGS VALUE", props.listingInfo);
+        //When we click the back button, fetchListing does not get rendered
+        //So we intercept the back button and forward button with:
+        let backAndForwardButtonClicked = false;
+        window.onpopstate = (e) => {
+            backAndForwardButtonClicked = true;
+            if (selectedSort === ORDER_BY_OLDEST_DATE) {
+                props.fetchListingsByOldestDate(currentPage, search);
+            } else if (selectedSort === ORDER_BY_NEWEST_DATE) {
+                props.fetchListingsByNewestDate(currentPage, search);
+            } else if (selectedSort === ORDER_BY_LOWEST_PRICE) {
+                props.fetchListingsByLowestPrice(currentPage, search);
+            } else if (selectedSort === ORDER_BY_HIGHEST_PRICE) {
+                props.fetchListingsByHighestPrice(currentPage, search);
+            }
+        };
+        if (backAndForwardButtonClicked === false)
+            props.fetchListingsByOldestDate(props.match.params.page, search);
+        setCurrentPage(props.match.params.page); //hook renders after everything in useffect is executed
+    }, [props.match.params.page, search]);
+
     return (
         <React.Fragment>
             <div className="listingsContainer">{renderListings()}</div>
