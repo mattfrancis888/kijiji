@@ -167,6 +167,7 @@ const Searchbar: React.FC<{}> = () => {
                 type="search"
                 placeholder="Search..."
                 // aria-label="Search"
+                value={queryValues.search}
                 name="search"
                 onChange={(event) => setSearchValue(event.target.value.trim())}
                 onKeyDown={handleKeyDown}
