@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import { Listing as ListingType } from "../actions";
 import moment from "moment";
-
+import postAdListingImagePlaceHolder from "../img/postAdListingImagePlaceHolder.png";
 const Listing: React.FC<ListingType> = ({
     listing_id,
     listing_name,
@@ -20,7 +20,19 @@ const Listing: React.FC<ListingType> = ({
     return (
         <div className="listingPreviewContainer">
             <div className="listingPreviewImageContainer">
-                <img src={listing_image} alt="listing" />
+                <img
+                    src={
+                        !listing_image
+                            ? postAdListingImagePlaceHolder
+                            : listing_image
+                    }
+                    //If image that we get from cloudinary is no longer valid / broken for some reason, resort to default image
+                    onError={(e) => {
+                        e.target.src = postAdListingImagePlaceHolder; // some replacement image
+                        // e.target.style = 'padding: 8px; margin: 16px' // inline styles in html format
+                    }}
+                    alt="listing"
+                />
             </div>
             <div className="listingPreviewInfoWrap">
                 <div className="titleAndPriceWrap">
