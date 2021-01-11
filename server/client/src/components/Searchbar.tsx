@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import history from "../browserHistory";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSlidersH, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./Modal";
@@ -18,7 +18,6 @@ export interface SearchFilterFormProps {
 }
 
 const Searchbar: React.FC<{}> = () => {
-    const history = useHistory();
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [filterQueries, setFilterQueries] = useState(null);
     const [searchValue, setSearchValue] = useState(null);

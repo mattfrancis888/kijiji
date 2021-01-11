@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import history from "../browserHistory";
 import { connect } from "react-redux";
 import { signOut } from "../actions";
 import { StoreState } from "../reducers";
@@ -15,7 +15,6 @@ interface IHeader {
 
 const Header: React.FC<IHeader> = (props) => {
     const { width } = useWindowDimensions();
-    const history = useHistory();
 
     return (
         <nav>

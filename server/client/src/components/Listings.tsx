@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import history from "../browserHistory";
 import { connect } from "react-redux";
 import {
     fetchListingsByOldestDate,
@@ -15,7 +15,6 @@ import Loading from "./Loading";
 import Pagination from "./Pagination";
 import queryString from "query-string";
 import { useLocation, useParams } from "react-router-dom";
-import { SearchFilterFormValues } from "./SearchFilterForm";
 const ORDER_BY_OLDEST_DATE = "Posted: oldest first";
 const ORDER_BY_NEWEST_DATE = "Posted: newest first";
 const ORDER_BY_LOWEST_PRICE = " Price: lowest first";
@@ -31,22 +30,22 @@ interface IListings {
 }
 
 const Listings: React.FC<IListings> = (props) => {
-    const currentPage = parseInt(props.match.params.page);
+    const [currentPage, setCurrentPage] = useState(props.match.params.page);
     const [selectedSort, setSelectedSort] = useState(ORDER_BY_OLDEST_DATE);
 
     //For Query Strings:
     const { search } = useLocation();
-    const queryValues: SearchFilterFormValues = queryString.parse(search);
 
-    console.log("hi matt", search);
     const handleDropdownChange = (event) => {
         let valueOfSelectedOption = event.target.value;
         if (valueOfSelectedOption === ORDER_BY_OLDEST_DATE) {
             setSelectedSort(ORDER_BY_OLDEST_DATE);
             props.fetchListingsByOldestDate(currentPage, search);
         } else if (valueOfSelectedOption === ORDER_BY_NEWEST_DATE) {
+            setSelectedSort(ORDER_BY_NEWEST_DATE);
             props.fetchListingsByNewestDate(currentPage, search);
         } else if (valueOfSelectedOption === ORDER_BY_LOWEST_PRICE) {
+            setSelectedSort(ORDER_BY_LOWEST_PRICE);
             props.fetchListingsByLowestPrice(currentPage, search);
         } else if (valueOfSelectedOption === ORDER_BY_HIGHEST_PRICE) {
             setSelectedSort(ORDER_BY_HIGHEST_PRICE);
@@ -124,9 +123,25 @@ const Listings: React.FC<IListings> = (props) => {
     };
 
     useEffect(() => {
-        //https://ui.dev/react-router-v5-query-strings/
         props.fetchListingsByOldestDate(currentPage, search);
-    }, [currentPage]);
+    }, []);
+
+    useEffect(() => {
+        setCurrentPage(props.match.params.page);
+        //When we click the back button, fetchListing does not get rendered
+        //So we intercept the back button and forward button with:
+        window.onpopstate = (e) => {
+            if (selectedSort === ORDER_BY_OLDEST_DATE) {
+                props.fetchListingsByOldestDate(currentPage, search);
+            } else if (selectedSort === ORDER_BY_NEWEST_DATE) {
+                props.fetchListingsByNewestDate(currentPage, search);
+            } else if (selectedSort === ORDER_BY_LOWEST_PRICE) {
+                props.fetchListingsByLowestPrice(currentPage, search);
+            } else if (selectedSort === ORDER_BY_HIGHEST_PRICE) {
+                props.fetchListingsByHighestPrice(currentPage, search);
+            }
+        };
+    }, [props.match.params.page]);
 
     return (
         <React.Fragment>
