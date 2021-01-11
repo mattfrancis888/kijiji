@@ -35,6 +35,19 @@ const Listings: React.FC<IListings> = (props) => {
     //For Query Strings:
     const { search } = useLocation();
 
+    const renderShowingText = () => {
+        if (props.listingInfo.totalListings < props.listingInfo.limitPerPage) {
+            return props.listingInfo.totalListings;
+        } else if (
+            props.listingInfo.limitPerPage * props.listingInfo.page >
+            props.listingInfo.totalListings
+        ) {
+            return props.listingInfo.totalListings;
+        } else {
+            return props.listingInfo.limitPerPage * props.listingInfo.page;
+        }
+    };
+
     const handleDropdownChange = (event) => {
         let valueOfSelectedOption = event.target.value;
         if (valueOfSelectedOption === ORDER_BY_OLDEST_DATE) {
@@ -78,13 +91,9 @@ const Listings: React.FC<IListings> = (props) => {
             return (
                 <React.Fragment>
                     <div className="showingAdsTitleAndDropdownWrap">
-                        <h1 className="showingAdsTitle">{`Showing ${
-                            props.listingInfo.totalListings <
-                            props.listingInfo.limitPerPage
-                                ? props.listingInfo.totalListings
-                                : props.listingInfo.limitPerPage *
-                                  props.listingInfo.page
-                        } out of ${props.listingInfo.totalListings} ads:`}</h1>
+                        <h1 className="showingAdsTitle">{`Showing ${renderShowingText()} out of ${
+                            props.listingInfo.totalListings
+                        } ads:`}</h1>
                         <div className="dropdownWrap">
                             <h3>Sort by</h3>
                             <select

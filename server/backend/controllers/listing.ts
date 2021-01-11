@@ -5,8 +5,6 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 
 //TODO:
-//1. Fix page number for : http://localhost:3000/listings/2?search=barbel&province=British%20Columbia
-//2. Fix x shouw out of
 
 export const categoriesForListing = async (req: Request, res: Response) => {
     pool.query(`SELECT category_name FROM category`, (error, category) => {
@@ -168,21 +166,36 @@ export const getSortedListingCount = async (
 ) => {
     const listing_name = req.query.search || "";
     const category_id = req.params.category_id;
+    const province = req.query.province || "";
+    const city = req.query.city || "";
     let countQuery;
     let countValues: any[] = [];
     try {
         if (listing_name && category_id) {
+            //User enters filters and entered words on search bar, possibly has province and city filter
+
             countQuery = `SELECT COUNT(listing_id) FROM listing WHERE name_tokens @@ to_tsquery($1)
-            AND category_id = $2`;
-            countValues = [listing_name, category_id];
+            AND category_id = $2 AND province LIKE $3 AND city LIKE $4`;
+            countValues = [
+                listing_name,
+                category_id,
+                `%${province}%`,
+                `%${city}%`,
+            ];
         } else if (listing_name) {
-            countQuery = `SELECT COUNT(*) FROM listing WHERE name_tokens @@ to_tsquery($1)`;
-            countValues = [listing_name];
+            //User only enters word on search bar, possibly has province and city filter
+            countQuery = `SELECT COUNT(*) FROM listing WHERE name_tokens @@ to_tsquery($1)
+            AND province LIKE $2 AND city LIKE $3 `;
+            countValues = [listing_name, `%${province}%`, `%${city}%`];
         } else if (category_id) {
-            countQuery = `SELECT COUNT(*) FROM listing WHERE category_id = $1`;
-            countValues = [category_id];
+            //User has category filter but enters nothing on search bar, possibly has province and city filter
+            countQuery = `SELECT COUNT(*) FROM listing WHERE category_id = $1
+            AND province LIKE $2 AND city LIKE $3`;
+            countValues = [category_id, `%${province}%`, `%${city}%`];
         } else {
-            countQuery = `SELECT COUNT(*) FROM listing`;
+            //User has no category filter and enters nothing on search bar, possibly has province and city filter
+            countQuery = `SELECT COUNT(*) FROM listing WHERE province LIKE $1 AND city LIKE $2 `;
+            countValues = [`%${province}%`, `%${city}%`];
         }
         const totalListingsResponse = await pool.query(countQuery, countValues);
         req.params.count = totalListingsResponse.rows[0].count;
@@ -237,7 +250,8 @@ export const sortByHelper = (columnName: string, order: string) => {
             //are trying to search
             //https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
             if (listing_name && category_id) {
-                //User enters filters and entered words on search bar
+                //User enters filters and entered words on search bar, possibly has province and city filter
+
                 // query = `SELECT  * FROM listing WHERE name_tokens @@ to_tsquery($1)
                 //  AND category_id = $2 ORDER BY ${columnName} ${order}
                 // LIMIT $3 OFFSET ($4 - 1) * $3`;
@@ -256,9 +270,11 @@ export const sortByHelper = (columnName: string, order: string) => {
                 ];
             } else if (listing_name) {
                 //User only enters word on search bar, possibly has province and city filter
+
                 // query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) ORDER BY  ${columnName} ${order}
                 // LIMIT $2 OFFSET ($3 - 1) * $2`;
                 // values = [`%${listing_name}%`, limitPerPage, page];
+
                 query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) 
                 AND province LIKE $2 AND city LIKE $3 ORDER BY  ${columnName} ${order}
                 LIMIT $4 OFFSET ($5 - 1) * $4`;
@@ -271,6 +287,7 @@ export const sortByHelper = (columnName: string, order: string) => {
                 ];
             } else if (category_id) {
                 //User has category filter but enters nothing on search bar, possibly has province and city filter
+
                 // query = `SELECT * FROM listing WHERE category_id = $1 ORDER BY  ${columnName} ${order}
                 // LIMIT $2 OFFSET ($3 - 1) * $2`;
                 // values = [category_id, limitPerPage, page];
@@ -285,10 +302,15 @@ export const sortByHelper = (columnName: string, order: string) => {
                     page,
                 ];
             } else {
-                //User has no category filter and enters nothing on search bar
-                query = `SELECT * FROM listing ORDER BY ${columnName} ${order} 
-                LIMIT $1 OFFSET ($2 - 1) * $1`;
-                values = [limitPerPage, page];
+                //User has no category filter and enters nothing on search bar, possibly has province and city filter
+
+                // query = `SELECT * FROM listing ORDER BY ${columnName} ${order}
+                // LIMIT $1 OFFSET ($2 - 1) * $1`;
+                // values = [limitPerPage, page];
+                query = `SELECT * FROM listing WHERE province LIKE $1 
+                and city LIKE $2 ORDER BY ${columnName} ${order} 
+                LIMIT $3 OFFSET ($4 - 1) * $3`;
+                values = [`%${province}%`, `%${city}`, limitPerPage, page];
             }
 
             const response = await pool.query(query, values);

@@ -45,8 +45,6 @@ var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
 var multer_1 = __importDefault(require("multer"));
 //TODO:
-//1. Fix page number for : http://localhost:3000/listings/2?search=barbel&province=British%20Columbia
-//2. Fix x shouw out of
 var categoriesForListing = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         databasePool_1.default.query("SELECT category_name FROM category", function (error, category) {
@@ -207,30 +205,42 @@ var getCategoryId = function (req, res, next) { return __awaiter(void 0, void 0,
 }); };
 exports.getCategoryId = getCategoryId;
 var getSortedListingCount = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var listing_name, category_id, countQuery, countValues, totalListingsResponse, err_2;
+    var listing_name, category_id, province, city, countQuery, countValues, totalListingsResponse, err_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 listing_name = req.query.search || "";
                 category_id = req.params.category_id;
+                province = req.query.province || "";
+                city = req.query.city || "";
                 countValues = [];
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 4]);
                 if (listing_name && category_id) {
-                    countQuery = "SELECT COUNT(listing_id) FROM listing WHERE name_tokens @@ to_tsquery($1)\n            AND category_id = $2";
-                    countValues = [listing_name, category_id];
+                    //User enters filters and entered words on search bar, possibly has province and city filter
+                    countQuery = "SELECT COUNT(listing_id) FROM listing WHERE name_tokens @@ to_tsquery($1)\n            AND category_id = $2 AND province LIKE $3 AND city LIKE $4";
+                    countValues = [
+                        listing_name,
+                        category_id,
+                        "%" + province + "%",
+                        "%" + city + "%",
+                    ];
                 }
                 else if (listing_name) {
-                    countQuery = "SELECT COUNT(*) FROM listing WHERE name_tokens @@ to_tsquery($1)";
-                    countValues = [listing_name];
+                    //User only enters word on search bar, possibly has province and city filter
+                    countQuery = "SELECT COUNT(*) FROM listing WHERE name_tokens @@ to_tsquery($1)\n            AND province LIKE $2 AND city LIKE $3 ";
+                    countValues = [listing_name, "%" + province + "%", "%" + city + "%"];
                 }
                 else if (category_id) {
-                    countQuery = "SELECT COUNT(*) FROM listing WHERE category_id = $1";
-                    countValues = [category_id];
+                    //User has category filter but enters nothing on search bar, possibly has province and city filter
+                    countQuery = "SELECT COUNT(*) FROM listing WHERE category_id = $1\n            AND province LIKE $2 AND city LIKE $3";
+                    countValues = [category_id, "%" + province + "%", "%" + city + "%"];
                 }
                 else {
-                    countQuery = "SELECT COUNT(*) FROM listing";
+                    //User has no category filter and enters nothing on search bar, possibly has province and city filter
+                    countQuery = "SELECT COUNT(*) FROM listing WHERE province LIKE $1 AND city LIKE $2 ";
+                    countValues = ["%" + province + "%", "%" + city + "%"];
                 }
                 return [4 /*yield*/, databasePool_1.default.query(countQuery, countValues)];
             case 2:
@@ -280,7 +290,7 @@ var sortByHelper = function (columnName, order) {
                         //are trying to search
                         //https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
                         if (listing_name && category_id) {
-                            //User enters filters and entered words on search bar
+                            //User enters filters and entered words on search bar, possibly has province and city filter
                             // query = `SELECT  * FROM listing WHERE name_tokens @@ to_tsquery($1)
                             //  AND category_id = $2 ORDER BY ${columnName} ${order}
                             // LIMIT $3 OFFSET ($4 - 1) * $3`;
@@ -324,9 +334,12 @@ var sortByHelper = function (columnName, order) {
                             ];
                         }
                         else {
-                            //User has no category filter and enters nothing on search bar
-                            query = "SELECT * FROM listing ORDER BY " + columnName + " " + order + " \n                LIMIT $1 OFFSET ($2 - 1) * $1";
-                            values = [limitPerPage, page];
+                            //User has no category filter and enters nothing on search bar, possibly has province and city filter
+                            // query = `SELECT * FROM listing ORDER BY ${columnName} ${order}
+                            // LIMIT $1 OFFSET ($2 - 1) * $1`;
+                            // values = [limitPerPage, page];
+                            query = "SELECT * FROM listing WHERE province LIKE $1 \n                and city LIKE $2 ORDER BY " + columnName + " " + order + " \n                LIMIT $3 OFFSET ($4 - 1) * $3";
+                            values = ["%" + province + "%", "%" + city, limitPerPage, page];
                         }
                         return [4 /*yield*/, databasePool_1.default.query(query, values)];
                     case 2:
