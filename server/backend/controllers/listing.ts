@@ -5,9 +5,9 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 
 //TODO:
-//1. Post ad token for text search
-//2. Fix back button and pagination
-//3. Province and city filter
+//1. Fix page number for : http://localhost:3000/listings/2?search=barbel&province=British%20Columbia
+//2. Fix x shouw out of
+
 export const categoriesForListing = async (req: Request, res: Response) => {
     pool.query(`SELECT category_name FROM category`, (error, category) => {
         if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
@@ -64,6 +64,15 @@ export const createListing = async (req: Request, res: Response) => {
         await pool.query(
             `INSERT INTO lookup_listing_user(user_id, listing_id)VALUES($1, $2)`,
             [userId, listingId]
+        );
+        //For our full-text-search; if user mispelt words in the search bar, we would still give them the intended word they
+        //are trying to search
+        //https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
+        await pool.query(
+            `UPDATE listing d1  
+            SET name_tokens = to_tsvector(d1.listing_name)  
+            FROM listing d2 WHERE d1.listing_id = $1;`,
+            [listingId]
         );
 
         await pool.query("COMMIT");
@@ -223,22 +232,58 @@ export const sortByHelper = (columnName: string, order: string) => {
         let query;
         let values;
         try {
+            //@to_tsquery is
+            //for our full-text-search; if user mispelt words in the search bar, we would still give them the intended word they
+            //are trying to search
+            //https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
             if (listing_name && category_id) {
                 //User enters filters and entered words on search bar
+                // query = `SELECT  * FROM listing WHERE name_tokens @@ to_tsquery($1)
+                //  AND category_id = $2 ORDER BY ${columnName} ${order}
+                // LIMIT $3 OFFSET ($4 - 1) * $3`;
+                // values = [`%${listing_name}%`, category_id, limitPerPage, page];
                 query = `SELECT  * FROM listing WHERE name_tokens @@ to_tsquery($1)
-                 AND category_id = $2 ORDER BY ${columnName} ${order}
-                LIMIT $3 OFFSET ($4 - 1) * $3`;
-                values = [`%${listing_name}%`, category_id, limitPerPage, page];
+                AND category_id = $2 AND province LIKE $3 AND city like $4 ORDER BY ${columnName} ${order}
+               LIMIT $5 OFFSET ($6 - 1) * $5`;
+
+                values = [
+                    listing_name,
+                    category_id,
+                    `%${province}%`,
+                    `%${city}%`,
+                    limitPerPage,
+                    page,
+                ];
             } else if (listing_name) {
-                //User only enters word on search bar
-                query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) ORDER BY  ${columnName} ${order}
-                LIMIT $2 OFFSET ($3 - 1) * $2`;
-                values = [`%${listing_name}%`, limitPerPage, page];
+                //User only enters word on search bar, possibly has province and city filter
+                // query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) ORDER BY  ${columnName} ${order}
+                // LIMIT $2 OFFSET ($3 - 1) * $2`;
+                // values = [`%${listing_name}%`, limitPerPage, page];
+                query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) 
+                AND province LIKE $2 AND city LIKE $3 ORDER BY  ${columnName} ${order}
+                LIMIT $4 OFFSET ($5 - 1) * $4`;
+                values = [
+                    listing_name,
+                    `%${province}%`,
+                    `%${city}%`,
+                    limitPerPage,
+                    page,
+                ];
             } else if (category_id) {
-                //User has category filter but enters nothing on search bar
-                query = `SELECT * FROM listing WHERE category_id = $1 ORDER BY  ${columnName} ${order} 
-                LIMIT $2 OFFSET ($3 - 1) * $2`;
-                values = [category_id, limitPerPage, page];
+                //User has category filter but enters nothing on search bar, possibly has province and city filter
+                // query = `SELECT * FROM listing WHERE category_id = $1 ORDER BY  ${columnName} ${order}
+                // LIMIT $2 OFFSET ($3 - 1) * $2`;
+                // values = [category_id, limitPerPage, page];
+                query = `SELECT * FROM listing WHERE category_id = $1 AND province LIKE $2 
+                AND city LIKE $3 ORDER BY  ${columnName} ${order} 
+                LIMIT $4 OFFSET ($5 - 1) * $4`;
+                values = [
+                    category_id,
+                    `%${province}%`,
+                    `%${city}`,
+                    limitPerPage,
+                    page,
+                ];
             } else {
                 //User has no category filter and enters nothing on search bar
                 query = `SELECT * FROM listing ORDER BY ${columnName} ${order} 

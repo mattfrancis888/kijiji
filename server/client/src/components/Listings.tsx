@@ -32,7 +32,6 @@ interface IListings {
 const Listings: React.FC<IListings> = (props) => {
     const [currentPage, setCurrentPage] = useState(props.match.params.page);
     const [selectedSort, setSelectedSort] = useState(ORDER_BY_OLDEST_DATE);
-
     //For Query Strings:
     const { search } = useLocation();
 
@@ -123,14 +122,11 @@ const Listings: React.FC<IListings> = (props) => {
     };
 
     useEffect(() => {
-        props.fetchListingsByOldestDate(currentPage, search);
-    }, []);
-
-    useEffect(() => {
-        setCurrentPage(props.match.params.page);
         //When we click the back button, fetchListing does not get rendered
         //So we intercept the back button and forward button with:
+        let backAndForwardButtonClicked = false;
         window.onpopstate = (e) => {
+            backAndForwardButtonClicked = true;
             if (selectedSort === ORDER_BY_OLDEST_DATE) {
                 props.fetchListingsByOldestDate(currentPage, search);
             } else if (selectedSort === ORDER_BY_NEWEST_DATE) {
@@ -141,7 +137,10 @@ const Listings: React.FC<IListings> = (props) => {
                 props.fetchListingsByHighestPrice(currentPage, search);
             }
         };
-    }, [props.match.params.page]);
+        if (backAndForwardButtonClicked === false)
+            props.fetchListingsByOldestDate(props.match.params.page, search);
+        setCurrentPage(props.match.params.page); //hook renders after everything in useffect is executed
+    }, [props.match.params.page, search]);
 
     return (
         <React.Fragment>
