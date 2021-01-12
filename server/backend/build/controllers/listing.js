@@ -45,6 +45,9 @@ var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
 var multer_1 = __importDefault(require("multer"));
 //TODO:
+//1. Post ad, handle what happens i an error uploading occurs
+//2. Search bar handle error when user writes a word with spaces:
+//https://stackoverflow.com/questions/46800075/how-to-do-or-to-all-the-words-in-full-text-search-instead-of-and-in-postgres
 var categoriesForListing = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         databasePool_1.default.query("SELECT category_name FROM category", function (error, category) {

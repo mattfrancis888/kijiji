@@ -1,0 +1,57 @@
+.listingDetailAndContactContainer {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.listingDetailContainer {
+    width: 100%;
+}
+.listingDetailImageContainer {
+    display: flex;
+    justify-content: center;
+    border: 1px solid red;
+    background-color: white;
+    padding: 2rem 0;
+    img {
+        width: 80%;
+        height: 100%;
+        object-fit: cover;
+        @media screen and (min-width: $lg_breakpoint) {
+            width: 50%;
+        }
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        padding: 3rem 0;
+    }
+}
+.listingDescriptionTextWrap {
+    padding: 1rem 5rem;
+}
+.listingDetailDescriptionContainer {
+    position: relative;
+    p {
+        font-size: 1.5rem;
+    }
+}
+.listingDetailDescriptionTitle {
+    font-size: 1.7rem;
+    font-weight: normal;
+}
+.listingDetailShowMoreText {
+    text-align: center;
+    font-weight: normal;
+    font-size: 1.5rem;
+    color: $light-blue;
+    position: relative; //needed for z-index
+    z-index: 1;
+}
+
+.listingDetailDescriptionFade {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0) 0, #f8f9f9 85%);
+    height: 15rem;
+    z-index: 0;
+}

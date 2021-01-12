@@ -1,0 +1,56 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import history from "../browserHistory";
+import { connect } from "react-redux";
+import { StoreState } from "../reducers";
+import { Listing as ListingType } from "../actions";
+import moment from "moment";
+import postAdListingImagePlaceHolder from "../img/postAdListingImagePlaceHolder.png";
+const ListingDetail: React.FC<ListingType> = ({
+    listing_id,
+    listing_name,
+    listing_image,
+    listing_price,
+    listing_description,
+    listing_date,
+    province,
+    city,
+    street,
+}) => {
+    return (
+        <React.Fragment>
+            <div className="listingDetailAndContactContainer">
+                <div className="listingDetailContainer">
+                    <div className="listingDetailImageContainer">
+                        <img
+                            // src={postAdListingImagePlaceHolder}
+                            src={
+                                "https://res.cloudinary.com/du8n2aa4p/image/upload/v1609297822/kijiji/azmduhvc9aa0a7bmd8u1.jpg"
+                            }
+                            alt="listing"
+                        />
+                    </div>
+                    <div className="listingDetailDescriptionContainer">
+                        <div className="listingDescriptionTextWrap">
+                            <h3 className="listingDetailDescriptionTitle">
+                                Description
+                            </h3>
+                            <p>Hello text</p>
+                        </div>
+                        <div className="listingDetailDescriptionFade"></div>
+                        <h3 className="listingDetailShowMoreText">Show More</h3>
+                    </div>
+                </div>
+                <div className="listingContactContainer">
+                    <h3>Contact at:</h3>
+                </div>
+            </div>
+        </React.Fragment>
+    );
+};
+
+const mapStateToProps = (state: StoreState) => {
+    return {};
+};
+
+export default connect(mapStateToProps, {})(ListingDetail);
