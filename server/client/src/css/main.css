@@ -646,13 +646,27 @@ body {
   }
 }
 
+.listingDetailCategories {
+  padding: 3rem;
+}
+.listingDetailCategories h3 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 300;
+}
+@media screen and (min-width: 992px) {
+  .listingDetailCategories {
+    padding: 2rem 4rem 4rem 4rem;
+  }
+}
+
 .listingDetailAndContactContainer {
   display: flex;
   flex-wrap: wrap;
+  padding: 0 2rem 3rem 2rem;
 }
 @media screen and (min-width: 992px) {
   .listingDetailAndContactContainer {
-    padding: 5rem 3rem;
     justify-content: space-around;
   }
 }
@@ -687,6 +701,12 @@ body {
 .listingDescriptionTextWrap {
   padding: 1rem 5rem;
 }
+@media screen and (min-width: 992px) {
+  .listingDescriptionTextWrap {
+    padding: 0;
+    margin-top: 3rem;
+  }
+}
 
 .listingDetailDescriptionContainer {
   position: relative;
@@ -695,9 +715,14 @@ body {
   font-size: 1.5rem;
 }
 
+.listingDetailPostedOn,
 .listingDetailDescriptionTitle {
   font-size: 1.7rem;
   font-weight: normal;
+}
+
+.locationOfPost {
+  font-size: 1.7rem;
 }
 
 .listingDetailShowMoreText {
@@ -707,6 +732,10 @@ body {
   color: #2681db;
   position: relative;
   z-index: 1;
+}
+
+.listingDetailShowMoreTextHide {
+  display: none;
 }
 
 .listingDetailDescriptionFade {
