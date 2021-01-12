@@ -41,8 +41,20 @@ const ListingDetail: React.FC<ListingType> = ({
                         <h3 className="listingDetailShowMoreText">Show More</h3>
                     </div>
                 </div>
-                <div className="listingContactContainer">
-                    <h3>Contact at:</h3>
+                <div className="listingDetailContactContainer">
+                    <div className="listingDetailProfileImageAndNameWrap">
+                        <img
+                            src={
+                                "https://res.cloudinary.com/du8n2aa4p/image/upload/v1609297822/kijiji/azmduhvc9aa0a7bmd8u1.jpg"
+                            }
+                            alt="profile"
+                        />
+                        <h3>Matt</h3>
+                    </div>
+                    <div className="contactAndMemberWrap">
+                        <h3>Contact at: email@gmail.com</h3>
+                        <h3>Member Since: </h3>
+                    </div>
                 </div>
             </div>
         </React.Fragment>

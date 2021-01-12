@@ -650,32 +650,38 @@ body {
   display: flex;
   flex-wrap: wrap;
 }
+@media screen and (min-width: 992px) {
+  .listingDetailAndContactContainer {
+    padding: 5rem 3rem;
+    justify-content: space-around;
+  }
+}
 
 .listingDetailContainer {
   width: 100%;
+}
+@media screen and (min-width: 992px) {
+  .listingDetailContainer {
+    width: 50%;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .listingDetailContainer {
+    width: 60%;
+  }
 }
 
 .listingDetailImageContainer {
   display: flex;
   justify-content: center;
-  border: 1px solid red;
+  border: 1px solid #e2e2e5;
   background-color: white;
   padding: 2rem 0;
 }
 .listingDetailImageContainer img {
-  width: 80%;
+  width: 90%;
   height: 100%;
   object-fit: cover;
-}
-@media screen and (min-width: 992px) {
-  .listingDetailImageContainer img {
-    width: 50%;
-  }
-}
-@media screen and (min-width: 992px) {
-  .listingDetailImageContainer {
-    padding: 3rem 0;
-  }
 }
 
 .listingDescriptionTextWrap {
@@ -711,6 +717,46 @@ body {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0, #f8f9f9 85%);
   height: 15rem;
   z-index: 0;
+}
+
+.listingDetailContactContainer {
+  background-color: white;
+  padding: 2rem;
+  margin: 0 2rem 4rem 2rem;
+  width: 100%;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+}
+@media screen and (min-width: 992px) {
+  .listingDetailContactContainer {
+    width: 45%;
+    margin: 0;
+    max-height: 20rem;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .listingDetailContactContainer {
+    width: 35%;
+  }
+}
+
+.listingDetailProfileImageAndNameWrap {
+  display: flex;
+  align-items: center;
+}
+.listingDetailProfileImageAndNameWrap img {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  margin-right: 2rem;
+}
+.listingDetailProfileImageAndNameWrap h3 {
+  font-size: 1.8rem;
+  font-weight: 300;
+}
+
+.contactAndMemberWrap h3 {
+  font-size: 1.3rem;
+  font-weight: 300;
 }
 
 .loadingCenter {
