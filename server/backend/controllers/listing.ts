@@ -330,3 +330,64 @@ export const sortByHelper = (columnName: string, order: string) => {
         }
     };
 };
+
+export const getListingDetail = async (req: Request, res: Response) => {
+    try {
+        const listingId = req.params.id;
+
+        const response = await pool.query(
+            `SELECT * from listing WHERE listing_id = $1`,
+            [listingId]
+        );
+
+        const title = response.rows[0].tile;
+        const description = response.rows[0].description;
+        const categoryId = response.rows[0].category_id;
+        const image = response.rows[0].cloudinaryImagePath; //can be null if cloduinaryImagePath is not given
+        const province = response.rows[0].province;
+        const city = response.rows[0].city;
+        const street = response.rows[0].street;
+        const price = response.rows[0].price;
+        const listingDate = response.rows[0].listing_date;
+
+        let categoryQuery = await pool.query(
+            `SELECT category_name FROM category WHERE category_id = $1;`,
+            [categoryId]
+        );
+        const category = categoryQuery.rows[0].category_name;
+
+        const lookUpListingUserResponse = await pool.query(
+            `SELECT user_id FROM lookup_listing_user WHERE listing_id = $1`,
+            [listingId]
+        );
+        const userId = lookUpListingUserResponse.rows[0].user_id;
+        const userInfoResponse = await pool.query(
+            `SELECT * FROM user_info WHERE user_id = $1`,
+            [userId]
+        );
+        const firstName = userInfoResponse.rows[0].first_name;
+        const lastName = userInfoResponse.rows[0].last_name;
+        const memberSince = userInfoResponse.rows[0].member_since;
+        const email = userInfoResponse.rows[0].email;
+
+        res.send({
+            listingId,
+            title,
+            description,
+            category,
+            image,
+            province,
+            city,
+            street,
+            price,
+            listingDate,
+            firstName,
+            lastName,
+            memberSince,
+            email,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+    }
+};

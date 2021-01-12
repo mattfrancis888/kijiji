@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
+exports.getListingDetail = exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
@@ -361,3 +361,63 @@ var sortByHelper = function (columnName, order) {
     };
 };
 exports.sortByHelper = sortByHelper;
+var getListingDetail = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var listingId, response_3, title, description, categoryId, image, province, city, street, price, listingDate, categoryQuery, category, lookUpListingUserResponse, userId, userInfoResponse, firstName, lastName, memberSince, email, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 5, , 6]);
+                listingId = req.params.id;
+                return [4 /*yield*/, databasePool_1.default.query("SELECT * from listing WHERE listing_id = $1", [listingId])];
+            case 1:
+                response_3 = _a.sent();
+                title = response_3.rows[0].tile;
+                description = response_3.rows[0].description;
+                categoryId = response_3.rows[0].category_id;
+                image = response_3.rows[0].cloudinaryImagePath;
+                province = response_3.rows[0].province;
+                city = response_3.rows[0].city;
+                street = response_3.rows[0].street;
+                price = response_3.rows[0].price;
+                listingDate = response_3.rows[0].listing_date;
+                return [4 /*yield*/, databasePool_1.default.query("SELECT category_name FROM category WHERE category_id = $1;", [categoryId])];
+            case 2:
+                categoryQuery = _a.sent();
+                category = categoryQuery.rows[0].category_name;
+                return [4 /*yield*/, databasePool_1.default.query("SELECT user_id FROM lookup_listing_user WHERE listing_id = $1", [listingId])];
+            case 3:
+                lookUpListingUserResponse = _a.sent();
+                userId = lookUpListingUserResponse.rows[0].user_id;
+                return [4 /*yield*/, databasePool_1.default.query("SELECT * FROM user_info WHERE user_id = $1", [userId])];
+            case 4:
+                userInfoResponse = _a.sent();
+                firstName = userInfoResponse.rows[0].first_name;
+                lastName = userInfoResponse.rows[0].last_name;
+                memberSince = userInfoResponse.rows[0].member_since;
+                email = userInfoResponse.rows[0].email;
+                res.send({
+                    listingId: listingId,
+                    title: title,
+                    description: description,
+                    category: category,
+                    image: image,
+                    province: province,
+                    city: city,
+                    street: street,
+                    price: price,
+                    listingDate: listingDate,
+                    firstName: firstName,
+                    lastName: lastName,
+                    memberSince: memberSince,
+                    email: email,
+                });
+                return [3 /*break*/, 6];
+            case 5:
+                error_2 = _a.sent();
+                console.log(error_2);
+                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
+            case 6: return [2 /*return*/];
+        }
+    });
+}); };
+exports.getListingDetail = getListingDetail;
