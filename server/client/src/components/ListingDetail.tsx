@@ -12,9 +12,9 @@ import defaultProfilePic from "../img/defaultProfilePic.jpg";
 import Loading from "./Loading";
 import moment from "moment";
 
-interface ListingDetailProps extends ListingDetailType {
-    fetchListingDetail(id: number): void;
-    listingDetail: any;
+interface ListingDetailProps {
+    fetchListingDetail(listingId: string): void;
+    listingDetail: ListingDetailType;
     match: any;
 }
 const ListingDetail: React.FC<ListingDetailProps> = (props) => {
@@ -80,7 +80,7 @@ const ListingDetail: React.FC<ListingDetailProps> = (props) => {
                                             listingDate
                                         ).format("YYYY/MM/DD")}`}
                                     </h3>
-                                    <h3 className="locationOfPost">Toronto</h3>
+                                    <h3 className="locationOfPost">{`${province}, ${city}, ${street}`}</h3>
                                     <h3 className="listingDetailDescriptionTitle">
                                         Description
                                     </h3>

@@ -4,12 +4,12 @@ import authReducer from "./authReducer";
 import { AuthStateResponse } from "./authReducer";
 import categoryReducer from "./categoryReducer";
 import { FetchListingResponse, ListingDetail } from "../actions";
-import listingReducer from "./listingReducer";
+import listingReducer, { DataResponse } from "./listingReducer";
 
 export interface StoreState {
     authStatus: AuthStateResponse;
     categories: [];
-    listingInfo: FetchListingResponse | ListingDetail;
+    listingInfo: DataResponse;
     form: FormStateMap;
 }
 export default combineReducers<StoreState>({

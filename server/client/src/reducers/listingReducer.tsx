@@ -2,10 +2,11 @@ import { ActionTypes, ListingAction } from "../actions";
 import { Listing, FetchListingResponse, ListingDetail } from "../actions";
 import _ from "lodash";
 
-const listingReducer = (
-    state: FetchListingResponse | ListingDetail = {},
-    action: ListingAction
-) => {
+export interface DataResponse {
+    data?: FetchListingResponse | ListingDetail;
+}
+
+const listingReducer = (state: DataResponse = {}, action: ListingAction) => {
     switch (action.type) {
         case ActionTypes.CREATE_LISTING:
             return { ...state, data: action.payload };
