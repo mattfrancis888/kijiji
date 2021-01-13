@@ -647,7 +647,7 @@ body {
 }
 
 .listingDetailCategories {
-  padding: 3rem;
+  padding: 3rem 2rem 1rem 2rem;
 }
 .listingDetailCategories h3 {
   margin: 0;
@@ -656,17 +656,38 @@ body {
 }
 @media screen and (min-width: 992px) {
   .listingDetailCategories {
+    padding-left: 4rem;
+  }
+}
+
+.listingDetailTitleAndPriceContainer {
+  padding: 2rem;
+}
+@media screen and (min-width: 992px) {
+  .listingDetailTitleAndPriceContainer {
     padding: 2rem 4rem 4rem 4rem;
   }
 }
 
-.listingDetailAndContactContainer {
+.listingDetailTitle,
+.listingDetailPrice {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.listingDetailPrice {
+  color: #37a864;
+  margin-top: 1.3rem;
+  font-weight: normal;
+}
+
+.listingDetailInfoAndContactContainer {
   display: flex;
   flex-wrap: wrap;
-  padding: 0 2rem 3rem 2rem;
+  margin-bottom: 3rem;
 }
 @media screen and (min-width: 992px) {
-  .listingDetailAndContactContainer {
+  .listingDetailInfoAndContactContainer {
     justify-content: space-around;
   }
 }
@@ -699,12 +720,12 @@ body {
 }
 
 .listingDescriptionTextWrap {
-  padding: 1rem 5rem;
+  margin: 2rem 0rem;
+  padding: 2rem;
 }
 @media screen and (min-width: 992px) {
   .listingDescriptionTextWrap {
-    padding: 0;
-    margin-top: 3rem;
+    margin: 4rem 0;
   }
 }
 
@@ -751,12 +772,13 @@ body {
 .listingDetailContactContainer {
   background-color: white;
   padding: 2rem;
-  margin: 0 2rem 4rem 2rem;
+  margin: 0 2rem;
   width: 100%;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 }
 @media screen and (min-width: 992px) {
   .listingDetailContactContainer {
+    margin: 0 2rem 4rem 2rem;
     width: 45%;
     margin: 0;
     max-height: 20rem;
@@ -777,6 +799,7 @@ body {
   height: 8rem;
   border-radius: 50%;
   margin-right: 2rem;
+  object-fit: cover;
 }
 .listingDetailProfileImageAndNameWrap h3 {
   font-size: 1.8rem;
@@ -792,6 +815,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100vw;
+  height: 100vh;
 }
 .loadingCenter > div {
   width: 10rem;

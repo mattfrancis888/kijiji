@@ -15,7 +15,7 @@ const Routes: React.FC<{}> = () => {
                 <Route path="/signin" exact component={SignIn} />
                 <Route path="/post-ad" exact component={PostAd} />
                 <Route path="/listings/:page" exact component={Listings} />
-                <Route path="/listing-detail" exact component={ListingDetail} />
+                <Route path="/listing/:id" exact component={ListingDetail} />
             </Switch>
         </React.Fragment>
     );

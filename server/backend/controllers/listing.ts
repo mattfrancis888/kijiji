@@ -340,14 +340,14 @@ export const getListingDetail = async (req: Request, res: Response) => {
             [listingId]
         );
 
-        const title = response.rows[0].tile;
-        const description = response.rows[0].description;
+        const title = response.rows[0].listing_name;
+        const description = response.rows[0].listing_description;
         const categoryId = response.rows[0].category_id;
         const image = response.rows[0].cloudinaryImagePath; //can be null if cloduinaryImagePath is not given
         const province = response.rows[0].province;
         const city = response.rows[0].city;
         const street = response.rows[0].street;
-        const price = response.rows[0].price;
+        const price = response.rows[0].listing_price;
         const listingDate = response.rows[0].listing_date;
 
         let categoryQuery = await pool.query(

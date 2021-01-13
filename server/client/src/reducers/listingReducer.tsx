@@ -1,19 +1,21 @@
 import { ActionTypes, ListingAction } from "../actions";
-import { Listing, FetchListingResponse } from "../actions";
+import { Listing, FetchListingResponse, ListingDetail } from "../actions";
 import _ from "lodash";
 
 const listingReducer = (
-    state: FetchListingResponse = {},
+    state: FetchListingResponse | ListingDetail = {},
     action: ListingAction
 ) => {
     switch (action.type) {
         case ActionTypes.CREATE_LISTING:
-            return { ...state, [action.payload.listing_id]: action.payload };
+            return { ...state, data: action.payload };
         case ActionTypes.LISTING_ERROR:
             return action.payload;
         case ActionTypes.FETCH_LISTINGS:
             return { ...state, data: action.payload };
         //    return { ...state, ..._.mapKeys(action.payload, "listing_id") };
+        case ActionTypes.FETCH_LISTING_DETAIL:
+            return { ...state, data: action.payload };
         default:
             return state;
     }

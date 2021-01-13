@@ -56,6 +56,28 @@ export interface FetchListingsAction {
     payload: FetchListingResponse;
 }
 
+export interface ListingDetail {
+    listingId: number;
+    title: string;
+    description: string;
+    category: string;
+    image: string;
+    province: string;
+    city: string;
+    street: string;
+    price: number;
+    listingDate: Date;
+    firstName: string;
+    lastName: string;
+    memberSince: Date;
+    email: string;
+}
+
+export interface FetchListingDetailAction {
+    type: ActionTypes.FETCH_LISTING_DETAIL;
+    payload: ListingDetail;
+}
+
 export const fetchCategoriesForListing = () => async (dispatch: Dispatch) => {
     try {
         const response = await axios.get<[]>("/categories-for-listing");
@@ -195,6 +217,25 @@ export const fetchListingsByHighestPrice = (
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,
+            payload: response.data,
+        });
+    } catch (error) {
+        dispatch<ListingErrorAction>({
+            type: ActionTypes.LISTING_ERROR,
+            payload: {},
+        });
+    }
+};
+
+export const fetchListingDetail = (listingId: string) => async (
+    dispatch: Dispatch
+) => {
+    try {
+        const response = await axios.get<ListingDetail>(
+            `/listing/${listingId}`
+        );
+        dispatch<FetchListingDetailAction>({
+            type: ActionTypes.FETCH_LISTING_DETAIL,
             payload: response.data,
         });
     } catch (error) {

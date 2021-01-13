@@ -371,14 +371,14 @@ var getListingDetail = function (req, res) { return __awaiter(void 0, void 0, vo
                 return [4 /*yield*/, databasePool_1.default.query("SELECT * from listing WHERE listing_id = $1", [listingId])];
             case 1:
                 response_3 = _a.sent();
-                title = response_3.rows[0].tile;
-                description = response_3.rows[0].description;
+                title = response_3.rows[0].listing_name;
+                description = response_3.rows[0].listing_description;
                 categoryId = response_3.rows[0].category_id;
                 image = response_3.rows[0].cloudinaryImagePath;
                 province = response_3.rows[0].province;
                 city = response_3.rows[0].city;
                 street = response_3.rows[0].street;
-                price = response_3.rows[0].price;
+                price = response_3.rows[0].listing_price;
                 listingDate = response_3.rows[0].listing_date;
                 return [4 /*yield*/, databasePool_1.default.query("SELECT category_name FROM category WHERE category_id = $1;", [categoryId])];
             case 2:
