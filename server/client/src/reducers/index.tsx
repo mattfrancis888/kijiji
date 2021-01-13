@@ -3,12 +3,13 @@ import { reducer as formReducer, FormStateMap } from "redux-form";
 import authReducer from "./authReducer";
 import { AuthStateResponse } from "./authReducer";
 import categoryReducer from "./categoryReducer";
-import { FetchListingResponse } from "../actions";
-import listingReducer from "./listingReducer";
+import { FetchListingResponse, ListingDetail } from "../actions";
+import listingReducer, { DataResponse } from "./listingReducer";
+
 export interface StoreState {
     authStatus: AuthStateResponse;
     categories: [];
-    listingInfo: FetchListingResponse;
+    listingInfo: DataResponse;
     form: FormStateMap;
 }
 export default combineReducers<StoreState>({

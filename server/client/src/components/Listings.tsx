@@ -159,7 +159,6 @@ const Listings: React.FC<IListings> = (props) => {
 };
 
 const mapStateToProps = (state: StoreState) => {
-    //@ts-ignore
     // return { listings: Object.values(state.listings) };
     return { listingInfo: state.listingInfo.data };
 };

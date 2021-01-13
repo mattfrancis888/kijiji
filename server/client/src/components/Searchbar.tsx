@@ -171,6 +171,7 @@ const Searchbar: React.FC<{}> = () => {
                 name="search"
                 onChange={(event) => setSearchValue(event.target.value.trim())}
                 onKeyDown={handleKeyDown}
+                autoComplete="off"
             />
             <FontAwesomeIcon
                 className="searchBarIcons"

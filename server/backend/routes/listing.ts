@@ -6,6 +6,7 @@ import {
     getSortedListingCount,
     getCategoryId,
     sortByHelper,
+    getListingDetail,
 } from "../controllers/listing";
 const listingRouter = Router();
 
@@ -37,4 +38,6 @@ listingRouter.get(
     getSortedListingCount,
     sortByHelper("listing_price", "DESC")
 );
+
+listingRouter.get("/listing/:id", getListingDetail);
 export default listingRouter;

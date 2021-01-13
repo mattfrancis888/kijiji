@@ -5,6 +5,7 @@ import Register from "./Register";
 import SignIn from "./SignIn";
 import PostAd from "./PostAd";
 import Listings from "./Listings";
+import ListingDetail from "./ListingDetail";
 const Routes: React.FC<{}> = () => {
     return (
         <React.Fragment>
@@ -14,6 +15,7 @@ const Routes: React.FC<{}> = () => {
                 <Route path="/signin" exact component={SignIn} />
                 <Route path="/post-ad" exact component={PostAd} />
                 <Route path="/listings/:page" exact component={Listings} />
+                <Route path="/listing/:id" exact component={ListingDetail} />
             </Switch>
         </React.Fragment>
     );

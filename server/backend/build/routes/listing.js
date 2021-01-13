@@ -10,4 +10,5 @@ listingRouter.get("/listing-oldest-date/:page", listing_1.getCategoryId, listing
 listingRouter.get("/listing-newest-date/:page", listing_1.getCategoryId, listing_1.getSortedListingCount, listing_1.sortByHelper("listing_date", "DESC"));
 listingRouter.get("/listing-lowest-price/:page", listing_1.getCategoryId, listing_1.getSortedListingCount, listing_1.sortByHelper("listing_price", "ASC"));
 listingRouter.get("/listing-highest-price/:page", listing_1.getCategoryId, listing_1.getSortedListingCount, listing_1.sortByHelper("listing_price", "DESC"));
+listingRouter.get("/listing/:id", listing_1.getListingDetail);
 exports.default = listingRouter;
