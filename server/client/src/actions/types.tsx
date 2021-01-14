@@ -9,6 +9,7 @@ import {
     FetchListingsAction,
     FetchListingDetailAction,
 } from "../actions";
+import { FetchUserProfileAction, FetchUserProfileErrorAction } from "./listing";
 export enum ActionTypes {
     AUTH_USER,
     AUTH_ERROR,
@@ -19,6 +20,8 @@ export enum ActionTypes {
     LISTING_ERROR,
     FETCH_LISTINGS,
     FETCH_LISTING_DETAIL,
+    FETCH_USER_PROFILE,
+    FETCH_USER_PROFILE_ERROR,
 }
 export type AuthActions = AuthUserAction | AuthErrorAction;
 export type FetchCategoriesActions =
@@ -30,3 +33,7 @@ export type ListingAction =
     | ListingErrorAction
     | FetchListingsAction
     | FetchListingDetailAction;
+
+export type UserProfileAction =
+    | FetchUserProfileAction
+    | FetchUserProfileErrorAction;

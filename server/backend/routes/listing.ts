@@ -40,4 +40,5 @@ listingRouter.get(
 );
 
 listingRouter.get("/listing/:id", getListingDetail);
+
 export default listingRouter;

@@ -74,6 +74,14 @@ const Header: React.FC<IHeader> = (props) => {
                     >
                         Sign Out
                     </h1>
+                    <h1
+                        onClick={() => {
+                            history.push("/profile");
+                        }}
+                        className="profileText"
+                    >
+                        Profile
+                    </h1>
 
                     <button
                         onClick={() => {

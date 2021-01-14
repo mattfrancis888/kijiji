@@ -32,7 +32,7 @@
         font-weight: 600;
         letter-spacing: 0.1rem;
         margin: 0;
-        font-size: 1rem;
+        font-size: 1.2rem;
         @media screen and (min-width: $sm_breakpoint) {
             font-size: 1.45rem;
         }
@@ -92,8 +92,10 @@
 .authFormFieldTitleWrap {
     display: flex;
     align-items: center;
-    margin-bottom: 0.7rem;
     padding: 0.5rem 0;
+    @media screen and (min-width: $sm_breakpoint) {
+        margin-bottom: 0.7rem;
+    }
 }
 
 .authFormFieldTitleEmailInUse {

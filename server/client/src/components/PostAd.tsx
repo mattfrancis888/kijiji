@@ -35,10 +35,10 @@ const PostAd: React.FC<PostAdProps> = (props) => {
             <h1>Post Your Ad, it's fast and easy</h1>
             <PostAdForm
                 onSubmit={onSubmitPostListing}
-                initialValues={{
-                    title: "bye",
-                    image: "",
-                }}
+                // initialValues={{
+                //     title: "bye",
+                //     image: "",
+                // }}
             />
         </div>
     );

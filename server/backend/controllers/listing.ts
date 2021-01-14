@@ -5,10 +5,11 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 
 //TODO:
-//1. Post ad, handle what happens i an error uploading occurs
+//1. Post ad, handle what happens if an error uploading occurs
 //2. Search bar handle error when user writes a word with spaces:
 //https://stackoverflow.com/questions/46800075/how-to-do-or-to-all-the-words-in-full-text-search-instead-of-and-in-postgres
-
+//3. Refactor getListingDetail with JOINs
+//4. Change getlsitingDetail camelcase to _
 export const categoriesForListing = async (req: Request, res: Response) => {
     pool.query(`SELECT category_name FROM category`, (error, category) => {
         if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);

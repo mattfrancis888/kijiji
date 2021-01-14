@@ -26,9 +26,10 @@ nav {
     align-items: center;
 }
 
+.profileText,
 .navAuthStatus {
     cursor: pointer;
-    color: #2681db;
+    color: $light-blue;
     font-size: 1.5rem;
     margin-right: 1rem;
     @media screen and (min-width: $sm_breakpoint) {
@@ -61,6 +62,9 @@ nav {
     display: block;
     width: 100%;
     @media screen and (min-width: $md_breakpoint) {
+        width: 55%;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
         width: 65%;
     }
 }
