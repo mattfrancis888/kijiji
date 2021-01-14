@@ -9,70 +9,82 @@ import defaultProfilePic from "../img/defaultProfilePic.jpg";
 import Loading from "./Loading";
 import moment from "moment";
 import emptyBox from "../img/emptyBox.svg";
+import { fetchUserProfile } from "../actions";
+import Listing from "./Listing";
+import { Listing as ListingType } from "../actions";
+interface ProfileProps {
+    fetchUserProfile(): void;
+    profileInfo: any;
+}
+const Profile: React.FC<ProfileProps> = (props) => {
+    useEffect(() => {
+        props.fetchUserProfile();
+    }, []);
 
-// interface ListingDetailProps {
-//     fetchListingDetail(listingId: string): void;
-//     listingDetail: ListingDetailType;
-//     match: any;
-// }
-const Profile: React.FC<{}> = (props) => {
-    // useEffect(() => {
-    //     props.fetchListingDetail(props.match.params.id);
-    // }, []);
-
-    // const renderListingDetail = () => {
-    //     if (!props.listingDetail) {
-    //         return (
-    //             <div className="loadingCenter">
-    //                 <Loading />
-    //             </div>
-    //         );
-    //     } else {
-    //         const {
-    //             listingId,
-    //             title,
-    //             description,
-    //             category,
-    //             image,
-    //             province,
-    //             city,
-    //             street,
-    //             price,
-    //             listingDate,
-    //             firstName,
-    //             lastName,
-    //             memberSince,
-    //             email,
-    //         } = props.listingDetail;
-
-    //         return <React.Fragment></React.Fragment>;
-    //     }
-    //};
-    return (
-        <React.Fragment>
-            <div className="profileInfoAndListingContainer">
-                <div className="profileInfoContainer">
-                    <div className="profileBannerContainer">
-                        <div className="purpleBanner"></div>
-                        <img src={defaultProfilePic} alt="profie"></img>
-                        <div className="whiteBanner"></div>
-                    </div>
-                    <h3>First Name Last </h3>
-                    <h3>Member Since: 2021/01/12</h3>
-                </div>
-
-                <div className="userListingContainer">
+    const renderListings = (listings) => {
+        if (listings.length === 0) {
+            return (
+                <div className="userListingContainerEmpty">
                     <h3 className="userListingText">0 listings</h3>
 
                     <img className="emptyBox" src={emptyBox} alt="empty box" />
                 </div>
-            </div>
-        </React.Fragment>
-    );
+            );
+        } else {
+            return (
+                <div className="userListingContainerFilled">
+                    <h3>Your Listings :</h3>
+                    {listings.map((listing: ListingType) => {
+                        return (
+                            <Listing key={listing.listing_id} {...listing} />
+                        );
+                    })}
+                </div>
+            );
+        }
+    };
+    const renderListingDetail = () => {
+        if (!props.profileInfo) {
+            return (
+                <div className="loadingCenter">
+                    <Loading />
+                </div>
+            );
+        } else {
+            const {
+                first_name,
+                last_name,
+                member_since,
+                listings,
+            } = props.profileInfo;
+
+            return (
+                <React.Fragment>
+                    <div className="profileInfoAndListingContainer">
+                        <div className="profileInfoContainer">
+                            <div className="profileBannerContainer">
+                                <div className="purpleBanner"></div>
+                                <img src={defaultProfilePic} alt="profie"></img>
+                                <div className="whiteBanner"></div>
+                            </div>
+                            <h3>{` ${first_name} ${last_name}`}</h3>
+                            <h3>
+                                {`Member Since: ${moment(member_since).format(
+                                    "YYYY/MM/DD"
+                                )}`}
+                            </h3>
+                        </div>
+                        {renderListings(listings)}
+                    </div>
+                </React.Fragment>
+            );
+        }
+    };
+    return <React.Fragment>{renderListingDetail()}</React.Fragment>;
 };
 
 const mapStateToProps = (state: StoreState) => {
-    return { listingDetail: state.listingInfo.data };
+    return { profileInfo: state.profileInfo.data };
 };
 
-export default connect(mapStateToProps, {})(Profile);
+export default connect(mapStateToProps, { fetchUserProfile })(Profile);

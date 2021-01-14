@@ -824,6 +824,7 @@ body {
   .profileInfoAndListingContainer {
     padding: 4rem;
     flex-direction: row;
+    justify-content: space-evenly;
   }
 }
 
@@ -875,13 +876,13 @@ body {
   background-color: white;
 }
 
-.userListingContainer {
+.userListingContainerEmpty {
   display: flex;
   flex-direction: column;
   margin-top: 3rem;
 }
 @media screen and (min-width: 520px) {
-  .userListingContainer {
+  .userListingContainerEmpty {
     flex-direction: row;
     align-items: center;
     justify-content: space-evenly;
@@ -889,8 +890,37 @@ body {
   }
 }
 @media screen and (min-width: 992px) {
-  .userListingContainer {
+  .userListingContainerEmpty {
     width: 70%;
+  }
+}
+
+.userListingContainerFilled {
+  display: flex;
+  flex-direction: column;
+  margin-top: 3rem;
+  padding: 1rem;
+}
+@media screen and (min-width: 520px) {
+  .userListingContainerFilled {
+    padding: 0;
+  }
+}
+@media screen and (min-width: 992px) {
+  .userListingContainerFilled {
+    margin-top: 0;
+    margin-left: 2rem;
+  }
+}
+.userListingContainerFilled h3 {
+  margin: 0;
+  margin-bottom: 1rem;
+  color: #373373;
+  font-size: 1.4rem;
+}
+@media screen and (min-width: 520px) {
+  .userListingContainerFilled h3 {
+    font-size: 2rem;
   }
 }
 

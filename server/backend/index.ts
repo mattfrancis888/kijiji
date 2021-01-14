@@ -12,6 +12,7 @@ import route from "./routes";
 import authenticatedRouter from "./routes/authenticated";
 import listingRouter from "./routes/listing";
 import { authenticateToken } from "./controllers/authentication";
+import profileRouter from "./routes/profile";
 const app = express();
 // middleware for parsing bodies from URL
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,6 +22,7 @@ app.use(cors({ origin: true, credentials: true }));
 console.log("NODE ENV", process.env.NODE_ENV);
 app.use("/", route);
 app.use("/", listingRouter);
+app.use("/", profileRouter);
 //NOTE: app.use below that uses authenticateToken MUST ALWAYS BE LAST of the routes. If we have an expired JWT, it will send an error
 //and none of the routes afterwards will work. By putting it last, we could send an error and get a new access token with "/token"
 app.use("/", authenticateToken, authenticatedRouter);

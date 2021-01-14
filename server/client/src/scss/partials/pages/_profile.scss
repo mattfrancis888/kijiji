@@ -7,6 +7,7 @@
     @media screen and (min-width: $lg_breakpoint) {
         padding: 4rem;
         flex-direction: row;
+        justify-content: space-evenly;
     }
 }
 .profileInfoContainer {
@@ -55,7 +56,7 @@
     }
 }
 
-.userListingContainer {
+.userListingContainerEmpty {
     display: flex;
     flex-direction: column;
     margin-top: 3rem;
@@ -67,6 +68,28 @@
     }
     @media screen and (min-width: $lg_breakpoint) {
         width: 70%;
+    }
+}
+.userListingContainerFilled {
+    display: flex;
+    flex-direction: column;
+    margin-top: 3rem;
+    padding: 1rem;
+    @media screen and (min-width: $sm_breakpoint) {
+        padding: 0;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        margin-top: 0;
+        margin-left: 2rem;
+    }
+    h3 {
+        margin: 0;
+        margin-bottom: 1rem;
+        color: $purple;
+        font-size: 1.4rem;
+        @media screen and (min-width: $sm_breakpoint) {
+            font-size: 2rem;
+        }
     }
 }
 .userListingText {
