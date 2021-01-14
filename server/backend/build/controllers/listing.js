@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getListingDetail = exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
+exports.getUserProfile = exports.getListingDetail = exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
@@ -48,6 +48,7 @@ var multer_1 = __importDefault(require("multer"));
 //1. Post ad, handle what happens if an error uploading occurs
 //2. Search bar handle error when user writes a word with spaces:
 //https://stackoverflow.com/questions/46800075/how-to-do-or-to-all-the-words-in-full-text-search-instead-of-and-in-postgres
+//3. Refactor getListingDetail with JOINs
 var categoriesForListing = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         databasePool_1.default.query("SELECT category_name FROM category", function (error, category) {
@@ -421,3 +422,37 @@ var getListingDetail = function (req, res) { return __awaiter(void 0, void 0, vo
     });
 }); };
 exports.getListingDetail = getListingDetail;
+var getUserProfile = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var email, userInfoResponse, userId, firstName, lastName, memberSince, lookUpListingUserResponse, sendObj, error_3;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                email = req.body.subject;
+                return [4 /*yield*/, databasePool_1.default.query("SELECT * from user_info WHERE email = $1", [email])];
+            case 1:
+                userInfoResponse = _a.sent();
+                userId = userInfoResponse.rows[0].user_id;
+                firstName = userInfoResponse.rows[0].first_name;
+                lastName = userInfoResponse.rows[0].last_name;
+                memberSince = userInfoResponse.rows[0].member_since;
+                return [4 /*yield*/, databasePool_1.default.query("SELECT \n            listing_id, \n            listing_name,\n            listing_price, \n            listing_description, \n            category_id,\n            listing_image,\n            province,\n            city,\n            street,\n            listing_date\n             FROM lookup_listing_user  NATURAL JOIN listing \n            WHERE user_id = $1", [userId])];
+            case 2:
+                lookUpListingUserResponse = _a.sent();
+                sendObj = {};
+                sendObj.user_id = userId;
+                sendObj.first_name = firstName;
+                sendObj.last_name = lastName;
+                sendObj.member_since = memberSince;
+                sendObj.listings = lookUpListingUserResponse.rows;
+                res.send(sendObj);
+                return [3 /*break*/, 4];
+            case 3:
+                error_3 = _a.sent();
+                console.log(error_3);
+                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.getUserProfile = getUserProfile;

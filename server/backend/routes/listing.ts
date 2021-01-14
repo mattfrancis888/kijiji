@@ -7,6 +7,7 @@ import {
     getCategoryId,
     sortByHelper,
     getListingDetail,
+    getUserProfile,
 } from "../controllers/listing";
 const listingRouter = Router();
 
@@ -40,4 +41,5 @@ listingRouter.get(
 );
 
 listingRouter.get("/listing/:id", getListingDetail);
+listingRouter.get("/profile", getUserProfile);
 export default listingRouter;
