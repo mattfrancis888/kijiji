@@ -989,6 +989,7 @@ nav {
   align-items: center;
 }
 
+.profileText,
 .navAuthStatus {
   cursor: pointer;
   color: #2681db;
@@ -996,13 +997,15 @@ nav {
   margin-right: 1rem;
 }
 @media screen and (min-width: 520px) {
-  .navAuthStatus {
+  .profileText,
+.navAuthStatus {
     font-size: 2rem;
     margin-right: 1.5rem;
   }
 }
 @media screen and (min-width: 768px) {
-  .navAuthStatus {
+  .profileText,
+.navAuthStatus {
     font-size: 2rem;
   }
 }
@@ -1031,6 +1034,11 @@ nav {
   width: 100%;
 }
 @media screen and (min-width: 768px) {
+  .displaySearchbar {
+    width: 55%;
+  }
+}
+@media screen and (min-width: 992px) {
   .displaySearchbar {
     width: 65%;
   }
@@ -1082,7 +1090,7 @@ nav {
   font-weight: 600;
   letter-spacing: 0.1rem;
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 @media screen and (min-width: 520px) {
   .authFieldSection h1 {
@@ -1158,8 +1166,12 @@ nav {
 .authFormFieldTitleWrap {
   display: flex;
   align-items: center;
-  margin-bottom: 0.7rem;
   padding: 0.5rem 0;
+}
+@media screen and (min-width: 520px) {
+  .authFormFieldTitleWrap {
+    margin-bottom: 0.7rem;
+  }
 }
 
 .authFormFieldTitleEmailInUse {
