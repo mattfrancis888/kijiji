@@ -75,10 +75,14 @@ const Header: React.FC<IHeader> = (props) => {
                         Sign Out
                     </h1>
                     <h1
+                        className={
+                            props.authStatus
+                                ? "profileText"
+                                : "navAuthStatusHide"
+                        }
                         onClick={() => {
                             history.push("/profile");
                         }}
-                        className="profileText"
                     >
                         Profile
                     </h1>
