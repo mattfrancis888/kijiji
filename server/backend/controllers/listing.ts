@@ -6,8 +6,6 @@ import multer from "multer";
 
 //TODO:
 //1. Post ad, handle what happens if an error uploading occurs
-//2. Search bar handle error when user writes a word with spaces:
-//https://stackoverflow.com/questions/46800075/how-to-do-or-to-all-the-words-in-full-text-search-instead-of-and-in-postgres
 //3. Refactor getListingDetail with JOINs
 //4. Change getlsitingDetail camelcase to _
 export const categoriesForListing = async (req: Request, res: Response) => {
@@ -178,7 +176,7 @@ export const getSortedListingCount = async (
         if (listing_name && category_id) {
             //User enters filters and entered words on search bar, possibly has province and city filter
 
-            countQuery = `SELECT COUNT(listing_id) FROM listing WHERE name_tokens @@ to_tsquery($1)
+            countQuery = `SELECT COUNT(listing_id) FROM listing WHERE name_tokens @@ plainto_tsquery($1)
             AND category_id = $2 AND province LIKE $3 AND city LIKE $4`;
             countValues = [
                 listing_name,
@@ -188,7 +186,7 @@ export const getSortedListingCount = async (
             ];
         } else if (listing_name) {
             //User only enters word on search bar, possibly has province and city filter
-            countQuery = `SELECT COUNT(*) FROM listing WHERE name_tokens @@ to_tsquery($1)
+            countQuery = `SELECT COUNT(*) FROM listing WHERE name_tokens @@ plainto_tsquery($1)
             AND province LIKE $2 AND city LIKE $3 `;
             countValues = [listing_name, `%${province}%`, `%${city}%`];
         } else if (category_id) {
@@ -256,11 +254,12 @@ export const sortByHelper = (columnName: string, order: string) => {
             if (listing_name && category_id) {
                 //User enters filters and entered words on search bar, possibly has province and city filter
 
-                // query = `SELECT  * FROM listing WHERE name_tokens @@ to_tsquery($1)
+                // query = `SELECT  * FROM listing WHERE name_tokens @@ plainto_tsquery($1)
                 //  AND category_id = $2 ORDER BY ${columnName} ${order}
                 // LIMIT $3 OFFSET ($4 - 1) * $3`;
                 // values = [`%${listing_name}%`, category_id, limitPerPage, page];
-                query = `SELECT  * FROM listing WHERE name_tokens @@ to_tsquery($1)
+                query = `SELECT  * FROM listing WHERE name_tokens
+                @@ plainto_tsquery($1)
                 AND category_id = $2 AND province LIKE $3 AND city like $4 ORDER BY ${columnName} ${order}
                LIMIT $5 OFFSET ($6 - 1) * $5`;
 
@@ -275,11 +274,11 @@ export const sortByHelper = (columnName: string, order: string) => {
             } else if (listing_name) {
                 //User only enters word on search bar, possibly has province and city filter
 
-                // query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) ORDER BY  ${columnName} ${order}
+                // query = `SELECT * FROM listing WHERE name_tokens @@ plainto_tsquery($1) ORDER BY  ${columnName} ${order}
                 // LIMIT $2 OFFSET ($3 - 1) * $2`;
                 // values = [`%${listing_name}%`, limitPerPage, page];
 
-                query = `SELECT * FROM listing WHERE name_tokens @@ to_tsquery($1) 
+                query = `SELECT * FROM listing WHERE name_tokens @@ plainto_tsquery($1) 
                 AND province LIKE $2 AND city LIKE $3 ORDER BY  ${columnName} ${order}
                 LIMIT $4 OFFSET ($5 - 1) * $4`;
                 values = [

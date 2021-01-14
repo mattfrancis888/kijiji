@@ -93,6 +93,7 @@ const Searchbar: React.FC<{}> = () => {
         setFilterCategory(queryValues.category);
         setFilterProvince(queryValues.province);
         setFilterCity(queryValues.city);
+        setSearchValue(queryValues.search);
     }, []);
 
     const renderInitialValuesForFilter = () => {
@@ -167,7 +168,7 @@ const Searchbar: React.FC<{}> = () => {
                 type="search"
                 placeholder="Search..."
                 // aria-label="Search"
-                value={queryValues.search}
+                value={searchValue}
                 name="search"
                 onChange={(event) => setSearchValue(event.target.value.trim())}
                 onKeyDown={handleKeyDown}

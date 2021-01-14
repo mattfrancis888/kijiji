@@ -65,6 +65,9 @@ const Listings: React.FC<IListings> = (props) => {
         }
     };
     const pageNumberClicked = (pageNumber: number) => {
+        //We don't use currentPage becaause oru useEffect does not has [currentPage]
+        //setting it to currentPage causes rendering issues where the page is not updating properly
+
         if (selectedSort === ORDER_BY_OLDEST_DATE) {
             props.fetchListingsByOldestDate(pageNumber, search);
         } else if (selectedSort === ORDER_BY_NEWEST_DATE) {
@@ -146,8 +149,29 @@ const Listings: React.FC<IListings> = (props) => {
                 props.fetchListingsByHighestPrice(currentPage, search);
             }
         };
-        if (backAndForwardButtonClicked === false)
-            props.fetchListingsByOldestDate(props.match.params.page, search);
+        if (backAndForwardButtonClicked === false) {
+            if (selectedSort === ORDER_BY_OLDEST_DATE) {
+                props.fetchListingsByOldestDate(
+                    props.match.params.page,
+                    search
+                );
+            } else if (selectedSort === ORDER_BY_NEWEST_DATE) {
+                props.fetchListingsByNewestDate(
+                    props.match.params.page,
+                    search
+                );
+            } else if (selectedSort === ORDER_BY_LOWEST_PRICE) {
+                props.fetchListingsByLowestPrice(
+                    props.match.params.page,
+                    search
+                );
+            } else if (selectedSort === ORDER_BY_HIGHEST_PRICE) {
+                props.fetchListingsByHighestPrice(
+                    props.match.params.page,
+                    search
+                );
+            }
+        }
         setCurrentPage(props.match.params.page); //hook renders after everything in useffect is executed
     }, [props.match.params.page, search]);
 
