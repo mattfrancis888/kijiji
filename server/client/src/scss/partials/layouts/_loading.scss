@@ -1,10 +1,12 @@
 .loadingCenter {
+    position: relative;
     display: flex;
-    justify-content: center;
     align-items: center;
     width: 100vw;
     height: 100vh;
     & > div {
+        margin: 0 auto;
+        z-index: -1;
         width: 10rem;
         height: 10rem;
         @media screen and (min-width: $sm_breakpoint) {

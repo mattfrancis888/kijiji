@@ -80,11 +80,24 @@ const Listings: React.FC<IListings> = (props) => {
     };
 
     const renderListings = () => {
-        if (!props.listingInfo.listings) {
+        if (!props.listingInfo) {
+            return (
+                <div className="loadingCenter">
+                    <Loading />
+                </div>
+            );
+        } else if (props.listingInfo.error) {
+            return (
+                <div className="serverErrorContainer">
+                    <h3 className="serverErrorText">
+                        {props.listingInfo.error}
+                    </h3>
+                </div>
+            );
+        } else if (!props.listingInfo.listings) {
             //Important: we use .listings here because listingInfo change it's state
             //if user clicks the listing (<ListingDetail> is triggered); there is no .listings
             //when it's triggered, so it will cause an undefined error at the else statement if we click back button
-
             return (
                 <div className="loadingCenter">
                     <Loading />
@@ -99,41 +112,48 @@ const Listings: React.FC<IListings> = (props) => {
 
             return (
                 <React.Fragment>
-                    <div className="showingAdsTitleAndDropdownWrap">
-                        <h1 className="showingAdsTitle">{`Showing ${renderShowingText()} out of ${
-                            props.listingInfo.totalListings
-                        } ads:`}</h1>
-                        <div className="dropdownWrap">
-                            <h3>Sort by</h3>
-                            <select
-                                className="sortByDropdown"
-                                onChange={handleDropdownChange}
-                            >
-                                <option value={ORDER_BY_OLDEST_DATE}>
-                                    {ORDER_BY_OLDEST_DATE}
-                                </option>
-                                <option value={ORDER_BY_NEWEST_DATE}>
-                                    {ORDER_BY_NEWEST_DATE}
-                                </option>
-                                <option value={ORDER_BY_LOWEST_PRICE}>
-                                    {ORDER_BY_LOWEST_PRICE}
-                                </option>
-                                <option value={ORDER_BY_HIGHEST_PRICE}>
-                                    {ORDER_BY_HIGHEST_PRICE}
-                                </option>
-                            </select>
+                    <div className="listingsContainer">
+                        <div className="showingAdsTitleAndDropdownWrap">
+                            <h1 className="showingAdsTitle">{`Showing ${renderShowingText()} out of ${
+                                props.listingInfo.totalListings
+                            } ads:`}</h1>
+                            <div className="dropdownWrap">
+                                <h3>Sort by</h3>
+                                <select
+                                    className="sortByDropdown"
+                                    onChange={handleDropdownChange}
+                                >
+                                    <option value={ORDER_BY_OLDEST_DATE}>
+                                        {ORDER_BY_OLDEST_DATE}
+                                    </option>
+                                    <option value={ORDER_BY_NEWEST_DATE}>
+                                        {ORDER_BY_NEWEST_DATE}
+                                    </option>
+                                    <option value={ORDER_BY_LOWEST_PRICE}>
+                                        {ORDER_BY_LOWEST_PRICE}
+                                    </option>
+                                    <option value={ORDER_BY_HIGHEST_PRICE}>
+                                        {ORDER_BY_HIGHEST_PRICE}
+                                    </option>
+                                </select>
+                            </div>
                         </div>
+                        {props.listingInfo.listings.map(
+                            (listing: ListingType) => (
+                                <Listing
+                                    key={listing.listing_id}
+                                    {...listing}
+                                />
+                            )
+                        )}
+                        <Pagination
+                            totalItems={props.listingInfo.totalListings}
+                            itemLimit={props.listingInfo.limitPerPage}
+                            currentPage={currentPage}
+                            onClickCallback={pageNumberClicked}
+                            query={search}
+                        />
                     </div>
-                    {props.listingInfo.listings.map((listing: ListingType) => (
-                        <Listing key={listing.listing_id} {...listing} />
-                    ))}
-                    <Pagination
-                        totalItems={props.listingInfo.totalListings}
-                        itemLimit={props.listingInfo.limitPerPage}
-                        currentPage={currentPage}
-                        onClickCallback={pageNumberClicked}
-                        query={search}
-                    />
                 </React.Fragment>
             );
         }
@@ -182,11 +202,7 @@ const Listings: React.FC<IListings> = (props) => {
         setCurrentPage(props.match.params.page); //hook renders after everything in useffect is executed
     }, [props.match.params.page, search]);
 
-    return (
-        <React.Fragment>
-            <div className="listingsContainer">{renderListings()}</div>
-        </React.Fragment>
-    );
+    return <React.Fragment>{renderListings()}</React.Fragment>;
 };
 
 const mapStateToProps = (state: StoreState) => {

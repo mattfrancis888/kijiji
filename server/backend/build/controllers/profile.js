@@ -49,8 +49,6 @@ var getUserProfile = function (req, res) { return __awaiter(void 0, void 0, void
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 3, , 4]);
-                console.log(req.cookies.ACCESS_TOKEN);
-                console.log(jwt_decode_1.default(req.cookies.ACCESS_TOKEN));
                 decodedJwt = jwt_decode_1.default(req.cookies.ACCESS_TOKEN);
                 email = decodedJwt.subject;
                 return [4 /*yield*/, databasePool_1.default.query("SELECT * from user_info WHERE email = $1", [email])];

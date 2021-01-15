@@ -943,13 +943,15 @@ body {
 }
 
 .loadingCenter {
+  position: relative;
   display: flex;
-  justify-content: center;
   align-items: center;
   width: 100vw;
   height: 100vh;
 }
 .loadingCenter > div {
+  margin: 0 auto;
+  z-index: -1;
   width: 10rem;
   height: 10rem;
 }
@@ -1715,6 +1717,21 @@ nav {
 .modalCancelButton {
   background-color: #e2e2e5;
   color: black;
+}
+
+.serverErrorContainer {
+  width: 100vw;
+  height: 100vh;
+}
+.serverErrorContainer h3 {
+  z-index: -1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #373373;
+  font-size: 1.4rem;
+  font-weight: 300;
 }
 
 /*# sourceMappingURL=main.css.map */

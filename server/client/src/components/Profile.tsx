@@ -50,6 +50,14 @@ const Profile: React.FC<ProfileProps> = (props) => {
                     <Loading />
                 </div>
             );
+        } else if (props.profileInfo.error) {
+            return (
+                <div className="serverErrorContainer">
+                    <h3 className="serverErrorText">
+                        {props.profileInfo.error}
+                    </h3>
+                </div>
+            );
         } else {
             const {
                 first_name,

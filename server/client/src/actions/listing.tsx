@@ -3,6 +3,7 @@ import axios from "./axiosConfig";
 import { Dispatch } from "redux";
 import jwt_decode from "jwt-decode";
 import CookieService from "../CookieService";
+import { SERVER_ERROR_MESSAGE } from "../constants";
 
 export interface FetchCategoriesForListingAction {
     type: ActionTypes.FETCH_CATEGORIES_FOR_LISTING;
@@ -71,6 +72,10 @@ export interface ListingDetail {
     city: string;
     street: string;
     listing_date: Date;
+}
+
+export interface ServerError {
+    error: string;
 }
 
 export interface FetchListingDetailAction {
@@ -162,7 +167,7 @@ export const fetchListingsByOldestDate = (
     } catch (error) {
         dispatch<ListingErrorAction>({
             type: ActionTypes.LISTING_ERROR,
-            payload: {},
+            payload: { error: SERVER_ERROR_MESSAGE },
         });
     }
 };
@@ -182,7 +187,7 @@ export const fetchListingsByNewestDate = (
     } catch (error) {
         dispatch<ListingErrorAction>({
             type: ActionTypes.LISTING_ERROR,
-            payload: {},
+            payload: { error: SERVER_ERROR_MESSAGE },
         });
     }
 };
@@ -202,7 +207,7 @@ export const fetchListingsByLowestPrice = (
     } catch (error) {
         dispatch<ListingErrorAction>({
             type: ActionTypes.LISTING_ERROR,
-            payload: {},
+            payload: { error: SERVER_ERROR_MESSAGE },
         });
     }
 };
@@ -222,7 +227,7 @@ export const fetchListingsByHighestPrice = (
     } catch (error) {
         dispatch<ListingErrorAction>({
             type: ActionTypes.LISTING_ERROR,
-            payload: {},
+            payload: { error: SERVER_ERROR_MESSAGE },
         });
     }
 };
@@ -241,7 +246,7 @@ export const fetchListingDetail = (listingId: string) => async (
     } catch (error) {
         dispatch<ListingErrorAction>({
             type: ActionTypes.LISTING_ERROR,
-            payload: {},
+            payload: { error: SERVER_ERROR_MESSAGE },
         });
     }
 };
