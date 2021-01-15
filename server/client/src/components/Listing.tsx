@@ -18,7 +18,12 @@ const Listing: React.FC<ListingType> = ({
     street,
 }) => {
     return (
-        <div className="listingPreviewContainer">
+        <div
+            className="listingPreviewContainer"
+            onClick={() => {
+                history.push(`/listing/${listing_id}`);
+            }}
+        >
             <div className="listingPreviewImageContainer">
                 <img
                     src={

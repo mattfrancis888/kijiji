@@ -336,56 +336,38 @@ export const getListingDetail = async (req: Request, res: Response) => {
         const listingId = req.params.id;
 
         const response = await pool.query(
-            `SELECT * from listing WHERE listing_id = $1`,
-            [listingId]
-        );
-
-        const title = response.rows[0].listing_name;
-        const description = response.rows[0].listing_description;
-        const categoryId = response.rows[0].category_id;
-        const image = response.rows[0].cloudinaryImagePath; //can be null if cloduinaryImagePath is not given
-        const province = response.rows[0].province;
-        const city = response.rows[0].city;
-        const street = response.rows[0].street;
-        const price = response.rows[0].listing_price;
-        const listingDate = response.rows[0].listing_date;
-
-        let categoryQuery = await pool.query(
-            `SELECT category_name FROM category WHERE category_id = $1;`,
-            [categoryId]
-        );
-        const category = categoryQuery.rows[0].category_name;
-
-        const lookUpListingUserResponse = await pool.query(
-            `SELECT user_id FROM lookup_listing_user WHERE listing_id = $1`,
-            [listingId]
-        );
-        const userId = lookUpListingUserResponse.rows[0].user_id;
-        const userInfoResponse = await pool.query(
-            `SELECT * FROM user_info WHERE user_id = $1`,
-            [userId]
-        );
-        const firstName = userInfoResponse.rows[0].first_name;
-        const lastName = userInfoResponse.rows[0].last_name;
-        const memberSince = userInfoResponse.rows[0].member_since;
-        const email = userInfoResponse.rows[0].email;
-
-        res.send({
-            listingId,
-            title,
-            description,
-            category,
-            image,
+            `SELECT
+            listing_id,
+            listing_name,
+            listing_price,
+            listing_description,
+            category_name,
+            listing_image,
             province,
             city,
             street,
-            price,
-            listingDate,
-            firstName,
-            lastName,
-            memberSince,
-            email,
-        });
+            listing_date
+            FROM listing NATURAL JOIN category  WHERE listing_id = $1`,
+            [listingId]
+        );
+
+        const lookUpListingUserResponse = await pool.query(
+            `SELECT * FROM lookup_listing_user NATURAL JOIN
+            user_info WHERE listing_id = $1`,
+            [listingId]
+        );
+
+        const firstName = lookUpListingUserResponse.rows[0].first_name;
+        const lastName = lookUpListingUserResponse.rows[0].last_name;
+        const memberSince = lookUpListingUserResponse.rows[0].member_since;
+        const email = lookUpListingUserResponse.rows[0].email;
+        let sendObj: any = {};
+        sendObj.first_name = firstName;
+        sendObj.last_name = lastName;
+        sendObj.member_since = memberSince;
+        sendObj.email = email;
+
+        res.send({ ...sendObj, ...response.rows[0] });
     } catch (error) {
         console.log(error);
         return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);

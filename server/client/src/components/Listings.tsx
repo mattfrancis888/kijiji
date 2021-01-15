@@ -80,17 +80,23 @@ const Listings: React.FC<IListings> = (props) => {
     };
 
     const renderListings = () => {
-        if (!props.listingInfo) {
+        if (!props.listingInfo.listings) {
+            //Important: we use .listings here because listingInfo change it's state
+            //if user clicks the listing (<ListingDetail> is triggered); there is no .listings
+            //when it's triggered, so it will cause an undefined error at the else statement if we click back button
+
             return (
                 <div className="loadingCenter">
                     <Loading />
                 </div>
             );
         } else {
+            // console.log("listingInfo", props.listingInfo);
             if (props.listingInfo.listings.length === 0) {
                 //When users enter an invalid page number in the url
                 return <h2>There seems to be nothing to show here...</h2>;
             }
+
             return (
                 <React.Fragment>
                     <div className="showingAdsTitleAndDropdownWrap">
@@ -139,6 +145,7 @@ const Listings: React.FC<IListings> = (props) => {
         let backAndForwardButtonClicked = false;
         window.onpopstate = (e) => {
             backAndForwardButtonClicked = true;
+            console.log("back button", selectedSort);
             if (selectedSort === ORDER_BY_OLDEST_DATE) {
                 props.fetchListingsByOldestDate(currentPage, search);
             } else if (selectedSort === ORDER_BY_NEWEST_DATE) {

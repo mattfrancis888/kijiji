@@ -57,20 +57,20 @@ export interface FetchListingsAction {
 }
 
 export interface ListingDetail {
-    listingId: number;
-    title: string;
-    description: string;
-    category: string;
-    image: string;
+    first_name: string;
+    last_name: string;
+    member_since: Date;
+    email: string;
+    listing_id: string;
+    listing_name: string;
+    listing_price: number;
+    listing_description: string;
+    category_name: string;
+    listing_image: string;
     province: string;
     city: string;
     street: string;
-    price: number;
-    listingDate: Date;
-    firstName: string;
-    lastName: string;
-    memberSince: Date;
-    email: string;
+    listing_date: Date;
 }
 
 export interface FetchListingDetailAction {

@@ -32,30 +32,30 @@ const ListingDetail: React.FC<ListingDetailProps> = (props) => {
             );
         } else {
             const {
-                listingId,
-                title,
-                description,
-                category,
-                image,
+                first_name,
+                last_name,
+                member_since,
+                email,
+                listing_id,
+                listing_name,
+                listing_price,
+                listing_description,
+                category_name,
+                listing_image,
                 province,
                 city,
                 street,
-                price,
-                listingDate,
-                firstName,
-                lastName,
-                memberSince,
-                email,
+                listing_date,
             } = props.listingDetail;
 
             return (
                 <React.Fragment>
                     <div className="listingDetailCategories">
-                        <h3>{`${province} > ${city} > ${street} > ${category}`}</h3>
+                        <h3>{`${province} > ${city} > ${street} > ${category_name}`}</h3>
                     </div>
                     <div className="listingDetailTitleAndPriceContainer">
-                        <h3 className="listingDetailTitle">{title}</h3>
-                        <h3 className="listingDetailPrice">{`$${price}`}</h3>
+                        <h3 className="listingDetailTitle">{listing_name}</h3>
+                        <h3 className="listingDetailPrice">{`$${listing_price}`}</h3>
                     </div>
                     <div className="listingDetailInfoAndContactContainer">
                         <div className="listingDetailContainer">
@@ -63,9 +63,9 @@ const ListingDetail: React.FC<ListingDetailProps> = (props) => {
                                 <img
                                     // src={postAdListingImagePlaceHolder}
                                     src={
-                                        !image
+                                        !listing_image
                                             ? postAdListingImagePlaceHolder
-                                            : image
+                                            : listing_image
                                     }
                                     onError={(e) => {
                                         e.target.src = postAdListingImagePlaceHolder;
@@ -77,7 +77,7 @@ const ListingDetail: React.FC<ListingDetailProps> = (props) => {
                                 <div className="listingDescriptionTextWrap">
                                     <h3 className="listingDetailPostedOn">
                                         {`Posted On:  ${moment(
-                                            listingDate
+                                            listing_date
                                         ).format("YYYY/MM/DD")}`}
                                     </h3>
                                     <h3 className="locationOfPost">{`${province}, ${city}, ${street}`}</h3>
@@ -85,7 +85,7 @@ const ListingDetail: React.FC<ListingDetailProps> = (props) => {
                                         Description
                                     </h3>
 
-                                    <p>{description}</p>
+                                    <p>{listing_description}</p>
                                 </div>
                                 <div
                                     className={
@@ -110,14 +110,14 @@ const ListingDetail: React.FC<ListingDetailProps> = (props) => {
                             <div className="listingDetailProfileImageAndNameWrap">
                                 <img src={defaultProfilePic} alt="profile" />
                                 <h3>
-                                    {`${firstName}
-                                    ${lastName}`}
+                                    {`${first_name}
+                                    ${last_name}`}
                                 </h3>
                             </div>
                             <div className="contactAndMemberWrap">
                                 <h3>{`Contact at: ${email}`}</h3>
                                 <h3>{`Member Since: ${moment(
-                                    memberSince
+                                    member_since
                                 ).format("YYYY/MM/DD")} `}</h3>
                             </div>
                         </div>

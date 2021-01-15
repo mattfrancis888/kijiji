@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -362,61 +373,34 @@ var sortByHelper = function (columnName, order) {
 };
 exports.sortByHelper = sortByHelper;
 var getListingDetail = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var listingId, response_3, title, description, categoryId, image, province, city, street, price, listingDate, categoryQuery, category, lookUpListingUserResponse, userId, userInfoResponse, firstName, lastName, memberSince, email, error_2;
+    var listingId, response_3, lookUpListingUserResponse, firstName, lastName, memberSince, email, sendObj, error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 5, , 6]);
+                _a.trys.push([0, 3, , 4]);
                 listingId = req.params.id;
-                return [4 /*yield*/, databasePool_1.default.query("SELECT * from listing WHERE listing_id = $1", [listingId])];
+                return [4 /*yield*/, databasePool_1.default.query("SELECT\n            listing_id,\n            listing_name,\n            listing_price,\n            listing_description,\n            category_name,\n            listing_image,\n            province,\n            city,\n            street,\n            listing_date\n            FROM listing NATURAL JOIN category  WHERE listing_id = $1", [listingId])];
             case 1:
                 response_3 = _a.sent();
-                title = response_3.rows[0].listing_name;
-                description = response_3.rows[0].listing_description;
-                categoryId = response_3.rows[0].category_id;
-                image = response_3.rows[0].cloudinaryImagePath;
-                province = response_3.rows[0].province;
-                city = response_3.rows[0].city;
-                street = response_3.rows[0].street;
-                price = response_3.rows[0].listing_price;
-                listingDate = response_3.rows[0].listing_date;
-                return [4 /*yield*/, databasePool_1.default.query("SELECT category_name FROM category WHERE category_id = $1;", [categoryId])];
+                return [4 /*yield*/, databasePool_1.default.query("SELECT * FROM lookup_listing_user NATURAL JOIN\n            user_info WHERE listing_id = $1", [listingId])];
             case 2:
-                categoryQuery = _a.sent();
-                category = categoryQuery.rows[0].category_name;
-                return [4 /*yield*/, databasePool_1.default.query("SELECT user_id FROM lookup_listing_user WHERE listing_id = $1", [listingId])];
-            case 3:
                 lookUpListingUserResponse = _a.sent();
-                userId = lookUpListingUserResponse.rows[0].user_id;
-                return [4 /*yield*/, databasePool_1.default.query("SELECT * FROM user_info WHERE user_id = $1", [userId])];
-            case 4:
-                userInfoResponse = _a.sent();
-                firstName = userInfoResponse.rows[0].first_name;
-                lastName = userInfoResponse.rows[0].last_name;
-                memberSince = userInfoResponse.rows[0].member_since;
-                email = userInfoResponse.rows[0].email;
-                res.send({
-                    listingId: listingId,
-                    title: title,
-                    description: description,
-                    category: category,
-                    image: image,
-                    province: province,
-                    city: city,
-                    street: street,
-                    price: price,
-                    listingDate: listingDate,
-                    firstName: firstName,
-                    lastName: lastName,
-                    memberSince: memberSince,
-                    email: email,
-                });
-                return [3 /*break*/, 6];
-            case 5:
+                firstName = lookUpListingUserResponse.rows[0].first_name;
+                lastName = lookUpListingUserResponse.rows[0].last_name;
+                memberSince = lookUpListingUserResponse.rows[0].member_since;
+                email = lookUpListingUserResponse.rows[0].email;
+                sendObj = {};
+                sendObj.first_name = firstName;
+                sendObj.last_name = lastName;
+                sendObj.member_since = memberSince;
+                sendObj.email = email;
+                res.send(__assign(__assign({}, sendObj), response_3.rows[0]));
+                return [3 /*break*/, 4];
+            case 3:
                 error_2 = _a.sent();
                 console.log(error_2);
                 return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
-            case 6: return [2 /*return*/];
+            case 4: return [2 /*return*/];
         }
     });
 }); };

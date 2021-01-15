@@ -6,6 +6,8 @@ import { decode } from "jsonwebtoken";
 
 export const getUserProfile = async (req: Request, res: Response) => {
     try {
+        console.log(req.cookies.ACCESS_TOKEN);
+        console.log(jwt_decode(req.cookies.ACCESS_TOKEN));
         const decodedJwt = jwt_decode(req.cookies.ACCESS_TOKEN);
         const email = decodedJwt.subject;
 
