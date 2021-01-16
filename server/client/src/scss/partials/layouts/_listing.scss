@@ -8,6 +8,7 @@
     padding: 1rem;
     align-items: center;
     cursor: pointer;
+    position: relative;
 }
 .listingPreviewImageContainer {
     margin-right: 0.9rem;
@@ -114,5 +115,19 @@
     }
     @media screen and (min-width: $md_breakpoint) {
         font-size: 1.8rem;
+    }
+}
+
+.pencilIcon {
+    color: $light-blue;
+    position: absolute;
+    font-size: 1.3rem;
+    right: 1rem;
+    top: 1rem;
+    cursor: pointer;
+    @media screen and (min-width: $sm_breakpoint) {
+        font-size: 1.7rem;
+        right: 2rem;
+        top: 2rem;
     }
 }

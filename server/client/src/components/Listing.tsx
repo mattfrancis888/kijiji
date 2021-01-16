@@ -6,6 +6,11 @@ import { StoreState } from "../reducers";
 import { Listing as ListingType } from "../actions";
 import moment from "moment";
 import postAdListingImagePlaceHolder from "../img/postAdListingImagePlaceHolder.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+
+import { useLocation } from "react-router-dom";
+
 const Listing: React.FC<ListingType> = ({
     listing_id,
     listing_name,
@@ -17,6 +22,7 @@ const Listing: React.FC<ListingType> = ({
     city,
     street,
 }) => {
+    const location = useLocation();
     return (
         <div
             className="listingPreviewContainer"
@@ -24,6 +30,12 @@ const Listing: React.FC<ListingType> = ({
                 history.push(`/listing/${listing_id}`);
             }}
         >
+            {location.pathname === "/profile" ? (
+                <FontAwesomeIcon className="pencilIcon" icon={faPencilAlt} />
+            ) : (
+                ""
+            )}
+
             <div className="listingPreviewImageContainer">
                 <img
                     src={

@@ -1392,6 +1392,7 @@ nav .logo {
   padding: 1rem;
   align-items: center;
   cursor: pointer;
+  position: relative;
 }
 
 .listingPreviewImageContainer {
@@ -1526,6 +1527,22 @@ nav .logo {
 @media screen and (min-width: 768px) {
   .listingDescription {
     font-size: 1.8rem;
+  }
+}
+
+.pencilIcon {
+  color: #2681db;
+  position: absolute;
+  font-size: 1.3rem;
+  right: 1rem;
+  top: 1rem;
+  cursor: pointer;
+}
+@media screen and (min-width: 520px) {
+  .pencilIcon {
+    font-size: 1.7rem;
+    right: 2rem;
+    top: 2rem;
   }
 }
 
