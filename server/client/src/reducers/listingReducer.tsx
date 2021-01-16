@@ -1,9 +1,9 @@
-import { ActionTypes, ListingAction } from "../actions";
+import { ActionTypes, ListingAction, ServerError } from "../actions";
 import { Listing, FetchListingResponse, ListingDetail } from "../actions";
 import _ from "lodash";
 
 export interface ListingDataResponse {
-    data?: FetchListingResponse | ListingDetail;
+    data?: FetchListingResponse | ListingDetail | ServerError;
 }
 
 const listingReducer = (
@@ -14,7 +14,7 @@ const listingReducer = (
         case ActionTypes.CREATE_LISTING:
             return { ...state, data: action.payload };
         case ActionTypes.LISTING_ERROR:
-            return action.payload;
+            return { ...state, data: action.payload };
         case ActionTypes.FETCH_LISTINGS:
             return { ...state, data: action.payload };
         //    return { ...state, ..._.mapKeys(action.payload, "listing_id") };

@@ -14,7 +14,7 @@ const listingReducer = (
         case ActionTypes.FETCH_USER_PROFILE:
             return { ...state, data: action.payload };
         case ActionTypes.FETCH_USER_PROFILE_ERROR:
-            return action.payload;
+            return { ...state, data: action.payload };
         default:
             return state;
     }

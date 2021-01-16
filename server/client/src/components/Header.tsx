@@ -7,6 +7,7 @@ import { StoreState } from "../reducers";
 import Searchbar from "./Searchbar";
 import useWindowDimensions from "../windowDimensions";
 import { MED_SCREEN_SIZE } from "../constants";
+import kijijiLogo from "../img/kijijiLogo.png";
 
 interface IHeader {
     authStatus?: string | null;
@@ -19,13 +20,13 @@ const Header: React.FC<IHeader> = (props) => {
     return (
         <nav>
             <div className="headerInfoWrap">
-                <Link to="/">
-                    <img
-                        className="logo"
-                        src="https://i.gyazo.com/0a31f614433ad0e8d1ee0f13893d9f41.png"
-                        alt="logo"
-                    />
-                </Link>
+                <img
+                    className="logo"
+                    src={kijijiLogo}
+                    alt="logo"
+                    onClick={() => history.push("/listings/1")}
+                />
+
                 <div
                     className={
                         width > MED_SCREEN_SIZE

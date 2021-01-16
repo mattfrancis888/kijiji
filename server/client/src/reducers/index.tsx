@@ -8,7 +8,7 @@ import profileReducer, { UserProfileDataResponse } from "./profileReducer";
 
 export interface StoreState {
     authStatus: AuthStateResponse;
-    categories: [];
+    categories: [] | [string];
     listingInfo: ListingDataResponse;
     profileInfo: UserProfileDataResponse;
     form: FormStateMap;

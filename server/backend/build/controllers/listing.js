@@ -63,7 +63,7 @@ var categoriesForListing = function (req, res) { return __awaiter(void 0, void 0
     return __generator(this, function (_a) {
         databasePool_1.default.query("SELECT category_name FROM category", function (error, category) {
             if (error)
-                return res.send(constants_1.INTERNAL_SERVER_ERROR_STATUS);
+                return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
             res.send(category.rows.map(function (category) { return category.category_name; }));
         });
         return [2 /*return*/];

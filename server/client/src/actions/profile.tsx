@@ -1,7 +1,7 @@
 import { ActionTypes } from "./types";
 import axios from "./axiosConfig";
 import { Dispatch } from "redux";
-
+import { SERVER_ERROR_MESSAGE } from "../constants";
 export interface UserProfileListing {
     listing_id: number;
     listing_name: string;
@@ -30,7 +30,7 @@ export interface FetchUserProfileAction {
 
 export interface FetchUserProfileErrorAction {
     type: ActionTypes.FETCH_USER_PROFILE_ERROR;
-    payload: {};
+    payload: { error: string };
 }
 export const fetchUserProfile = () => async (dispatch: Dispatch) => {
     try {
@@ -42,7 +42,7 @@ export const fetchUserProfile = () => async (dispatch: Dispatch) => {
     } catch (error) {
         dispatch<FetchUserProfileErrorAction>({
             type: ActionTypes.FETCH_USER_PROFILE_ERROR,
-            payload: {},
+            payload: { error: SERVER_ERROR_MESSAGE },
         });
     }
 };

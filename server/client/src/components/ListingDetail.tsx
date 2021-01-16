@@ -6,6 +6,7 @@ import { StoreState } from "../reducers";
 import {
     ListingDetail as ListingDetailType,
     fetchListingDetail,
+    ServerError,
 } from "../actions";
 import postAdListingImagePlaceHolder from "../img/postAdListingImagePlaceHolder.png";
 import defaultProfilePic from "../img/defaultProfilePic.jpg";
@@ -28,6 +29,15 @@ const ListingDetail: React.FC<ListingDetailProps> = (props) => {
             return (
                 <div className="loadingCenter">
                     <Loading />
+                </div>
+            );
+            //too lazy to fix ts error, but I get the idea
+        } else if (props.listingDetail.error) {
+            return (
+                <div className="serverErrorContainer">
+                    <h3 className="serverErrorText">
+                        {props.listingDetail.error}
+                    </h3>
                 </div>
             );
         } else {

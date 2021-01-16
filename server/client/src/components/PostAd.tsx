@@ -7,6 +7,8 @@ import { StoreState } from "../reducers";
 import { createListing, Listing } from "../actions/listing";
 import jwt_decode from "jwt-decode";
 import CookieService from "../CookieService";
+import { ListingDataResponse } from "../reducers/listingReducer";
+import Loading from "./Loading";
 
 export interface PostAdFormProps {
     onSubmit(formValues: any): void;
@@ -19,6 +21,7 @@ export interface PostAdFormProps {
 
 export interface PostAdProps {
     createListing(formValues: any): void;
+    listingInfo: ListingDataResponse;
 }
 
 const PostAd: React.FC<PostAdProps> = (props) => {
@@ -29,7 +32,6 @@ const PostAd: React.FC<PostAdProps> = (props) => {
     const onSubmitPostListing = async (formValues: any) => {
         props.createListing(formValues);
     };
-
     return (
         <div className="postAdPageContainer">
             <h1>Post Your Ad, it's fast and easy</h1>
@@ -44,4 +46,10 @@ const PostAd: React.FC<PostAdProps> = (props) => {
     );
 };
 
-export default connect(null, { createListing })(requireAuth(PostAd));
+const mapStateToProps = (state: StoreState) => {
+    return {
+        listingInfo: state.listingInfo,
+    };
+};
+
+export default connect(mapStateToProps, { createListing })(requireAuth(PostAd));
