@@ -18,14 +18,14 @@ export const categoriesForListing = async (req: Request, res: Response) => {
 export const createListing = async (req: Request, res: Response) => {
     // console.log(req.body);
 
-    const title = req.body.title;
-    const description = req.body.description;
+    const listing_name = req.body.title;
+    const listing_description = req.body.description;
     const category = req.body.category;
-    const image = req.body.cloudinaryImagePath; //can be null if cloduinaryImagePath is not given
+    const listing_image = req.body.cloudinaryImagePath; //can be null if cloduinaryImagePath is not given
     const province = req.body.province;
     const city = req.body.city;
     const street = req.body.street;
-    const price = req.body.price;
+    const listing_price = req.body.price;
     const email = req.body.subject;
 
     try {
@@ -43,11 +43,11 @@ export const createListing = async (req: Request, res: Response) => {
             ` INSERT INTO listing(listing_name, listing_price, listing_description, 
                 category_id, listing_image, province, city, street)VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;`,
             [
-                title,
-                price,
-                description,
+                listing_name,
+                listing_price,
+                listing_description,
                 categoryId,
-                image,
+                listing_image,
                 province,
                 city,
                 street,
@@ -58,13 +58,13 @@ export const createListing = async (req: Request, res: Response) => {
             `SELECT user_id FROM  user_info WHERE email = $1`,
             [email]
         );
-        const userId = userInfoResponse.rows[0].user_id;
+        const user_id = userInfoResponse.rows[0].user_id;
 
-        const listingId = response.rows[0].listing_id;
+        const listing_id = response.rows[0].listing_id;
 
         await pool.query(
             `INSERT INTO lookup_listing_user(user_id, listing_id)VALUES($1, $2)`,
-            [userId, listingId]
+            [user_id, listing_id]
         );
         //For our full-text-search; if user mispelt words in the search bar, we would still give them the intended word they
         //are trying to search
@@ -73,20 +73,20 @@ export const createListing = async (req: Request, res: Response) => {
             `UPDATE listing d1  
             SET name_tokens = to_tsvector(d1.listing_name)  
             FROM listing d2 WHERE d1.listing_id = $1;`,
-            [listingId]
+            [listing_id]
         );
 
         await pool.query("COMMIT");
         res.send({
-            id: listingId,
-            title,
-            description,
+            listing_id,
+            listing_name,
+            listing_description,
             category,
-            image,
+            listing_image,
             province,
             city,
             street,
-            price,
+            listing_price,
         });
     } catch (error) {
         pool.query("ROLLBACK");
@@ -371,6 +371,84 @@ export const getListingDetail = async (req: Request, res: Response) => {
         res.send({ ...sendObj, ...response.rows[0] });
     } catch (error) {
         console.log(error);
+        return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+    }
+};
+
+export const editListing = async (req: Request, res: Response) => {
+    const listing_id = req.params.id;
+    const listing_name = req.body.title;
+    const listing_description = req.body.description;
+    const category = req.body.category;
+    const listing_image = req.body.cloudinaryImagePath; //can be null if cloduinaryImagePath is not given
+    const province = req.body.province;
+    const city = req.body.city;
+    const street = req.body.street;
+    const listing_price = req.body.price;
+
+    try {
+        //Using transactions with psql pool:
+        //https://kb.objectrocket.com/postgresql/nodejs-and-the-postgres-transaction-968
+        await pool.query("BEGIN");
+
+        let categoryQuery = await pool.query(
+            `SELECT category_id FROM category WHERE category_name = $1;`,
+            [category]
+        );
+        let categoryId = categoryQuery.rows[0].category_id;
+
+        const response = await pool.query(
+            ` UPDATE listing SET 
+            listing_name = $1, 
+            listing_price = $2, 
+            listing_description = $3,
+            category_id = $4, 
+            listing_image = $5, 
+            province =$6,
+            city = $7, 
+            street =$8
+            WHERE listing_id = $9 
+            RETURNING
+            listing_name,
+            listing_price,
+            listing_description,
+            category_id,
+            listing_image,
+            province,
+            city,
+            street;`,
+            [
+                listing_name,
+                listing_price,
+                listing_description,
+                categoryId,
+                listing_image,
+                province,
+                city,
+                street,
+                listing_id,
+            ]
+        );
+
+        //For our full-text-search; if user mispelt words in the search bar, we would still give them the intended word they
+        //are trying to search
+        //https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
+        await pool.query(
+            `UPDATE listing d1  
+            SET name_tokens = to_tsvector(d1.listing_name)  
+            FROM listing d2 WHERE d1.listing_id = $1;`,
+            [listing_id]
+        );
+
+        await pool.query("COMMIT");
+
+        res.send({
+            listing_id,
+            ...response.rows[0],
+        });
+    } catch (error) {
+        pool.query("ROLLBACK");
+        console.log("ROLLBACK TRIGGERED", error);
         return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
     }
 };

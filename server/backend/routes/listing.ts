@@ -7,6 +7,7 @@ import {
     getCategoryId,
     sortByHelper,
     getListingDetail,
+    editListing,
 } from "../controllers/listing";
 const listingRouter = Router();
 
@@ -40,5 +41,6 @@ listingRouter.get(
 );
 
 listingRouter.get("/listing/:id", getListingDetail);
+listingRouter.patch("/listing/:id/edit", editListing);
 
 export default listingRouter;

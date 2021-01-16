@@ -50,7 +50,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getListingDetail = exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
+exports.editListing = exports.getListingDetail = exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
@@ -71,18 +71,18 @@ var categoriesForListing = function (req, res) { return __awaiter(void 0, void 0
 }); };
 exports.categoriesForListing = categoriesForListing;
 var createListing = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, description, category, image, province, city, street, price, email, categoryQuery, categoryId, response_1, userInfoResponse, userId, listingId, error_1;
+    var listing_name, listing_description, category, listing_image, province, city, street, listing_price, email, categoryQuery, categoryId, response_1, userInfoResponse, user_id, listing_id, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                title = req.body.title;
-                description = req.body.description;
+                listing_name = req.body.title;
+                listing_description = req.body.description;
                 category = req.body.category;
-                image = req.body.cloudinaryImagePath;
+                listing_image = req.body.cloudinaryImagePath;
                 province = req.body.province;
                 city = req.body.city;
                 street = req.body.street;
-                price = req.body.price;
+                listing_price = req.body.price;
                 email = req.body.subject;
                 _a.label = 1;
             case 1:
@@ -99,11 +99,11 @@ var createListing = function (req, res) { return __awaiter(void 0, void 0, void 
                 categoryQuery = _a.sent();
                 categoryId = categoryQuery.rows[0].category_id;
                 return [4 /*yield*/, databasePool_1.default.query(" INSERT INTO listing(listing_name, listing_price, listing_description, \n                category_id, listing_image, province, city, street)VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;", [
-                        title,
-                        price,
-                        description,
+                        listing_name,
+                        listing_price,
+                        listing_description,
                         categoryId,
-                        image,
+                        listing_image,
                         province,
                         city,
                         street,
@@ -113,15 +113,15 @@ var createListing = function (req, res) { return __awaiter(void 0, void 0, void 
                 return [4 /*yield*/, databasePool_1.default.query("SELECT user_id FROM  user_info WHERE email = $1", [email])];
             case 5:
                 userInfoResponse = _a.sent();
-                userId = userInfoResponse.rows[0].user_id;
-                listingId = response_1.rows[0].listing_id;
-                return [4 /*yield*/, databasePool_1.default.query("INSERT INTO lookup_listing_user(user_id, listing_id)VALUES($1, $2)", [userId, listingId])];
+                user_id = userInfoResponse.rows[0].user_id;
+                listing_id = response_1.rows[0].listing_id;
+                return [4 /*yield*/, databasePool_1.default.query("INSERT INTO lookup_listing_user(user_id, listing_id)VALUES($1, $2)", [user_id, listing_id])];
             case 6:
                 _a.sent();
                 //For our full-text-search; if user mispelt words in the search bar, we would still give them the intended word they
                 //are trying to search
                 //https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
-                return [4 /*yield*/, databasePool_1.default.query("UPDATE listing d1  \n            SET name_tokens = to_tsvector(d1.listing_name)  \n            FROM listing d2 WHERE d1.listing_id = $1;", [listingId])];
+                return [4 /*yield*/, databasePool_1.default.query("UPDATE listing d1  \n            SET name_tokens = to_tsvector(d1.listing_name)  \n            FROM listing d2 WHERE d1.listing_id = $1;", [listing_id])];
             case 7:
                 //For our full-text-search; if user mispelt words in the search bar, we would still give them the intended word they
                 //are trying to search
@@ -131,15 +131,15 @@ var createListing = function (req, res) { return __awaiter(void 0, void 0, void 
             case 8:
                 _a.sent();
                 res.send({
-                    id: listingId,
-                    title: title,
-                    description: description,
+                    listing_id: listing_id,
+                    listing_name: listing_name,
+                    listing_description: listing_description,
                     category: category,
-                    image: image,
+                    listing_image: listing_image,
                     province: province,
                     city: city,
                     street: street,
-                    price: price,
+                    listing_price: listing_price,
                 });
                 return [3 /*break*/, 10];
             case 9:
@@ -405,3 +405,68 @@ var getListingDetail = function (req, res) { return __awaiter(void 0, void 0, vo
     });
 }); };
 exports.getListingDetail = getListingDetail;
+var editListing = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var listing_id, listing_name, listing_description, category, listing_image, province, city, street, listing_price, categoryQuery, categoryId, response_4, error_3;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                listing_id = req.params.id;
+                listing_name = req.body.title;
+                listing_description = req.body.description;
+                category = req.body.category;
+                listing_image = req.body.cloudinaryImagePath;
+                province = req.body.province;
+                city = req.body.city;
+                street = req.body.street;
+                listing_price = req.body.price;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 7, , 8]);
+                //Using transactions with psql pool:
+                //https://kb.objectrocket.com/postgresql/nodejs-and-the-postgres-transaction-968
+                return [4 /*yield*/, databasePool_1.default.query("BEGIN")];
+            case 2:
+                //Using transactions with psql pool:
+                //https://kb.objectrocket.com/postgresql/nodejs-and-the-postgres-transaction-968
+                _a.sent();
+                return [4 /*yield*/, databasePool_1.default.query("SELECT category_id FROM category WHERE category_name = $1;", [category])];
+            case 3:
+                categoryQuery = _a.sent();
+                categoryId = categoryQuery.rows[0].category_id;
+                return [4 /*yield*/, databasePool_1.default.query(" UPDATE listing SET \n            listing_name = $1, \n            listing_price = $2, \n            listing_description = $3,\n            category_id = $4, \n            listing_image = $5, \n            province =$6,\n            city = $7, \n            street =$8\n            WHERE listing_id = $9 \n            RETURNING\n            listing_name,\n            listing_price,\n            listing_description,\n            category_id,\n            listing_image,\n            province,\n            city,\n            street;", [
+                        listing_name,
+                        listing_price,
+                        listing_description,
+                        categoryId,
+                        listing_image,
+                        province,
+                        city,
+                        street,
+                        listing_id,
+                    ])];
+            case 4:
+                response_4 = _a.sent();
+                //For our full-text-search; if user mispelt words in the search bar, we would still give them the intended word they
+                //are trying to search
+                //https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
+                return [4 /*yield*/, databasePool_1.default.query("UPDATE listing d1  \n            SET name_tokens = to_tsvector(d1.listing_name)  \n            FROM listing d2 WHERE d1.listing_id = $1;", [listing_id])];
+            case 5:
+                //For our full-text-search; if user mispelt words in the search bar, we would still give them the intended word they
+                //are trying to search
+                //https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
+                _a.sent();
+                return [4 /*yield*/, databasePool_1.default.query("COMMIT")];
+            case 6:
+                _a.sent();
+                res.send(__assign({ listing_id: listing_id }, response_4.rows[0]));
+                return [3 /*break*/, 8];
+            case 7:
+                error_3 = _a.sent();
+                databasePool_1.default.query("ROLLBACK");
+                console.log("ROLLBACK TRIGGERED", error_3);
+                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
+            case 8: return [2 /*return*/];
+        }
+    });
+}); };
+exports.editListing = editListing;
