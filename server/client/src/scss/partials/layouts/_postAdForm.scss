@@ -134,7 +134,7 @@
 .imageUploadWrapper {
     display: flex;
     flex-direction: column;
-
+    max-width: 10rem;
     .postAdChooseListingImage {
         width: 10rem;
         padding: 2rem;

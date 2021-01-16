@@ -20,6 +20,8 @@ const listingReducer = (
         //    return { ...state, ..._.mapKeys(action.payload, "listing_id") };
         case ActionTypes.FETCH_LISTING_DETAIL:
             return { ...state, data: action.payload };
+        case ActionTypes.EDIT_LISTING:
+            return { ...state, data: action.payload };
         default:
             return state;
     }

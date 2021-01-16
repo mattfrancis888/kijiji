@@ -79,6 +79,11 @@ export interface FetchListingDetailAction {
     payload: ListingDetail;
 }
 
+export interface EditListingAction {
+    type: ActionTypes.EDIT_LISTING;
+    payload: Listing;
+}
+
 export const fetchCategoriesForListing = () => async (dispatch: Dispatch) => {
     try {
         const response = await axios.get<[]>("/categories-for-listing");
@@ -242,6 +247,55 @@ export const fetchListingDetail = (listingId: string) => async (
             payload: response.data,
         });
     } catch (error) {
+        dispatch<ListingErrorAction>({
+            type: ActionTypes.LISTING_ERROR,
+            payload: { error: SERVER_ERROR_MESSAGE },
+        });
+    }
+};
+
+export const editListing = (formValues: any) => async (dispatch: Dispatch) => {
+    try {
+        //Distributed transaction takes place here, if an error occurs in uploading to one of the storage systems,
+        // we haven't handle it (i.e an image may be uploaded, but the data failed to be inserted; the image wouldn't be deleted)
+
+        //Form data is used to POST a file (image in our case)
+        //https://stackoverflow.com/questions/43013858/how-to-post-a-file-from-a-form-with-axios
+
+        let cloudinaryImagePath = {};
+        if (formValues.image) {
+            let formData = new FormData();
+            formData.append("image", formValues.image[0]);
+
+            const imagePathResponse = await axios.post<CloudinaryImagePath>(
+                "/upload-image",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+            dispatch<UploadImageToCloudinaryAction>({
+                type: ActionTypes.UPLOAD_IMAGE_TO_CLOUDINARY,
+                payload: imagePathResponse.data,
+            });
+
+            cloudinaryImagePath = imagePathResponse.data;
+        }
+
+        const listingResponse = await axios.post<Listing>("/create-listing", {
+            ...cloudinaryImagePath,
+            ...formValues,
+        });
+
+        dispatch<EditListingAction>({
+            type: ActionTypes.EDIT_LISTING,
+            payload: listingResponse.data,
+        });
+        // history.push("/profile");
+    } catch (error) {
+        alert(SERVER_ERROR_MESSAGE);
         dispatch<ListingErrorAction>({
             type: ActionTypes.LISTING_ERROR,
             payload: { error: SERVER_ERROR_MESSAGE },

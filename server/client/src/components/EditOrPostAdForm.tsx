@@ -17,6 +17,7 @@ import { formValueSelector } from "redux-form";
 import { fetchCategoriesForListing } from "../actions";
 import Loading from "./Loading";
 import { SERVER_ERROR_MESSAGE } from "../constants";
+import { initial } from "lodash";
 
 export interface PostAdFormValues {
     title: string;
@@ -127,6 +128,15 @@ const PostAdForm: React.FC<
     const onSubmit = (formValues: any, dispatch: any) => {
         props.onSubmit(formValues);
     };
+
+    const [listingImage, setListingImage] = useState(null);
+    useEffect(() => {
+        if (props.initialValues)
+            if (props.initialValues.image)
+                setListingImage(props.initialValues.image);
+    }, []);
+
+    const openFileExplorer = useRef(null);
 
     const renderFields = (): JSX.Element => {
         if (props.categories.length === 0) {
@@ -331,10 +341,6 @@ const PostAdForm: React.FC<
             />
         );
     };
-
-    const [listingImage, setListingImage] = useState(null);
-
-    const openFileExplorer = useRef(null);
 
     return <React.Fragment>{renderFields()}</React.Fragment>;
 };

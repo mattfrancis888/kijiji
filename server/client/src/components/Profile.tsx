@@ -12,6 +12,7 @@ import emptyBox from "../img/emptyBox.svg";
 import { fetchUserProfile } from "../actions";
 import Listing from "./Listing";
 import { Listing as ListingType } from "../actions";
+import requireAuth from "./requireAuth";
 interface ProfileProps {
     fetchUserProfile(): void;
     profileInfo: any;
@@ -95,4 +96,6 @@ const mapStateToProps = (state: StoreState) => {
     return { profileInfo: state.profileInfo.data };
 };
 
-export default connect(mapStateToProps, { fetchUserProfile })(Profile);
+export default connect(mapStateToProps, { fetchUserProfile })(
+    requireAuth(Profile)
+);
