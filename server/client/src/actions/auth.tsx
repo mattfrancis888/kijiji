@@ -23,9 +23,7 @@ export const signUp = (formValues: any) => async (dispatch: Dispatch) => {
             type: ActionTypes.AUTH_USER,
             payload: response.data,
         });
-        //Save token to local storage so that we could persist login state, keep user log in
-        // localStorage.setItem("token", response.data.token);
-        // history.push("/walkman");
+        history.push("/listings/1");
     } catch (err) {
         dispatch<AuthErrorAction>({
             type: ActionTypes.AUTH_ERROR,
@@ -40,9 +38,7 @@ export const signIn = (formValues: any) => async (dispatch: Dispatch) => {
             type: ActionTypes.AUTH_USER,
             payload: response.data,
         });
-        //Save token to local storage so that we could persist login state, keep user log in
-        //localStorage.setItem("token", response.data.token);
-        //history.push("/walkman");
+        history.push("/listings/1");
     } catch (err) {
         // if (err.message === "Network Error") {
         //     console.log("check error", err);
@@ -62,6 +58,7 @@ export const signOut = () => async (dispatch: Dispatch) => {
             type: ActionTypes.AUTH_USER,
             payload: response.data,
         });
+        history.push("/signin");
         alert("Logged out succesfully");
     } catch (err) {
         alert("Log out failed, try again");

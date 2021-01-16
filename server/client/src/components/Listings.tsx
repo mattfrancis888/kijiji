@@ -104,10 +104,13 @@ const Listings: React.FC<IListings> = (props) => {
                 </div>
             );
         } else {
-            // console.log("listingInfo", props.listingInfo);
             if (props.listingInfo.listings.length === 0) {
                 //When users enter an invalid page number in the url
-                return <h2>There seems to be nothing to show here...</h2>;
+                return (
+                    <h2 className="nothingToShow">
+                        There seems to be nothing to show here...
+                    </h2>
+                );
             }
 
             return (

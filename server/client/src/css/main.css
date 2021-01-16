@@ -753,6 +753,7 @@ body {
   color: #2681db;
   position: relative;
   z-index: 1;
+  cursor: pointer;
 }
 
 .listingDetailShowMoreTextHide {
@@ -974,6 +975,10 @@ nav {
   background-color: white;
   padding: 1rem 2rem;
 }
+nav .logo {
+  cursor: pointer;
+}
+
 .headerInfoWrap {
   display: flex;
   align-items: center;
@@ -1386,6 +1391,7 @@ nav {
   margin-bottom: 2rem;
   padding: 1rem;
   align-items: center;
+  cursor: pointer;
 }
 
 .listingPreviewImageContainer {
@@ -1539,6 +1545,7 @@ nav {
 .pageItemSelected {
   padding: 0.5rem 1rem;
   font-size: 1.3rem;
+  cursor: pointer;
 }
 @media screen and (min-width: 520px) {
   .pageItem,
@@ -1732,6 +1739,11 @@ nav {
   color: #373373;
   font-size: 1.4rem;
   font-weight: 300;
+}
+
+.nothingToShow {
+  text-align: center;
+  margin: 4rem;
 }
 
 /*# sourceMappingURL=main.css.map */
