@@ -16,6 +16,8 @@ import { CANADIAN_PROVINCES, CANADIAN_PROVINCE_AND_CITIES } from "../constants";
 import { formValueSelector } from "redux-form";
 import { fetchCategoriesForListing } from "../actions";
 import Loading from "./Loading";
+import { SERVER_ERROR_MESSAGE } from "../constants";
+
 export interface PostAdFormValues {
     title: string;
     description: string;
@@ -127,13 +129,19 @@ const PostAdForm: React.FC<
     };
 
     const renderFields = (): JSX.Element => {
-        if (props.categories.length === 0)
+        if (props.categories.length === 0) {
             return (
                 <div className="loadingCenter">
                     <Loading />
                 </div>
             );
-        else {
+        } else if (props.categories[0] === SERVER_ERROR_MESSAGE) {
+            return (
+                <div className="serverErrorContainer">
+                    <h3 className="serverErrorText">{props.categories[0]}</h3>
+                </div>
+            );
+        } else {
             return (
                 <form
                     className="postAdForm"

@@ -10,13 +10,14 @@ import multer from "multer";
 //4. Change getlsitingDetail camelcase to _
 export const categoriesForListing = async (req: Request, res: Response) => {
     pool.query(`SELECT category_name FROM category`, (error, category) => {
-        if (error) return res.send(INTERNAL_SERVER_ERROR_STATUS);
+        if (error) return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
 
         res.send(category.rows.map((category) => category.category_name));
     });
 };
 export const createListing = async (req: Request, res: Response) => {
     // console.log(req.body);
+
     const title = req.body.title;
     const description = req.body.description;
     const category = req.body.category;
