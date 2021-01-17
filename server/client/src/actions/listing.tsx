@@ -254,7 +254,9 @@ export const fetchListingDetail = (listingId: string) => async (
     }
 };
 
-export const editListing = (formValues: any) => async (dispatch: Dispatch) => {
+export const editListing = (formValues: any, listingId: string) => async (
+    dispatch: Dispatch
+) => {
     try {
         //Distributed transaction takes place here, if an error occurs in uploading to one of the storage systems,
         // we haven't handle it (i.e an image may be uploaded, but the data failed to be inserted; the image wouldn't be deleted)
@@ -263,12 +265,12 @@ export const editListing = (formValues: any) => async (dispatch: Dispatch) => {
         //https://stackoverflow.com/questions/43013858/how-to-post-a-file-from-a-form-with-axios
 
         let cloudinaryImagePath = {};
-        if (formValues.image) {
+        if (formValues.image instanceof File) {
             let formData = new FormData();
             formData.append("image", formValues.image[0]);
 
-            const imagePathResponse = await axios.post<CloudinaryImagePath>(
-                "/upload-image",
+            const imagePathResponse = await axios.put<CloudinaryImagePath>(
+                "/edit-image/op5zynuvystrayhfcgp7",
                 formData,
                 {
                     headers: {
@@ -284,10 +286,13 @@ export const editListing = (formValues: any) => async (dispatch: Dispatch) => {
             cloudinaryImagePath = imagePathResponse.data;
         }
 
-        const listingResponse = await axios.post<Listing>("/create-listing", {
-            ...cloudinaryImagePath,
-            ...formValues,
-        });
+        const listingResponse = await axios.patch<Listing>(
+            `/listing/${listingId}/edit`,
+            {
+                ...cloudinaryImagePath,
+                ...formValues,
+            }
+        );
 
         dispatch<EditListingAction>({
             type: ActionTypes.EDIT_LISTING,
@@ -296,9 +301,9 @@ export const editListing = (formValues: any) => async (dispatch: Dispatch) => {
         // history.push("/profile");
     } catch (error) {
         alert(SERVER_ERROR_MESSAGE);
-        dispatch<ListingErrorAction>({
-            type: ActionTypes.LISTING_ERROR,
-            payload: { error: SERVER_ERROR_MESSAGE },
-        });
+        // dispatch<ListingErrorAction>({
+        //     type: ActionTypes.LISTING_ERROR,
+        //     payload: { error: SERVER_ERROR_MESSAGE },
+        // });
     }
 };

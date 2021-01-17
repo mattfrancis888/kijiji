@@ -113,16 +113,45 @@ cloudinary.config({
     api_secret: process.env.cloudinary_secret,
 });
 
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: "kijiji",
-        format: async (req, file) => "jpg",
-    },
-});
-const multerUploader = multer({ storage });
-const upload = multerUploader.single("image");
 export const uploadImage = async (req: any, res: Response) => {
+    //Unable ot use async await with upload()
+    //Wants 3 arguments
+    const storage = new CloudinaryStorage({
+        cloudinary: cloudinary,
+        params: {
+            folder: "kijiji",
+            format: async (req, file) => "jpg",
+        },
+    });
+    const multerUploader = multer({ storage });
+    const upload = multerUploader.single("image");
+
+    upload(req, res, (err: any) => {
+        if (err instanceof multer.MulterError) {
+            return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+            // A Multer error occurred when uploading.
+        } else if (err) {
+            // An unknown error occurred when uploading.
+            return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+        }
+        return res.send({ cloudinaryImagePath: req.file.path });
+
+        // Everything went fine and save document in DB here.
+    });
+};
+
+export const editImage = async (req: any, res: Response) => {
+    console.log("publicId", req.params.publicId);
+    const storage = new CloudinaryStorage({
+        cloudinary: cloudinary,
+        params: {
+            folder: "kijiji",
+            format: async (req, file) => "jpg",
+            public_id: req.params.publicId,
+        },
+    });
+    const multerUploader = multer({ storage });
+    const upload = multerUploader.single("image");
     //Unable ot use async await with upload()
     //Wants 3 arguments
     upload(req, res, (err: any) => {
@@ -377,6 +406,7 @@ export const getListingDetail = async (req: Request, res: Response) => {
 
 export const editListing = async (req: Request, res: Response) => {
     const listing_id = req.params.id;
+    console.log("edit listing body", req.body);
     const listing_name = req.body.title;
     const listing_description = req.body.description;
     const category = req.body.category;

@@ -8,6 +8,7 @@ import {
     sortByHelper,
     getListingDetail,
     editListing,
+    editImage,
 } from "../controllers/listing";
 const listingRouter = Router();
 
@@ -42,5 +43,6 @@ listingRouter.get(
 
 listingRouter.get("/listing/:id", getListingDetail);
 listingRouter.patch("/listing/:id/edit", editListing);
+listingRouter.put("/edit-image/:id", editImage);
 
 export default listingRouter;

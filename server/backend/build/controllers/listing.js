@@ -50,7 +50,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editListing = exports.getListingDetail = exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
+exports.editListing = exports.getListingDetail = exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.editImage = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
@@ -160,19 +160,52 @@ cloudinary.config({
     api_key: process.env.cloudinary_api_key,
     api_secret: process.env.cloudinary_secret,
 });
-var storage = new multer_storage_cloudinary_1.CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: "kijiji",
-        format: function (req, file) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-            return [2 /*return*/, "jpg"];
-        }); }); },
-    },
-});
-var multerUploader = multer_1.default({ storage: storage });
-var upload = multerUploader.single("image");
 var uploadImage = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var storage, multerUploader, upload;
     return __generator(this, function (_a) {
+        storage = new multer_storage_cloudinary_1.CloudinaryStorage({
+            cloudinary: cloudinary,
+            params: {
+                folder: "kijiji",
+                format: function (req, file) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
+                    return [2 /*return*/, "jpg"];
+                }); }); },
+            },
+        });
+        multerUploader = multer_1.default({ storage: storage });
+        upload = multerUploader.single("image");
+        upload(req, res, function (err) {
+            if (err instanceof multer_1.default.MulterError) {
+                return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
+                // A Multer error occurred when uploading.
+            }
+            else if (err) {
+                // An unknown error occurred when uploading.
+                return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
+            }
+            return res.send({ cloudinaryImagePath: req.file.path });
+            // Everything went fine and save document in DB here.
+        });
+        return [2 /*return*/];
+    });
+}); };
+exports.uploadImage = uploadImage;
+var editImage = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var storage, multerUploader, upload;
+    return __generator(this, function (_a) {
+        console.log("publicId", req.params.publicId);
+        storage = new multer_storage_cloudinary_1.CloudinaryStorage({
+            cloudinary: cloudinary,
+            params: {
+                folder: "kijiji",
+                format: function (req, file) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
+                    return [2 /*return*/, "jpg"];
+                }); }); },
+                public_id: req.params.publicId,
+            },
+        });
+        multerUploader = multer_1.default({ storage: storage });
+        upload = multerUploader.single("image");
         //Unable ot use async await with upload()
         //Wants 3 arguments
         upload(req, res, function (err) {
@@ -190,7 +223,7 @@ var uploadImage = function (req, res) { return __awaiter(void 0, void 0, void 0,
         return [2 /*return*/];
     });
 }); };
-exports.uploadImage = uploadImage;
+exports.editImage = editImage;
 var getCategoryId = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var category, categoryQueryResponse, err_1;
     return __generator(this, function (_a) {
@@ -411,6 +444,7 @@ var editListing = function (req, res) { return __awaiter(void 0, void 0, void 0,
         switch (_a.label) {
             case 0:
                 listing_id = req.params.id;
+                console.log("edit listing body", req.body);
                 listing_name = req.body.title;
                 listing_description = req.body.description;
                 category = req.body.category;

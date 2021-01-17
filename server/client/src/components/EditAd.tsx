@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import jwt_decode from "jwt-decode";
 import CookieService from "../CookieService";
+import { editListing } from "../actions/listing";
 import { ListingDataResponse } from "../reducers/listingReducer";
 import Loading from "./Loading";
 
@@ -17,6 +18,7 @@ import {
 
 export interface EditAdProps {
     fetchListingDetail(listingId: string): void;
+    editListing(formValues: any, id: string): void;
     match: any;
     listingDetail: ListingDetailType;
 }
@@ -49,12 +51,12 @@ const EditAd: React.FC<EditAdProps> = (props) => {
                 street,
                 listing_price,
             } = props.listingDetail;
-            console.log(props.listingDetail);
+
             return (
                 <div className="editAdPageContainer">
                     <h1>Edit Your Ad</h1>
                     <EditOrPostAdForm
-                        onSubmit={onSubmitPostListing}
+                        onSubmit={onEditListing}
                         initialValues={{
                             title: listing_name,
                             description: listing_description,
@@ -74,8 +76,10 @@ const EditAd: React.FC<EditAdProps> = (props) => {
     useEffect(() => {
         props.fetchListingDetail(props.match.params.id);
     }, []);
-    const onSubmitPostListing = async (formValues: any) => {
-        //  props.createListing(formValues);
+
+    const onEditListing = async (formValues: any) => {
+        console.log("editAds", formValues);
+        props.editListing(formValues, props.match.params.id);
     };
     return renderContent();
 };
@@ -86,6 +90,6 @@ const mapStateToProps = (state: StoreState) => {
     };
 };
 
-export default connect(mapStateToProps, { fetchListingDetail })(
-    requireAuth(EditAd)
+export default connect(mapStateToProps, { editListing, fetchListingDetail })(
+    EditAd
 );

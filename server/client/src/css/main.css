@@ -1300,9 +1300,10 @@ nav .logo {
   }
 }
 
+.deleteAd,
 .postAdFormSubmit {
   cursor: pointer;
-  padding: 1.3rem 2.5rem;
+  padding: 1rem 2rem;
   border-radius: 0.5rem;
   margin: 1rem 0;
   font-weight: bold;
@@ -1312,8 +1313,21 @@ nav .logo {
   color: white;
 }
 @media screen and (min-width: 520px) {
-  .postAdFormSubmit {
+  .deleteAd,
+.postAdFormSubmit {
     font-size: 1.4rem;
+    padding: 1.3rem 2.5rem;
+  }
+}
+
+.deleteAd {
+  background-color: red;
+  border-color: red;
+  margin-left: 0.5rem;
+}
+@media screen and (min-width: 520px) {
+  .deleteAd {
+    margin-left: 2.5rem;
   }
 }
 
@@ -1400,6 +1414,7 @@ nav .logo {
 .imageUploadWrapper .removeUploadedImage {
   color: red;
   text-align: center;
+  cursor: pointer;
 }
 
 .listingPreviewContainer {

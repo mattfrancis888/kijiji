@@ -12,4 +12,5 @@ listingRouter.get("/listing-lowest-price/:page", listing_1.getCategoryId, listin
 listingRouter.get("/listing-highest-price/:page", listing_1.getCategoryId, listing_1.getSortedListingCount, listing_1.sortByHelper("listing_price", "DESC"));
 listingRouter.get("/listing/:id", listing_1.getListingDetail);
 listingRouter.patch("/listing/:id/edit", listing_1.editListing);
+listingRouter.put("/edit-image/:id", listing_1.editImage);
 exports.default = listingRouter;

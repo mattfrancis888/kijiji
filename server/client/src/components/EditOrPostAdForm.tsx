@@ -18,6 +18,7 @@ import { fetchCategoriesForListing } from "../actions";
 import Loading from "./Loading";
 import { SERVER_ERROR_MESSAGE } from "../constants";
 import { initial } from "lodash";
+import { useLocation } from "react-router-dom";
 
 export interface PostAdFormValues {
     title: string;
@@ -125,6 +126,8 @@ const renderFieldSectionLayout = (title: string, children: JSX.Element) => {
 const PostAdForm: React.FC<
     PostAdFormProps & InjectedFormProps<{}, PostAdFormProps>
 > = (props) => {
+    const location = useLocation();
+
     const onSubmit = (formValues: any, dispatch: any) => {
         props.onSubmit(formValues);
     };
@@ -299,7 +302,18 @@ const PostAdForm: React.FC<
                         />
                     )}
 
-                    <button className="postAdFormSubmit">Post Your Ad</button>
+                    <button className="postAdFormSubmit">
+                        {location.pathname === "/post-ad"
+                            ? "Post Your Ad"
+                            : "Edit Your Ad"}
+                    </button>
+                    {location.pathname === "/post-ad" ? (
+                        ""
+                    ) : (
+                        <button className="deleteAd" type="button">
+                            Delete Ad
+                        </button>
+                    )}
                 </form>
             );
         }
