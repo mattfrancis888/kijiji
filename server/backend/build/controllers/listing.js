@@ -193,7 +193,7 @@ exports.uploadImage = uploadImage;
 var editImage = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var storage, multerUploader, upload;
     return __generator(this, function (_a) {
-        console.log("publicId", req.params.publicId);
+        console.log("publicId", req.params.cloudinaryPublicId);
         storage = new multer_storage_cloudinary_1.CloudinaryStorage({
             cloudinary: cloudinary,
             params: {
@@ -201,7 +201,7 @@ var editImage = function (req, res) { return __awaiter(void 0, void 0, void 0, f
                 format: function (req, file) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
                     return [2 /*return*/, "jpg"];
                 }); }); },
-                public_id: req.params.publicId,
+                public_id: req.params.cloudinaryPublicId,
             },
         });
         multerUploader = multer_1.default({ storage: storage });
@@ -444,7 +444,6 @@ var editListing = function (req, res) { return __awaiter(void 0, void 0, void 0,
         switch (_a.label) {
             case 0:
                 listing_id = req.params.id;
-                console.log("edit listing body", req.body);
                 listing_name = req.body.title;
                 listing_description = req.body.description;
                 category = req.body.category;

@@ -265,7 +265,9 @@ export const editListing = (formValues: any, listingId: string) => async (
         //https://stackoverflow.com/questions/43013858/how-to-post-a-file-from-a-form-with-axios
 
         let cloudinaryImagePath = {};
-        if (formValues.image instanceof File) {
+        console.log("typeof image", typeof formValues.image);
+        if (formValues.image instanceof FileList) {
+            console.log("instance of file");
             let formData = new FormData();
             formData.append("image", formValues.image[0]);
 

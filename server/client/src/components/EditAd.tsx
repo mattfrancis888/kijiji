@@ -61,12 +61,12 @@ const EditAd: React.FC<EditAdProps> = (props) => {
                             title: listing_name,
                             description: listing_description,
                             category: category_name,
-                            image: listing_image,
                             province,
                             city,
                             street,
                             price: listing_price,
                         }}
+                        cloudinaryImage={listing_image}
                     />
                 </div>
             );

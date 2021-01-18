@@ -39,6 +39,25 @@ const renderError = ({ error, touched }: any) => {
     }
 };
 
+const renderAutoFocusTextInput = ({ input, label, meta, placeHolder }: any) => {
+    //I think there's a bug with the librrary
+    //If we have initialValues set for the form and then we don't have an autofocs on for a field
+    //refs such as openFileExplorer will not be generated until a text is actualy focused.
+    //If we remove the initialValues, refs will be rendered.
+    return (
+        <div>
+            {/* <label>{label}</label> */}
+            <input
+                className="createPostAdInputs"
+                {...input}
+                autoComplete="off"
+                autoFocus
+            />
+            {renderError(meta)}
+        </div>
+    );
+};
+
 const renderTextInput = ({ input, label, meta, placeHolder }: any) => {
     //"component" property automatically passes props to argument, it has {input properties and meta properties}
     //"label" automatically passes props to arguments
@@ -127,19 +146,72 @@ const PostAdForm: React.FC<
     PostAdFormProps & InjectedFormProps<{}, PostAdFormProps>
 > = (props) => {
     const location = useLocation();
+    const openFileExplorer = useRef(null);
+    const [listingImage, setListingImage] = useState(null);
+    useEffect(() => {
+        props.fetchCategoriesForListing();
+
+        //  props.dispatch(change("postAdForm", "price", props.listingPrice));
+        // props.dispatch(change("postAdForm", "description", "hi"));
+    }, []);
 
     const onSubmit = (formValues: any, dispatch: any) => {
         props.onSubmit(formValues);
     };
 
-    const [listingImage, setListingImage] = useState(null);
-    useEffect(() => {
-        if (props.initialValues)
-            if (props.initialValues.image)
-                setListingImage(props.initialValues.image);
-    }, []);
+    const renderImageUpload = ({
+        input,
+        label,
+        meta,
+        placeHolder,
+        optionValues,
+    }: any) => {
+        //We cannot pass in {...input} (so that the input is submited when onSubmit button is clicked) like our other renders because <input> has type="file"
+        //Must do this instead: https://github.com/redux-form/redux-form/issues/3686
+        //We do not have a name in <input> so that redux won't complain with validate (thus making this input optional)
 
-    const openFileExplorer = useRef(null);
+        return (
+            <input
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                ref={openFileExplorer}
+                onChange={(...args) => {
+                    //The input's text dosen't change but the input is actually inserted (do formValues.image below)
+                    //  let event = args.map((val) => val.nativeEvent)[0];
+                    input.onChange(...args);
+                    //@ts-ignore
+                    // setListingImage(URL.createObjectURL(event.target.files[0]));
+                    //chagne also dosen't change the textbox input
+                    // props.dispatch(
+                    //     change("postAdForm", "image", event.target.files[0])
+                    // );
+                }}
+            />
+        );
+    };
+
+    const renderImage = () => {
+        if (props.cloudinaryImage) {
+            return {
+                backgroundImage: `url(${props.cloudinaryImage})`,
+                backgroundPosition: "center",
+                backgroundSize: "cover",
+                backgroundColor: "white",
+            };
+        } else if (!props.cloudinaryImage && listingImage) {
+            return {
+                backgroundImage: `url(${listingImage})`,
+                backgroundPosition: "center",
+                backgroundSize: "cover",
+                backgroundColor: "white",
+            };
+        } else {
+            return {
+                backgroundImage: `url(${postAdListingImagePlaceHolder})`,
+            };
+        }
+    };
 
     const renderFields = (): JSX.Element => {
         if (props.categories.length === 0) {
@@ -166,10 +238,10 @@ const PostAdForm: React.FC<
                             name="title"
                             type="text"
                             // label="Ad Title"
-                            component={renderTextInput}
+
+                            component={renderAutoFocusTextInput}
                         />
                     )}
-
                     {renderFieldSectionLayout(
                         "Description",
                         <Field
@@ -178,7 +250,6 @@ const PostAdForm: React.FC<
                             component={renderTextArea}
                         />
                     )}
-
                     {renderFieldSectionLayout(
                         "Category",
                         <Field
@@ -195,8 +266,9 @@ const PostAdForm: React.FC<
                                 name="image"
                                 type="file"
                                 component={renderImageUpload}
-                                ref={openFileExplorer}
                                 value={listingImage}
+                                ref={openFileExplorer}
+                                withRef
                                 onChange={(event) => {
                                     //For some reason,
                                     //The input's text dosen't change but the input is actually inserted (do formValues.image below)
@@ -210,29 +282,22 @@ const PostAdForm: React.FC<
                                     // );
                                     //https://medium.com/@650egor/react-30-day-challenge-day-2-image-upload-preview-2d534f8eaaa
                                 }}
-                                withRef
                             />
                             <div className="imageUploadWrapper">
                                 <input
                                     type="button"
-                                    value={listingImage ? "" : "Choose Files!"}
+                                    value={
+                                        listingImage || props.cloudinaryImage
+                                            ? ""
+                                            : "Choose Files!"
+                                    }
                                     className="postAdChooseListingImage"
-                                    onClick={() =>
-                                        openFileExplorer.current.click()
-                                    }
-                                    style={
-                                        listingImage
-                                            ? {
-                                                  backgroundImage: `url(${listingImage})`,
-                                                  backgroundPosition: "center",
-                                                  backgroundSize: "cover",
-                                                  backgroundColor: "white",
-                                              }
-                                            : {
-                                                  backgroundImage: `url(${postAdListingImagePlaceHolder})`,
-                                              }
-                                    }
+                                    onClick={() => {
+                                        openFileExplorer.current.click();
+                                    }}
+                                    style={renderImage()}
                                 />
+
                                 {listingImage && (
                                     <h3
                                         className="removeUploadedImage"
@@ -264,7 +329,6 @@ const PostAdForm: React.FC<
                             })}
                         />
                     )}
-
                     {renderFieldSectionLayout(
                         "City",
                         <Field
@@ -282,7 +346,6 @@ const PostAdForm: React.FC<
                             }
                         />
                     )}
-
                     {renderFieldSectionLayout(
                         "Street",
                         <Field
@@ -291,14 +354,15 @@ const PostAdForm: React.FC<
                             component={renderTextInput}
                         />
                     )}
+
                     {renderFieldSectionLayout(
                         "Price ($ CAD)",
                         <Field
                             name="price"
                             type="text"
+                            component={renderTextInput}
                             format={formatAmount}
                             normalize={normalizeAmount}
-                            component={renderTextInput}
                         />
                     )}
 
@@ -317,43 +381,6 @@ const PostAdForm: React.FC<
                 </form>
             );
         }
-    };
-
-    useEffect(() => {
-        props.fetchCategoriesForListing();
-        //props.dispatch(change("postAdForm", "image", "hi"));
-        // props.dispatch(change("postAdForm", "description", "hi"));
-    }, []);
-
-    const renderImageUpload = ({
-        input,
-        label,
-        meta,
-        placeHolder,
-        optionValues,
-    }: any) => {
-        //We cannot pass in {...input} (so that the input is submited when onSubmit button is clicked) like our other renders because <input> has type="file"
-        //Must do this instead: https://github.com/redux-form/redux-form/issues/3686
-        //We do not have a name in <input> so that redux won't complain with validate (thus making this input optional)
-        return (
-            <input
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                ref={openFileExplorer}
-                onChange={(...args) => {
-                    //The input's text dosen't change but the input is actually inserted (do formValues.image below)
-                    //  let event = args.map((val) => val.nativeEvent)[0];
-                    input.onChange(...args);
-                    //@ts-ignore
-                    // setListingImage(URL.createObjectURL(event.target.files[0]));
-                    //chagne also dosen't change the textbox input
-                    // props.dispatch(
-                    //     change("postAdForm", "image", event.target.files[0])
-                    // );
-                }}
-            />
-        );
     };
 
     return <React.Fragment>{renderFields()}</React.Fragment>;

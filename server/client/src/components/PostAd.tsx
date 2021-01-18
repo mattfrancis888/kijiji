@@ -17,6 +17,7 @@ export interface PostAdFormProps {
     provinceValue: string;
     categories: [];
     dispatch: any;
+    cloudinaryImage: string;
 }
 
 export interface PostAdProps {

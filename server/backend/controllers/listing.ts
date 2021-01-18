@@ -141,13 +141,13 @@ export const uploadImage = async (req: any, res: Response) => {
 };
 
 export const editImage = async (req: any, res: Response) => {
-    console.log("publicId", req.params.publicId);
+    console.log("publicId", req.params.cloudinaryPublicId);
     const storage = new CloudinaryStorage({
         cloudinary: cloudinary,
         params: {
             folder: "kijiji",
             format: async (req, file) => "jpg",
-            public_id: req.params.publicId,
+            public_id: req.params.cloudinaryPublicId,
         },
     });
     const multerUploader = multer({ storage });
@@ -406,7 +406,6 @@ export const getListingDetail = async (req: Request, res: Response) => {
 
 export const editListing = async (req: Request, res: Response) => {
     const listing_id = req.params.id;
-    console.log("edit listing body", req.body);
     const listing_name = req.body.title;
     const listing_description = req.body.description;
     const category = req.body.category;

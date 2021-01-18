@@ -43,6 +43,6 @@ listingRouter.get(
 
 listingRouter.get("/listing/:id", getListingDetail);
 listingRouter.patch("/listing/:id/edit", editListing);
-listingRouter.put("/edit-image/:id", editImage);
+listingRouter.put("/edit-image/:cloudinaryPublicId", editImage);
 
 export default listingRouter;
