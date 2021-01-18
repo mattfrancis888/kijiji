@@ -18,7 +18,11 @@ import {
 
 export interface EditAdProps {
     fetchListingDetail(listingId: string): void;
-    editListing(formValues: any, id: string): void;
+    editListing(
+        formValues: any,
+        listingId: string,
+        cloudinaryPublicId: string
+    ): void;
     match: any;
     listingDetail: ListingDetailType;
 }
@@ -79,7 +83,15 @@ const EditAd: React.FC<EditAdProps> = (props) => {
 
     const onEditListing = async (formValues: any) => {
         console.log("editAds", formValues);
-        props.editListing(formValues, props.match.params.id);
+        let cloudinaryPaths = props.listingDetail.listing_image.split("/");
+        let cloudinaryLastPath = cloudinaryPaths.pop();
+        let cloudinaryPublicId = cloudinaryLastPath.split(".")[0];
+        console.log("cloudinaryPublicId", cloudinaryPublicId);
+        props.editListing(
+            formValues,
+            props.match.params.id,
+            cloudinaryPublicId
+        );
     };
     return renderContent();
 };

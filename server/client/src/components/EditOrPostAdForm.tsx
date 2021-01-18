@@ -298,7 +298,7 @@ const PostAdForm: React.FC<
                                     style={renderImage()}
                                 />
 
-                                {listingImage && (
+                                {(listingImage || props.cloudinaryImage) && (
                                     <h3
                                         className="removeUploadedImage"
                                         onClick={() => {

@@ -201,7 +201,7 @@ var editImage = function (req, res) { return __awaiter(void 0, void 0, void 0, f
                 format: function (req, file) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
                     return [2 /*return*/, "jpg"];
                 }); }); },
-                public_id: req.params.cloudinaryPublicId,
+                public_id: function (req, file) { return req.params.cloudinaryPublicId; },
             },
         });
         multerUploader = multer_1.default({ storage: storage });
@@ -210,10 +210,12 @@ var editImage = function (req, res) { return __awaiter(void 0, void 0, void 0, f
         //Wants 3 arguments
         upload(req, res, function (err) {
             if (err instanceof multer_1.default.MulterError) {
+                console.log(err);
                 return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
                 // A Multer error occurred when uploading.
             }
             else if (err) {
+                console.log(err);
                 // An unknown error occurred when uploading.
                 return res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS);
             }

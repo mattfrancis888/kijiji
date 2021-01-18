@@ -147,7 +147,7 @@ export const editImage = async (req: any, res: Response) => {
         params: {
             folder: "kijiji",
             format: async (req, file) => "jpg",
-            public_id: req.params.cloudinaryPublicId,
+            public_id: (req, file) => req.params.cloudinaryPublicId,
         },
     });
     const multerUploader = multer({ storage });
@@ -156,9 +156,11 @@ export const editImage = async (req: any, res: Response) => {
     //Wants 3 arguments
     upload(req, res, (err: any) => {
         if (err instanceof multer.MulterError) {
+            console.log(err);
             return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
             // A Multer error occurred when uploading.
         } else if (err) {
+            console.log(err);
             // An unknown error occurred when uploading.
             return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
         }

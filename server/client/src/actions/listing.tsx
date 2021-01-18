@@ -254,9 +254,11 @@ export const fetchListingDetail = (listingId: string) => async (
     }
 };
 
-export const editListing = (formValues: any, listingId: string) => async (
-    dispatch: Dispatch
-) => {
+export const editListing = (
+    formValues: any,
+    listingId: string,
+    cloudinaryPublicId: string
+) => async (dispatch: Dispatch) => {
     try {
         //Distributed transaction takes place here, if an error occurs in uploading to one of the storage systems,
         // we haven't handle it (i.e an image may be uploaded, but the data failed to be inserted; the image wouldn't be deleted)
@@ -265,14 +267,12 @@ export const editListing = (formValues: any, listingId: string) => async (
         //https://stackoverflow.com/questions/43013858/how-to-post-a-file-from-a-form-with-axios
 
         let cloudinaryImagePath = {};
-        console.log("typeof image", typeof formValues.image);
         if (formValues.image instanceof FileList) {
-            console.log("instance of file");
             let formData = new FormData();
             formData.append("image", formValues.image[0]);
-
+            //overrides current image with the current publicid
             const imagePathResponse = await axios.put<CloudinaryImagePath>(
-                "/edit-image/op5zynuvystrayhfcgp7",
+                `/edit-image/${cloudinaryPublicId}`,
                 formData,
                 {
                     headers: {
@@ -300,7 +300,7 @@ export const editListing = (formValues: any, listingId: string) => async (
             type: ActionTypes.EDIT_LISTING,
             payload: listingResponse.data,
         });
-        // history.push("/profile");
+        //history.push(`/listing/${listingId}`);
     } catch (error) {
         alert(SERVER_ERROR_MESSAGE);
         // dispatch<ListingErrorAction>({
