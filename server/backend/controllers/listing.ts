@@ -4,10 +4,6 @@ import { FORBIDDEN_STATUS, INTERNAL_SERVER_ERROR_STATUS } from "../constants";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 
-//TODO:
-//1. Post ad, handle what happens if an error uploading occurs
-//3. Refactor getListingDetail with JOINs
-//4. Change getlsitingDetail camelcase to _
 export const categoriesForListing = async (req: Request, res: Response) => {
     pool.query(`SELECT category_name FROM category`, (error, category) => {
         if (error) return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
@@ -168,6 +164,21 @@ export const editImage = async (req: any, res: Response) => {
 
         // Everything went fine and save document in DB here.
     });
+};
+
+export const deleteImage = async (req: any, res: Response) => {
+    console.log("publicId", req.params.cloudinaryPublicId);
+
+    cloudinary.uploader.destroy(
+        // req.params.cloudinaryPublicId,
+        `kijiji/${req.params.cloudinaryPublicId}`,
+        (err, result) => {
+            if (err) return console.log(err);
+            console.log(result);
+            console.log(req.params.cloudinaryPublicId, " deleted");
+            res.send(result);
+        }
+    );
 };
 
 export const getCategoryId = async (

@@ -83,6 +83,9 @@ const EditAd: React.FC<EditAdProps> = (props) => {
 
     const onEditListing = async (formValues: any) => {
         console.log("editAds", formValues);
+        //TODO:
+        //1. User wants to remove listing image
+        //2. Database will return null value if user removes lsting image, handle error here
         let cloudinaryPaths = props.listingDetail.listing_image.split("/");
         let cloudinaryLastPath = cloudinaryPaths.pop();
         let cloudinaryPublicId = cloudinaryLastPath.split(".")[0];

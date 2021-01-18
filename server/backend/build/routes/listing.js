@@ -13,4 +13,5 @@ listingRouter.get("/listing-highest-price/:page", listing_1.getCategoryId, listi
 listingRouter.get("/listing/:id", listing_1.getListingDetail);
 listingRouter.patch("/listing/:id/edit", listing_1.editListing);
 listingRouter.put("/edit-image/:cloudinaryPublicId", listing_1.editImage);
+listingRouter.delete("/delete-image/:cloudinaryPublicId", listing_1.deleteImage);
 exports.default = listingRouter;

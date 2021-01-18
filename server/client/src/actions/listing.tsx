@@ -286,6 +286,8 @@ export const editListing = (
             });
 
             cloudinaryImagePath = imagePathResponse.data;
+        } else if (formValues.image === null) {
+            //User wants to remove image
         }
 
         const listingResponse = await axios.patch<Listing>(

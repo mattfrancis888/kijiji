@@ -50,15 +50,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editListing = exports.getListingDetail = exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.editImage = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
+exports.editListing = exports.getListingDetail = exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.deleteImage = exports.editImage = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
 var multer_1 = __importDefault(require("multer"));
-//TODO:
-//1. Post ad, handle what happens if an error uploading occurs
-//3. Refactor getListingDetail with JOINs
-//4. Change getlsitingDetail camelcase to _
 var categoriesForListing = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         databasePool_1.default.query("SELECT category_name FROM category", function (error, category) {
@@ -226,6 +222,22 @@ var editImage = function (req, res) { return __awaiter(void 0, void 0, void 0, f
     });
 }); };
 exports.editImage = editImage;
+var deleteImage = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        console.log("publicId", req.params.cloudinaryPublicId);
+        cloudinary.uploader.destroy(
+        // req.params.cloudinaryPublicId,
+        "kijiji/" + req.params.cloudinaryPublicId, function (err, result) {
+            if (err)
+                return console.log(err);
+            console.log(result);
+            console.log(req.params.cloudinaryPublicId, " deleted");
+            res.send(result);
+        });
+        return [2 /*return*/];
+    });
+}); };
+exports.deleteImage = deleteImage;
 var getCategoryId = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var category, categoryQueryResponse, err_1;
     return __generator(this, function (_a) {
