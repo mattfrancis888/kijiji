@@ -20,7 +20,7 @@ import { SERVER_ERROR_MESSAGE } from "../constants";
 import { initial } from "lodash";
 import { useLocation } from "react-router-dom";
 
-export interface PostAdFormValues {
+export interface EditOrPostAdFormValues {
     title: string;
     description: string;
     category: string;
@@ -391,10 +391,10 @@ const PostAdForm: React.FC<
 };
 
 const validate = (
-    formValues: PostAdFormValues
-): FormErrors<PostAdFormValues> => {
+    formValues: EditOrPostAdFormValues
+): FormErrors<EditOrPostAdFormValues> => {
     //MUST BE NAMED VALIDATE! Other names would be ignored by reduxForm(..)
-    const errors: FormErrors<PostAdFormValues> = {};
+    const errors: FormErrors<EditOrPostAdFormValues> = {};
     //If you return an empty object, redux form will assume everything is ok
     // console.log("FILE UPLOAD VALUE", formValues.image);
     if (!formValues.title) {
@@ -440,7 +440,7 @@ const mapStateToProps = (state: StoreState) => {
 };
 
 export default connect(mapStateToProps, { fetchCategoriesForListing })(
-    reduxForm<{}, PostAdFormProps>({
+    reduxForm<{}, EditOrPostAdFormValues>({
         form: "postAdForm",
         validate,
     })(PostAdForm)

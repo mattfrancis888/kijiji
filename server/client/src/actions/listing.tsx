@@ -265,7 +265,7 @@ export const fetchListingDetail = (listingId: string) => async (
 export const editListing = (
     formValues: any,
     listingId: string,
-    cloudinaryPublicId: string
+    cloudinaryPublicId: string | null
 ) => async (dispatch: Dispatch) => {
     try {
         //Distributed transaction takes place here, if an error occurs in uploading to one of the storage systems,
@@ -275,7 +275,11 @@ export const editListing = (
         //https://stackoverflow.com/questions/43013858/how-to-post-a-file-from-a-form-with-axios
 
         let cloudinaryImagePath = {};
-        if (formValues.image instanceof FileList) {
+        if (
+            formValues.image instanceof FileList &&
+            cloudinaryPublicId != null
+        ) {
+            //A cloudinary image already exists, ovveride current cloudinary image
             let formData = new FormData();
             formData.append("image", formValues.image[0]);
             //overrides current image with the current publicid
@@ -288,6 +292,27 @@ export const editListing = (
                     },
                 }
             );
+            cloudinaryImagePath = imagePathResponse.data;
+        } else if (
+            formValues.image instanceof FileList &&
+            cloudinaryPublicId === null
+        ) {
+            //cloudinary image does not exist because user did not create a listing with an image or
+            //has removed an image in their lisitng
+
+            let formData = new FormData();
+            formData.append("image", formValues.image[0]);
+
+            const imagePathResponse = await axios.post<CloudinaryImagePath>(
+                "/upload-image",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
             cloudinaryImagePath = imagePathResponse.data;
         } else if (formValues.image === null) {
             //User wants to remove image
@@ -311,9 +336,9 @@ export const editListing = (
         //history.push(`/listing/${listingId}`);
     } catch (error) {
         alert(SERVER_ERROR_MESSAGE);
-        // dispatch<ListingErrorAction>({
-        //     type: ActionTypes.LISTING_ERROR,
-        //     payload: { error: SERVER_ERROR_MESSAGE },
-        // });
+        dispatch<ListingErrorAction>({
+            type: ActionTypes.LISTING_ERROR,
+            payload: { error: SERVER_ERROR_MESSAGE },
+        });
     }
 };

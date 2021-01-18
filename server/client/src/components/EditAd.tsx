@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import requireAuth from "./requireAuth";
-import EditOrPostAdForm from "./EditOrPostAdForm";
+import EditOrPostAdForm, { EditOrPostAdFormValues } from "./EditOrPostAdForm";
 import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import jwt_decode from "jwt-decode";
@@ -81,20 +81,27 @@ const EditAd: React.FC<EditAdProps> = (props) => {
         props.fetchListingDetail(props.match.params.id);
     }, []);
 
-    const onEditListing = async (formValues: any) => {
+    const onEditListing = async (formValues: EditOrPostAdFormValues) => {
         console.log("editAds", formValues);
         //TODO:
         //1. User wants to remove listing image
         //2. Database will return null value if user removes lsting image, handle error here
-        let cloudinaryPaths = props.listingDetail.listing_image.split("/");
-        let cloudinaryLastPath = cloudinaryPaths.pop();
-        let cloudinaryPublicId = cloudinaryLastPath.split(".")[0];
-        console.log("cloudinaryPublicId", cloudinaryPublicId);
-        props.editListing(
-            formValues,
-            props.match.params.id,
-            cloudinaryPublicId
-        );
+        if (props.listingDetail.listing_image && formValues.image) {
+            let cloudinaryPaths = props.listingDetail.listing_image.split("/");
+            let cloudinaryLastPath = cloudinaryPaths.pop();
+            let cloudinaryPublicId = cloudinaryLastPath.split(".")[0];
+            console.log("cloudinaryPublicId", cloudinaryPublicId);
+            props.editListing(
+                formValues,
+                props.match.params.id,
+                cloudinaryPublicId
+            );
+        } else {
+            //If listing does not have initial cloudinary image link (because they made a listing without a picture beforehand
+            //or they removed their picture and want to edit their listing picture again)
+            //Upload cloudinary image
+            props.editListing(formValues, props.match.params.id, null);
+        }
     };
     return renderContent();
 };
