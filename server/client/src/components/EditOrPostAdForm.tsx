@@ -273,6 +273,7 @@ const PostAdForm: React.FC<
                                 onChange={(event) => {
                                     //For some reason,
                                     //The input's text dosen't change but the input is actually inserted (do formValues.image below)
+                                    setCloudinaryImage(null);
                                     setListingImage(
                                         URL.createObjectURL(
                                             event.target.files[0]

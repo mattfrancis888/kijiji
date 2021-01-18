@@ -84,6 +84,10 @@ export interface EditListingAction {
     payload: Listing;
 }
 
+export interface CloudinaryImageDelete {
+    result: string;
+}
+
 export const fetchCategoriesForListing = () => async (dispatch: Dispatch) => {
     try {
         const response = await axios.get<[]>("/categories-for-listing");
@@ -127,6 +131,10 @@ export const createListing = (formValues: any) => async (
                     },
                 }
             );
+            //Youd ont need to dispatch again
+            //But I included it in case we handle errors when failing to
+            //upload to cloudinary or the database so we 'backtrack'
+
             dispatch<UploadImageToCloudinaryAction>({
                 type: ActionTypes.UPLOAD_IMAGE_TO_CLOUDINARY,
                 payload: imagePathResponse.data,
@@ -280,14 +288,12 @@ export const editListing = (
                     },
                 }
             );
-            dispatch<UploadImageToCloudinaryAction>({
-                type: ActionTypes.UPLOAD_IMAGE_TO_CLOUDINARY,
-                payload: imagePathResponse.data,
-            });
-
             cloudinaryImagePath = imagePathResponse.data;
         } else if (formValues.image === null) {
             //User wants to remove image
+            await axios.delete<CloudinaryImageDelete>(
+                `/delete-image/${cloudinaryPublicId}`
+            );
         }
 
         const listingResponse = await axios.patch<Listing>(
