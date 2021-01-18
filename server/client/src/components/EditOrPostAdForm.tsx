@@ -148,9 +148,10 @@ const PostAdForm: React.FC<
     const location = useLocation();
     const openFileExplorer = useRef(null);
     const [listingImage, setListingImage] = useState(null);
+    const [cloudinaryImage, setCloudinaryImage] = useState(null);
     useEffect(() => {
         props.fetchCategoriesForListing();
-
+        if (props.cloudinaryImage) setCloudinaryImage(props.cloudinaryImage);
         //  props.dispatch(change("postAdForm", "price", props.listingPrice));
         // props.dispatch(change("postAdForm", "description", "hi"));
     }, []);
@@ -192,14 +193,14 @@ const PostAdForm: React.FC<
     };
 
     const renderImage = () => {
-        if (props.cloudinaryImage) {
+        if (cloudinaryImage) {
             return {
-                backgroundImage: `url(${props.cloudinaryImage})`,
+                backgroundImage: `url(${cloudinaryImage})`,
                 backgroundPosition: "center",
                 backgroundSize: "cover",
                 backgroundColor: "white",
             };
-        } else if (!props.cloudinaryImage && listingImage) {
+        } else if (!cloudinaryImage && listingImage) {
             return {
                 backgroundImage: `url(${listingImage})`,
                 backgroundPosition: "center",
@@ -277,6 +278,7 @@ const PostAdForm: React.FC<
                                             event.target.files[0]
                                         )
                                     );
+
                                     // console.log(
                                     //     `Selected file - ${event.target.files[0].name}`
                                     // );
@@ -287,7 +289,7 @@ const PostAdForm: React.FC<
                                 <input
                                     type="button"
                                     value={
-                                        listingImage || props.cloudinaryImage
+                                        listingImage || cloudinaryImage
                                             ? ""
                                             : "Choose Files!"
                                     }
@@ -303,6 +305,7 @@ const PostAdForm: React.FC<
                                         className="removeUploadedImage"
                                         onClick={() => {
                                             setListingImage(null);
+                                            setCloudinaryImage(null);
                                             props.dispatch(
                                                 change(
                                                     "postAdForm",
