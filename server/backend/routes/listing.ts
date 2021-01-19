@@ -7,6 +7,10 @@ import {
     getCategoryId,
     sortByHelper,
     getListingDetail,
+    editListing,
+    editImage,
+    deleteImage,
+    deleteListing,
 } from "../controllers/listing";
 const listingRouter = Router();
 
@@ -40,5 +44,9 @@ listingRouter.get(
 );
 
 listingRouter.get("/listing/:id", getListingDetail);
+listingRouter.patch("/listing/:id/edit", editListing);
+listingRouter.put("/edit-image/:cloudinaryPublicId", editImage);
+listingRouter.delete("/delete-image/:cloudinaryPublicId", deleteImage);
+listingRouter.delete("/listing/:id/delete", deleteListing);
 
 export default listingRouter;

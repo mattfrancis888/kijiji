@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import requireAuth from "./requireAuth";
-import PostAdForm from "./PostAdForm";
+import EditOrPostAdForm from "./EditOrPostAdForm";
 import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import { createListing, Listing } from "../actions/listing";
@@ -17,6 +17,7 @@ export interface PostAdFormProps {
     provinceValue: string;
     categories: [];
     dispatch: any;
+    cloudinaryImage: string;
 }
 
 export interface PostAdProps {
@@ -35,7 +36,7 @@ const PostAd: React.FC<PostAdProps> = (props) => {
     return (
         <div className="postAdPageContainer">
             <h1>Post Your Ad, it's fast and easy</h1>
-            <PostAdForm
+            <EditOrPostAdForm
                 onSubmit={onSubmitPostListing}
                 // initialValues={{
                 //     title: "bye",

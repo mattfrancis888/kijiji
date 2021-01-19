@@ -69,9 +69,10 @@
     margin-bottom: 3.5rem;
 }
 
+.deleteAd,
 .postAdFormSubmit {
     cursor: pointer;
-    padding: 1.3rem 2.5rem;
+    padding: 1rem 2rem;
     border-radius: 0.5rem;
     margin: 1rem 0;
     font-weight: bold;
@@ -79,9 +80,19 @@
     letter-spacing: 0.1rem;
     @media screen and (min-width: $sm_breakpoint) {
         font-size: 1.4rem;
+        padding: 1.3rem 2.5rem;
     }
     background-color: $purple;
     color: white;
+}
+
+.deleteAd {
+    background-color: red;
+    border-color: red;
+    margin-left: 0.5rem;
+    @media screen and (min-width: $sm_breakpoint) {
+        margin-left: 2.5rem;
+    }
 }
 .registerAccountText {
     color: red;
@@ -134,7 +145,7 @@
 .imageUploadWrapper {
     display: flex;
     flex-direction: column;
-
+    max-width: 10rem;
     .postAdChooseListingImage {
         width: 10rem;
         padding: 2rem;
@@ -154,5 +165,6 @@
     .removeUploadedImage {
         color: red;
         text-align: center;
+        cursor: pointer;
     }
 }
