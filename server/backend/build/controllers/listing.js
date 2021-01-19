@@ -50,7 +50,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editListing = exports.getListingDetail = exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.deleteImage = exports.editImage = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
+exports.deleteListing = exports.editListing = exports.getListingDetail = exports.sortByHelper = exports.getSortedListingCount = exports.getCategoryId = exports.deleteImage = exports.editImage = exports.uploadImage = exports.createListing = exports.categoriesForListing = void 0;
 var databasePool_1 = __importDefault(require("../databasePool"));
 var constants_1 = require("../constants");
 var multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
@@ -224,13 +224,11 @@ var editImage = function (req, res) { return __awaiter(void 0, void 0, void 0, f
 exports.editImage = editImage;
 var deleteImage = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        console.log("publicId", req.params.cloudinaryPublicId);
         cloudinary.uploader.destroy(
         // req.params.cloudinaryPublicId,
         "kijiji/" + req.params.cloudinaryPublicId, function (err, result) {
             if (err)
                 return console.log(err);
-            console.log(result);
             console.log(req.params.cloudinaryPublicId, " deleted");
             res.send(result);
         });
@@ -517,3 +515,36 @@ var editListing = function (req, res) { return __awaiter(void 0, void 0, void 0,
     });
 }); };
 exports.editListing = editListing;
+var deleteListing = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var listing_id, response_5, error_4;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                listing_id = req.params.id;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 6, , 7]);
+                return [4 /*yield*/, databasePool_1.default.query("BEGIN")];
+            case 2:
+                _a.sent();
+                return [4 /*yield*/, databasePool_1.default.query("DELETE FROM lookup_listing_user WHERE listing_id = $1", [listing_id])];
+            case 3:
+                _a.sent();
+                return [4 /*yield*/, databasePool_1.default.query("DELETE FROM listing WHERE listing_id = $1 RETURNING *", [listing_id])];
+            case 4:
+                response_5 = _a.sent();
+                return [4 /*yield*/, databasePool_1.default.query("COMMIT")];
+            case 5:
+                _a.sent();
+                res.send(__assign({}, response_5.rows[0]));
+                return [3 /*break*/, 7];
+            case 6:
+                error_4 = _a.sent();
+                databasePool_1.default.query("ROLLBACK");
+                console.log("ROLLBACK TRIGGERED", error_4);
+                return [2 /*return*/, res.sendStatus(constants_1.INTERNAL_SERVER_ERROR_STATUS)];
+            case 7: return [2 /*return*/];
+        }
+    });
+}); };
+exports.deleteListing = deleteListing;

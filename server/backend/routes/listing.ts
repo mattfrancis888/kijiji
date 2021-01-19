@@ -46,5 +46,6 @@ listingRouter.get("/listing/:id", getListingDetail);
 listingRouter.patch("/listing/:id/edit", editListing);
 listingRouter.put("/edit-image/:cloudinaryPublicId", editImage);
 listingRouter.delete("/delete-image/:cloudinaryPublicId", deleteImage);
+listingRouter.delete("/listing/:id/delete", deleteImage);
 
 export default listingRouter;

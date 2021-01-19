@@ -167,14 +167,11 @@ export const editImage = async (req: any, res: Response) => {
 };
 
 export const deleteImage = async (req: any, res: Response) => {
-    console.log("publicId", req.params.cloudinaryPublicId);
-
     cloudinary.uploader.destroy(
         // req.params.cloudinaryPublicId,
         `kijiji/${req.params.cloudinaryPublicId}`,
         (err, result) => {
             if (err) return console.log(err);
-            console.log(result);
             console.log(req.params.cloudinaryPublicId, " deleted");
             res.send(result);
         }
@@ -486,6 +483,32 @@ export const editListing = async (req: Request, res: Response) => {
 
         res.send({
             listing_id,
+            ...response.rows[0],
+        });
+    } catch (error) {
+        pool.query("ROLLBACK");
+        console.log("ROLLBACK TRIGGERED", error);
+        return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+    }
+};
+
+export const deleteListing = async (req: any, res: Response) => {
+    const listing_id = req.params.id;
+    try {
+        await pool.query("BEGIN");
+
+        await pool.query(
+            `DELETE FROM lookup_listing_user WHERE listing_id = $1`,
+            [listing_id]
+        );
+        const response = await pool.query(
+            `DELETE FROM listing WHERE listing_id = $1 RETURNING *`,
+            [listing_id]
+        );
+
+        await pool.query("COMMIT");
+
+        res.send({
             ...response.rows[0],
         });
     } catch (error) {
