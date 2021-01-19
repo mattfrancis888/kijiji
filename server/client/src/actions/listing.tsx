@@ -352,13 +352,13 @@ export const editListing = (
             type: ActionTypes.EDIT_LISTING,
             payload: listingResponse.data,
         });
-        //history.push(`/listing/${listingId}`);
+        history.push(`/listing/${listingId}`);
     } catch (error) {
         alert(SERVER_ERROR_MESSAGE);
-        dispatch<ListingErrorAction>({
-            type: ActionTypes.LISTING_ERROR,
-            payload: { error: SERVER_ERROR_MESSAGE },
-        });
+        // dispatch<ListingErrorAction>({
+        //     type: ActionTypes.LISTING_ERROR,
+        //     payload: { error: SERVER_ERROR_MESSAGE },
+        // });
     }
 };
 
@@ -383,9 +383,10 @@ export const deleteListing = (
 
         history.push("/profile");
     } catch (error) {
-        dispatch<ListingErrorAction>({
-            type: ActionTypes.LISTING_ERROR,
-            payload: { error: SERVER_ERROR_MESSAGE },
-        });
+        alert(SERVER_ERROR_MESSAGE);
+        // dispatch<ListingErrorAction>({
+        //     type: ActionTypes.LISTING_ERROR,
+        //     payload: { error: SERVER_ERROR_MESSAGE },
+        // });
     }
 };

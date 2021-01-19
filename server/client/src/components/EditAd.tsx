@@ -15,6 +15,7 @@ import {
     fetchListingDetail,
     ServerError,
 } from "../actions";
+import formValues from "redux-form/lib/formValues";
 
 export interface EditAdProps {
     fetchListingDetail(listingId: string): void;
@@ -29,6 +30,10 @@ export interface EditAdProps {
 }
 
 const EditAd: React.FC<EditAdProps> = (props) => {
+    useEffect(() => {
+        props.fetchListingDetail(props.match.params.id);
+    }, []);
+
     const renderContent = () => {
         if (!props.listingDetail) {
             return (
@@ -36,8 +41,9 @@ const EditAd: React.FC<EditAdProps> = (props) => {
                     <Loading />
                 </div>
             );
-            // //too lazy to fix ts error, but I get the idea
-        } else if (props.listingDetail.error) {
+        }
+        // //too lazy to fix ts error, but I get the idea
+        else if (props.listingDetail.error) {
             return (
                 <div className="serverErrorContainer">
                     <h3 className="serverErrorText">
@@ -78,10 +84,6 @@ const EditAd: React.FC<EditAdProps> = (props) => {
             );
         }
     };
-
-    useEffect(() => {
-        props.fetchListingDetail(props.match.params.id);
-    }, []);
 
     const onEditListing = async (formValues: EditOrPostAdFormValues) => {
         console.log("editAds", formValues);

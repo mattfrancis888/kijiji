@@ -1,3 +1,6 @@
+.listingContainer {
+    position: relative;
+}
 .listingPreviewContainer {
     display: flex;
     background: white;
@@ -125,9 +128,18 @@
     right: 1rem;
     top: 1rem;
     cursor: pointer;
+    z-index: 1;
     @media screen and (min-width: $sm_breakpoint) {
         font-size: 1.7rem;
         right: 2rem;
         top: 2rem;
+    }
+    &:hover {
+        font-size: 1.8rem;
+        transition: all 0.25s ease 0s;
+        color: $purple;
+        @media screen and (min-width: $sm_breakpoint) {
+            font-size: 2.2rem;
+        }
     }
 }

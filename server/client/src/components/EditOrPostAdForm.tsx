@@ -195,14 +195,14 @@ const PostAdForm: React.FC<
     const renderImage = () => {
         if (cloudinaryImage) {
             return {
-                backgroundImage: `url(${cloudinaryImage})`,
+                backgroundImage: `url(${cloudinaryImage}), url(${postAdListingImagePlaceHolder})`,
                 backgroundPosition: "center",
                 backgroundSize: "cover",
                 backgroundColor: "white",
             };
         } else if (!cloudinaryImage && listingImage) {
             return {
-                backgroundImage: `url(${listingImage})`,
+                backgroundImage: `url(${listingImage}), url(${postAdListingImagePlaceHolder})`,
                 backgroundPosition: "center",
                 backgroundSize: "cover",
                 backgroundColor: "white",
