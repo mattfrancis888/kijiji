@@ -22,6 +22,8 @@ const listingReducer = (
             return { ...state, data: action.payload };
         case ActionTypes.EDIT_LISTING:
             return { ...state, data: action.payload };
+        case ActionTypes.DELETE_LISTING:
+            return { ...state, data: action.payload };
         default:
             return state;
     }

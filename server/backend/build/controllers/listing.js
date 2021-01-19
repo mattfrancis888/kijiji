@@ -536,6 +536,7 @@ var deleteListing = function (req, res) { return __awaiter(void 0, void 0, void 
                 return [4 /*yield*/, databasePool_1.default.query("COMMIT")];
             case 5:
                 _a.sent();
+                console.log(response_5.rows[0]);
                 res.send(__assign({}, response_5.rows[0]));
                 return [3 /*break*/, 7];
             case 6:

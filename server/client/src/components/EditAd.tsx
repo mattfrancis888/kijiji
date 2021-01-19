@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import jwt_decode from "jwt-decode";
 import CookieService from "../CookieService";
-import { editListing } from "../actions/listing";
+import { deleteListing, editListing } from "../actions/listing";
 import { ListingDataResponse } from "../reducers/listingReducer";
 import Loading from "./Loading";
 
@@ -21,8 +21,9 @@ export interface EditAdProps {
     editListing(
         formValues: any,
         listingId: string,
-        cloudinaryPublicId: string
+        cloudinaryPublicId: string | null
     ): void;
+    deleteListing(listingId: string, cloudinaryPublicId: string | null): void;
     match: any;
     listingDetail: ListingDetailType;
 }
@@ -61,6 +62,7 @@ const EditAd: React.FC<EditAdProps> = (props) => {
                     <h1>Edit Your Ad</h1>
                     <EditOrPostAdForm
                         onSubmit={onEditListing}
+                        onDelete={onDeleteListing}
                         initialValues={{
                             title: listing_name,
                             description: listing_description,
@@ -83,9 +85,7 @@ const EditAd: React.FC<EditAdProps> = (props) => {
 
     const onEditListing = async (formValues: EditOrPostAdFormValues) => {
         console.log("editAds", formValues);
-        //TODO:
-        //1. User wants to remove listing image
-        //2. Database will return null value if user removes lsting image, handle error here
+
         if (props.listingDetail.listing_image && formValues.image) {
             let cloudinaryPaths = props.listingDetail.listing_image.split("/");
             let cloudinaryLastPath = cloudinaryPaths.pop();
@@ -103,6 +103,18 @@ const EditAd: React.FC<EditAdProps> = (props) => {
             props.editListing(formValues, props.match.params.id, null);
         }
     };
+
+    const onDeleteListing = () => {
+        if (props.listingDetail.listing_image) {
+            let cloudinaryPaths = props.listingDetail.listing_image.split("/");
+            let cloudinaryLastPath = cloudinaryPaths.pop();
+            let cloudinaryPublicId = cloudinaryLastPath.split(".")[0];
+            props.deleteListing(props.match.params.id, cloudinaryPublicId);
+        } else {
+            props.deleteListing(props.match.params.id, null);
+        }
+    };
+
     return renderContent();
 };
 
@@ -112,6 +124,8 @@ const mapStateToProps = (state: StoreState) => {
     };
 };
 
-export default connect(mapStateToProps, { editListing, fetchListingDetail })(
-    EditAd
-);
+export default connect(mapStateToProps, {
+    deleteListing,
+    editListing,
+    fetchListingDetail,
+})(EditAd);

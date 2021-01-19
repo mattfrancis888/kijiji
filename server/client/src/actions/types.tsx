@@ -24,6 +24,7 @@ export enum ActionTypes {
     FETCH_USER_PROFILE,
     FETCH_USER_PROFILE_ERROR,
     EDIT_LISTING,
+    DELETE_LISTING,
 }
 export type AuthActions = AuthUserAction | AuthErrorAction;
 export type FetchCategoriesActions =
@@ -35,7 +36,8 @@ export type ListingAction =
     | ListingErrorAction
     | FetchListingsAction
     | FetchListingDetailAction
-    | EditListingAction;
+    | EditListingAction
+    | DeleteListingAction;
 
 export type UserProfileAction =
     | FetchUserProfileAction

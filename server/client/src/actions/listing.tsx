@@ -35,6 +35,20 @@ export interface Listing {
     listing_date: Date;
 }
 
+export interface DeletedListing {
+    listing_id: number;
+    listing_name: string;
+    listing_description: string;
+    category_id: number;
+    listing_image: string;
+    province: string;
+    city: string;
+    street: string;
+    listing_price: string;
+    listing_date: Date;
+    name_tokens: string;
+}
+
 export interface FetchListingResponse {
     totalListings?: number;
     page?: number;
@@ -86,6 +100,11 @@ export interface EditListingAction {
 
 export interface CloudinaryImageDelete {
     result: string;
+}
+
+export interface DeleteListingAction {
+    type: ActionTypes.DELETE_LISTING;
+    payload: DeletedListing;
 }
 
 export const fetchCategoriesForListing = () => async (dispatch: Dispatch) => {
@@ -336,6 +355,34 @@ export const editListing = (
         //history.push(`/listing/${listingId}`);
     } catch (error) {
         alert(SERVER_ERROR_MESSAGE);
+        dispatch<ListingErrorAction>({
+            type: ActionTypes.LISTING_ERROR,
+            payload: { error: SERVER_ERROR_MESSAGE },
+        });
+    }
+};
+
+export const deleteListing = (
+    listingId: string,
+    cloudinaryPublicId: string | null
+) => async (dispatch: Dispatch) => {
+    try {
+        //Delete data from database:
+        const response = await axios.delete<DeletedListing>(
+            `/listing/${listingId}/delete`
+        );
+        dispatch<DeleteListingAction>({
+            type: ActionTypes.DELETE_LISTING,
+            payload: response.data,
+        });
+        if (cloudinaryPublicId) {
+            await axios.delete<CloudinaryImageDelete>(
+                `/delete-image/${cloudinaryPublicId}`
+            );
+        }
+
+        history.push("/profile");
+    } catch (error) {
         dispatch<ListingErrorAction>({
             type: ActionTypes.LISTING_ERROR,
             payload: { error: SERVER_ERROR_MESSAGE },

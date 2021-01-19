@@ -507,7 +507,7 @@ export const deleteListing = async (req: any, res: Response) => {
         );
 
         await pool.query("COMMIT");
-
+        console.log(response.rows[0]);
         res.send({
             ...response.rows[0],
         });

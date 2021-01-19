@@ -378,7 +378,11 @@ const PostAdForm: React.FC<
                     {location.pathname === "/post-ad" ? (
                         ""
                     ) : (
-                        <button className="deleteAd" type="button">
+                        <button
+                            className="deleteAd"
+                            type="button"
+                            onClick={props.onDelete}
+                        >
                             Delete Ad
                         </button>
                     )}
