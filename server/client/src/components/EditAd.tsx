@@ -6,7 +6,11 @@ import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import jwt_decode from "jwt-decode";
 import CookieService from "../CookieService";
-import { deleteListing, editListing } from "../actions/listing";
+import {
+    deleteListing,
+    editListing,
+    validateListingAndUserRelationship,
+} from "../actions/listing";
 import { ListingDataResponse } from "../reducers/listingReducer";
 import Loading from "./Loading";
 
@@ -25,12 +29,15 @@ export interface EditAdProps {
         cloudinaryPublicId: string | null
     ): void;
     deleteListing(listingId: string, cloudinaryPublicId: string | null): void;
+    validateListingAndUserRelationship(listingId: string);
     match: any;
     listingDetail: ListingDetailType;
 }
 
 const EditAd: React.FC<EditAdProps> = (props) => {
     useEffect(() => {
+        //We should validate if the listing actualy belongs to the user
+        props.validateListingAndUserRelationship(props.match.params.id);
         props.fetchListingDetail(props.match.params.id);
     }, []);
 
@@ -127,7 +134,8 @@ const mapStateToProps = (state: StoreState) => {
 };
 
 export default connect(mapStateToProps, {
+    validateListingAndUserRelationship,
     deleteListing,
     editListing,
     fetchListingDetail,
-})(EditAd);
+})(requireAuth(EditAd));

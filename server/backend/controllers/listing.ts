@@ -3,6 +3,7 @@ import pool from "../databasePool";
 import { FORBIDDEN_STATUS, INTERNAL_SERVER_ERROR_STATUS } from "../constants";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
+import jwt_decode from "jwt-decode";
 
 export const categoriesForListing = async (req: Request, res: Response) => {
     pool.query(`SELECT category_name FROM category`, (error, category) => {
@@ -514,6 +515,40 @@ export const deleteListing = async (req: any, res: Response) => {
     } catch (error) {
         pool.query("ROLLBACK");
         console.log("ROLLBACK TRIGGERED", error);
+        return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
+    }
+};
+
+export const validateListingAndUserRelationship = async (
+    req: any,
+    res: Response
+) => {
+    const listing_id = req.params.id;
+
+    const decodedJwt = jwt_decode(req.cookies.ACCESS_TOKEN);
+    const email = decodedJwt.subject;
+    //const email = "h@gmail.com";
+    //console.log("EMAIL", email);
+
+    try {
+        const userResponse = await pool.query(
+            `SELECT user_id FROM user_info 
+             WHERE email = $1`,
+            [email]
+        );
+
+        const response = await pool.query(
+            `SELECT * from lookup_listing_user
+             WHERE user_id = $1 AND listing_id = $2`,
+            [userResponse.rows[0].user_id, listing_id]
+        );
+        if (!response.rows[0]) {
+            throw new Error("Undefined");
+        }
+        console.log("RESPONSE", response.rows[0]);
+        res.send(response.rows[0]);
+    } catch (error) {
+        console.log("ERROR", error);
         return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);
     }
 };

@@ -11,6 +11,7 @@ import {
     editImage,
     deleteImage,
     deleteListing,
+    validateListingAndUserRelationship,
 } from "../controllers/listing";
 const listingRouter = Router();
 
@@ -48,5 +49,8 @@ listingRouter.patch("/listing/:id/edit", editListing);
 listingRouter.put("/edit-image/:cloudinaryPublicId", editImage);
 listingRouter.delete("/delete-image/:cloudinaryPublicId", deleteImage);
 listingRouter.delete("/listing/:id/delete", deleteListing);
-
+listingRouter.get(
+    "/listing/:id/validate-user",
+    validateListingAndUserRelationship
+);
 export default listingRouter;

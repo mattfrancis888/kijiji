@@ -71,6 +71,11 @@ export interface FetchListingsAction {
     payload: FetchListingResponse;
 }
 
+export interface ValidateListingAndUser {
+    user_id: number;
+    listing_id: number;
+}
+
 export interface ListingDetail {
     first_name: string;
     last_name: string;
@@ -388,5 +393,19 @@ export const deleteListing = (
         //     type: ActionTypes.LISTING_ERROR,
         //     payload: { error: SERVER_ERROR_MESSAGE },
         // });
+    }
+};
+
+export const validateListingAndUserRelationship = (listingId: string) => async (
+    dispatch: Dispatch
+) => {
+    try {
+        const response = await axios.get<ValidateListingAndUser>(
+            `/listing/${listingId}/validate-user`
+        );
+        dispatch(null); //without dispatch axios won't be triggered
+    } catch (error) {
+        //User cannot edit a listing that does not belong to them
+        history.push("/listings/1");
     }
 };
