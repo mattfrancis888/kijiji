@@ -33,7 +33,6 @@ export interface EditAdProps {
 const EditAd: React.FC<EditAdProps> = (props) => {
     useEffect(() => {
         //We should validate if the listing actualy belongs to the user
-        console.log("useEffect");
         props.validateUserAndGetListingDetail(props.match.params.id);
     }, []);
 
