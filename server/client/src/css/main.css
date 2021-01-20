@@ -1418,10 +1418,6 @@ nav .logo {
   cursor: pointer;
 }
 
-.listingContainer {
-  position: relative;
-}
-
 .listingPreviewContainer {
   display: flex;
   background: white;

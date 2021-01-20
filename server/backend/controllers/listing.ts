@@ -521,7 +521,8 @@ export const deleteListing = async (req: any, res: Response) => {
 
 export const validateListingAndUserRelationship = async (
     req: any,
-    res: Response
+    res: Response,
+    next: NextFunction
 ) => {
     const listing_id = req.params.id;
 
@@ -543,10 +544,9 @@ export const validateListingAndUserRelationship = async (
             [userResponse.rows[0].user_id, listing_id]
         );
         if (!response.rows[0]) {
-            throw new Error("Undefined");
+            throw new Error("User does not own this listing");
         }
-        console.log("RESPONSE", response.rows[0]);
-        res.send(response.rows[0]);
+        next();
     } catch (error) {
         console.log("ERROR", error);
         return res.sendStatus(INTERNAL_SERVER_ERROR_STATUS);

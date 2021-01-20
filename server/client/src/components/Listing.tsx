@@ -24,53 +24,52 @@ const Listing: React.FC<ListingType> = ({
 }) => {
     const location = useLocation();
     return (
-        <div className="listingContainer">
+        <div
+            className="listingPreviewContainer"
+            onClick={() => {
+                history.push(`/listing/${listing_id}`);
+            }}
+        >
             {location.pathname === "/profile" ? (
                 <FontAwesomeIcon
                     className="pencilIcon"
                     icon={faPencilAlt}
-                    onClick={() => {
-                        history.replace(`/listing/${listing_id}/edit`);
+                    onClick={(event) => {
+                        event.stopPropagation(); //stops bubbling for history.push
+                        history.push(`/listing/${listing_id}/edit`);
                     }}
                 />
             ) : (
                 ""
             )}
-            <div
-                className="listingPreviewContainer"
-                onClick={() => {
-                    history.push(`/listing/${listing_id}`);
-                }}
-            >
-                <div className="listingPreviewImageContainer">
-                    <img
-                        src={
-                            !listing_image
-                                ? postAdListingImagePlaceHolder
-                                : listing_image
-                        }
-                        //If image that we get from cloudinary is no longer valid / broken for some reason, resort to default image
-                        onError={(e) => {
-                            e.target.src = postAdListingImagePlaceHolder; // some replacement image
-                            // e.target.style = 'padding: 8px; margin: 16px' // inline styles in html format
-                        }}
-                        alt="listing"
-                    />
+            <div className="listingPreviewImageContainer">
+                <img
+                    src={
+                        !listing_image
+                            ? postAdListingImagePlaceHolder
+                            : listing_image
+                    }
+                    //If image that we get from cloudinary is no longer valid / broken for some reason, resort to default image
+                    onError={(e) => {
+                        e.target.src = postAdListingImagePlaceHolder; // some replacement image
+                        // e.target.style = 'padding: 8px; margin: 16px' // inline styles in html format
+                    }}
+                    alt="listing"
+                />
+            </div>
+            <div className="listingPreviewInfoWrap">
+                <div className="titleAndPriceWrap">
+                    <h1 className="title">{listing_name}</h1>
+                    <h1 className="price">${listing_price}</h1>
                 </div>
-                <div className="listingPreviewInfoWrap">
-                    <div className="titleAndPriceWrap">
-                        <h1 className="title">{listing_name}</h1>
-                        <h1 className="price">${listing_price}</h1>
-                    </div>
-                    <div className="locationAndDateWrap">
-                        <h3 className="location">{`${city}, ${province} at ${street} `}</h3>
+                <div className="locationAndDateWrap">
+                    <h3 className="location">{`${city}, ${province} at ${street} `}</h3>
 
-                        <h3 className="date">
-                            {moment(listing_date).format("YYYY/MM/DD")}
-                        </h3>
-                    </div>
-                    <p className="listingDescription">{listing_description}</p>
+                    <h3 className="date">
+                        {moment(listing_date).format("YYYY/MM/DD")}
+                    </h3>
                 </div>
+                <p className="listingDescription">{listing_description}</p>
             </div>
         </div>
     );

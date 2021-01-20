@@ -550,7 +550,7 @@ var deleteListing = function (req, res) { return __awaiter(void 0, void 0, void 
     });
 }); };
 exports.deleteListing = deleteListing;
-var validateListingAndUserRelationship = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var validateListingAndUserRelationship = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var listing_id, decodedJwt, email, userResponse, response_6, error_5;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -568,10 +568,9 @@ var validateListingAndUserRelationship = function (req, res) { return __awaiter(
             case 3:
                 response_6 = _a.sent();
                 if (!response_6.rows[0]) {
-                    throw new Error("Undefined");
+                    throw new Error("User does not own this listing");
                 }
-                console.log("RESPONSE", response_6.rows[0]);
-                res.send(response_6.rows[0]);
+                next();
                 return [3 /*break*/, 5];
             case 4:
                 error_5 = _a.sent();

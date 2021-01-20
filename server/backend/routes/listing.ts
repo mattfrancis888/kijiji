@@ -49,8 +49,12 @@ listingRouter.patch("/listing/:id/edit", editListing);
 listingRouter.put("/edit-image/:cloudinaryPublicId", editImage);
 listingRouter.delete("/delete-image/:cloudinaryPublicId", deleteImage);
 listingRouter.delete("/listing/:id/delete", deleteListing);
+
+//When user goes to edit list, we want to validate if it's the lister owner
+//is valid and then we want to get the listing detail
 listingRouter.get(
-    "/listing/:id/validate-user",
-    validateListingAndUserRelationship
+    "/listing/:id/validate-user/edit",
+    validateListingAndUserRelationship,
+    getListingDetail
 );
 export default listingRouter;

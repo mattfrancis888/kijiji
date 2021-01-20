@@ -9,16 +9,12 @@ import CookieService from "../CookieService";
 import {
     deleteListing,
     editListing,
-    validateListingAndUserRelationship,
+    validateUserAndGetListingDetail,
 } from "../actions/listing";
 import { ListingDataResponse } from "../reducers/listingReducer";
 import Loading from "./Loading";
 
-import {
-    ListingDetail as ListingDetailType,
-    fetchListingDetail,
-    ServerError,
-} from "../actions";
+import { ListingDetail as ListingDetailType, ServerError } from "../actions";
 import formValues from "redux-form/lib/formValues";
 
 export interface EditAdProps {
@@ -29,7 +25,7 @@ export interface EditAdProps {
         cloudinaryPublicId: string | null
     ): void;
     deleteListing(listingId: string, cloudinaryPublicId: string | null): void;
-    validateListingAndUserRelationship(listingId: string);
+    validateUserAndGetListingDetail(listingId: string);
     match: any;
     listingDetail: ListingDetailType;
 }
@@ -37,8 +33,8 @@ export interface EditAdProps {
 const EditAd: React.FC<EditAdProps> = (props) => {
     useEffect(() => {
         //We should validate if the listing actualy belongs to the user
-        props.validateListingAndUserRelationship(props.match.params.id);
-        props.fetchListingDetail(props.match.params.id);
+        console.log("useEffect");
+        props.validateUserAndGetListingDetail(props.match.params.id);
     }, []);
 
     const renderContent = () => {
@@ -72,7 +68,7 @@ const EditAd: React.FC<EditAdProps> = (props) => {
 
             return (
                 <div className="editAdPageContainer">
-                    <h1>Edit Your Ad</h1>
+                    <h1>`Edit Your Ad</h1>
                     <EditOrPostAdForm
                         onSubmit={onEditListing}
                         onDelete={onDeleteListing}
@@ -134,8 +130,7 @@ const mapStateToProps = (state: StoreState) => {
 };
 
 export default connect(mapStateToProps, {
-    validateListingAndUserRelationship,
+    validateUserAndGetListingDetail,
     deleteListing,
     editListing,
-    fetchListingDetail,
 })(requireAuth(EditAd));

@@ -396,14 +396,17 @@ export const deleteListing = (
     }
 };
 
-export const validateListingAndUserRelationship = (listingId: string) => async (
+export const validateUserAndGetListingDetail = (listingId: string) => async (
     dispatch: Dispatch
 ) => {
     try {
-        const response = await axios.get<ValidateListingAndUser>(
-            `/listing/${listingId}/validate-user`
+        const response = await axios.get<ListingDetail>(
+            `/listing/${listingId}/validate-user/edit`
         );
-        dispatch(null); //without dispatch axios won't be triggered
+        dispatch<FetchListingDetailAction>({
+            type: ActionTypes.FETCH_LISTING_DETAIL,
+            payload: response.data,
+        });
     } catch (error) {
         //User cannot edit a listing that does not belong to them
         history.push("/listings/1");

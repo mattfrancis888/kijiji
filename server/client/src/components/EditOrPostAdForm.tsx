@@ -447,5 +447,11 @@ export default connect(mapStateToProps, { fetchCategoriesForListing })(
     reduxForm<{}, EditOrPostAdFormValues>({
         form: "postAdForm",
         validate,
+        enableReinitialize: true,
     })(PostAdForm)
 );
+
+//enableReinitialize: true is fo:
+//initialState does not re-render unless we eable enableReinitialize: true (pretty sure it has to do with the current redux version because
+//our music video stream project work without it)
+//https://stackoverflow.com/questions/38881324/redux-form-initialvalues-not-updating-with-state
