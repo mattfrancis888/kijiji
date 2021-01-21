@@ -24,6 +24,7 @@ const Header: React.FC<IHeader> = (props) => {
                     className="logo"
                     src={kijijiLogo}
                     alt="logo"
+                    data-testid="kijijiLogo"
                     onClick={() => history.push("/listings/1")}
                 />
 

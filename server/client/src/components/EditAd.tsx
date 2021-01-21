@@ -14,8 +14,7 @@ import {
 import { ListingDataResponse } from "../reducers/listingReducer";
 import Loading from "./Loading";
 
-import { ListingDetail as ListingDetailType, ServerError } from "../actions";
-import formValues from "redux-form/lib/formValues";
+import { ListingDetail as ListingDetailType } from "../actions";
 
 export interface EditAdProps {
     fetchListingDetail(listingId: string): void;
@@ -25,7 +24,7 @@ export interface EditAdProps {
         cloudinaryPublicId: string | null
     ): void;
     deleteListing(listingId: string, cloudinaryPublicId: string | null): void;
-    validateUserAndGetListingDetail(listingId: string);
+    validateUserAndGetListingDetail(listingId: string): void;
     match: any;
     listingDetail: ListingDetailType;
 }
@@ -45,11 +44,15 @@ const EditAd: React.FC<EditAdProps> = (props) => {
             );
         }
         // //too lazy to fix ts error, but I get the idea
+        //@ts-ignore
         else if (props.listingDetail.error) {
             return (
                 <div className="serverErrorContainer">
                     <h3 className="serverErrorText">
-                        {props.listingDetail.error}
+                        {
+                            //@ts-ignore
+                            props.listingDetail.error
+                        }
                     </h3>
                 </div>
             );
@@ -69,6 +72,7 @@ const EditAd: React.FC<EditAdProps> = (props) => {
                 <div className="editAdPageContainer">
                     <h1>`Edit Your Ad</h1>
                     <EditOrPostAdForm
+                        //@ts-ignore for some reason, there's a ts error with this react version
                         onSubmit={onEditListing}
                         onDelete={onDeleteListing}
                         initialValues={{
@@ -92,7 +96,9 @@ const EditAd: React.FC<EditAdProps> = (props) => {
 
         if (props.listingDetail.listing_image && formValues.image) {
             let cloudinaryPaths = props.listingDetail.listing_image.split("/");
+
             let cloudinaryLastPath = cloudinaryPaths.pop();
+            //@ts-ignore, catch block will catch it at editListing, dont worry
             let cloudinaryPublicId = cloudinaryLastPath.split(".")[0];
             console.log("cloudinaryPublicId", cloudinaryPublicId);
             props.editListing(
@@ -112,6 +118,7 @@ const EditAd: React.FC<EditAdProps> = (props) => {
         if (props.listingDetail.listing_image) {
             let cloudinaryPaths = props.listingDetail.listing_image.split("/");
             let cloudinaryLastPath = cloudinaryPaths.pop();
+            //@ts-ignore
             let cloudinaryPublicId = cloudinaryLastPath.split(".")[0];
             props.deleteListing(props.match.params.id, cloudinaryPublicId);
         } else {

@@ -50,7 +50,7 @@ const Listing: React.FC<ListingType> = ({
                             : listing_image
                     }
                     //If image that we get from cloudinary is no longer valid / broken for some reason, resort to default image
-                    onError={(e) => {
+                    onError={(e: any) => {
                         e.target.src = postAdListingImagePlaceHolder; // some replacement image
                         // e.target.style = 'padding: 8px; margin: 16px' // inline styles in html format
                     }}

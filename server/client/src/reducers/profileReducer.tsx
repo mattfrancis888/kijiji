@@ -3,7 +3,7 @@ import { UserProfile } from "../actions";
 import _ from "lodash";
 
 export interface UserProfileDataResponse {
-    data?: UserProfile;
+    data?: UserProfile | ServerError;
 }
 
 const listingReducer = (

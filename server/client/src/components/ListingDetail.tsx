@@ -6,7 +6,6 @@ import { StoreState } from "../reducers";
 import {
     ListingDetail as ListingDetailType,
     fetchListingDetail,
-    ServerError,
 } from "../actions";
 import postAdListingImagePlaceHolder from "../img/postAdListingImagePlaceHolder.png";
 import defaultProfilePic from "../img/defaultProfilePic.jpg";
@@ -15,7 +14,7 @@ import moment from "moment";
 
 interface ListingDetailProps {
     fetchListingDetail(listingId: string): void;
-    listingDetail: ListingDetailType;
+    listingDetail: any;
     match: any;
 }
 const ListingDetail: React.FC<ListingDetailProps> = (props) => {
@@ -31,12 +30,15 @@ const ListingDetail: React.FC<ListingDetailProps> = (props) => {
                     <Loading />
                 </div>
             );
-            //too lazy to fix ts error, but I get the idea
+            //@ts-ignore too lazy to fix ts error, but I get the idea
         } else if (props.listingDetail.error) {
             return (
                 <div className="serverErrorContainer">
                     <h3 className="serverErrorText">
-                        {props.listingDetail.error}
+                        {
+                            //@ts-ignore too lazy to fix ts error, but I get the idea
+                            props.listingDetail.error
+                        }
                     </h3>
                 </div>
             );
@@ -77,7 +79,7 @@ const ListingDetail: React.FC<ListingDetailProps> = (props) => {
                                             ? postAdListingImagePlaceHolder
                                             : listing_image
                                     }
-                                    onError={(e) => {
+                                    onError={(e: any) => {
                                         e.target.src = postAdListingImagePlaceHolder;
                                     }}
                                     alt="listing"

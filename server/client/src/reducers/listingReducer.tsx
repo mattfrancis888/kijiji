@@ -1,9 +1,14 @@
-import { ActionTypes, ListingAction, ServerError } from "../actions";
-import { Listing, FetchListingResponse, ListingDetail } from "../actions";
+import { ActionTypes, ListingAction } from "../actions";
+import {
+    Listing,
+    FetchListingResponse,
+    ListingDetail,
+    ServerError,
+} from "../actions";
 import _ from "lodash";
 
 export interface ListingDataResponse {
-    data?: FetchListingResponse | ListingDetail | ServerError;
+    data?: Listing | FetchListingResponse | ListingDetail | ServerError;
 }
 
 const listingReducer = (

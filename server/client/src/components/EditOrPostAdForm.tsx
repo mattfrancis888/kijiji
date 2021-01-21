@@ -10,14 +10,14 @@ import {
 //compose is used to make it easier to "organize" mapStateToProps and redux form
 import { StoreState } from "../reducers";
 import { connect } from "react-redux";
-import { PostAdFormProps } from "./PostAd";
+import { EditOrPostAdFormProps } from "./PostAd";
 import postAdListingImagePlaceHolder from "../img/postAdListingImagePlaceHolder.png";
 import { CANADIAN_PROVINCES, CANADIAN_PROVINCE_AND_CITIES } from "../constants";
 import { formValueSelector } from "redux-form";
 import { fetchCategoriesForListing } from "../actions";
 import Loading from "./Loading";
 import { SERVER_ERROR_MESSAGE } from "../constants";
-import { initial } from "lodash";
+
 import { useLocation } from "react-router-dom";
 
 export interface EditOrPostAdFormValues {
@@ -106,7 +106,7 @@ const renderDropDown = ({
                 autoComplete="off"
             >
                 <option></option>
-                {optionValues.map((val) => (
+                {optionValues.map((val: string) => (
                     <option key={val} value={val}>
                         {val}
                     </option>
@@ -118,7 +118,7 @@ const renderDropDown = ({
     );
 };
 
-const formatAmount = (input) => {
+const formatAmount = (input: string) => {
     //For price input, from: https://blog.harveydelaney.com/redux-form-lifecycle-example/
     if (!input) return;
     if (isNaN(parseInt(input[input.length - 1], 10))) {
@@ -127,7 +127,7 @@ const formatAmount = (input) => {
     return input.replace(/,/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
-const normalizeAmount = (val) => {
+const normalizeAmount = (val: string) => {
     //For price input, from: https://blog.harveydelaney.com/redux-form-lifecycle-example/
     return val.replace(/,/g, "");
 };
@@ -143,12 +143,12 @@ const renderFieldSectionLayout = (title: string, children: JSX.Element) => {
     );
 };
 const PostAdForm: React.FC<
-    PostAdFormProps & InjectedFormProps<{}, PostAdFormProps>
+    EditOrPostAdFormProps & InjectedFormProps<{}, EditOrPostAdFormProps>
 > = (props) => {
     const location = useLocation();
     const openFileExplorer = useRef(null);
-    const [listingImage, setListingImage] = useState(null);
-    const [cloudinaryImage, setCloudinaryImage] = useState(null);
+    const [listingImage, setListingImage] = useState<string | null>(null);
+    const [cloudinaryImage, setCloudinaryImage] = useState<string | null>(null);
     useEffect(() => {
         props.fetchCategoriesForListing();
         if (props.cloudinaryImage) setCloudinaryImage(props.cloudinaryImage);
@@ -267,10 +267,11 @@ const PostAdForm: React.FC<
                                 name="image"
                                 type="file"
                                 component={renderImageUpload}
+                                //@ts-ignore dont worry
                                 value={listingImage}
                                 ref={openFileExplorer}
                                 withRef
-                                onChange={(event) => {
+                                onChange={(event: any) => {
                                     //For some reason,
                                     //The input's text dosen't change but the input is actually inserted (do formValues.image below)
                                     setCloudinaryImage(null);
@@ -296,6 +297,7 @@ const PostAdForm: React.FC<
                                     }
                                     className="postAdChooseListingImage"
                                     onClick={() => {
+                                        // @ts-ignore
                                         openFileExplorer.current.click();
                                     }}
                                     style={renderImage()}
@@ -448,6 +450,8 @@ export default connect(mapStateToProps, { fetchCategoriesForListing })(
         form: "postAdForm",
         validate,
         enableReinitialize: true,
+        //@ts-ignore I'm missing a field value, too lazy to fix, refer to old projects to get the idea of proper
+        //typescipt integration with forms.
     })(PostAdForm)
 );
 

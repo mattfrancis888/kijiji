@@ -17,10 +17,17 @@ export interface SearchFilterFormProps {
     onDropdownChange(): void;
 }
 
+export interface ModalProps {
+    onDismiss(): void;
+    title: string;
+    content: JSX.Element;
+    actions?: JSX.Element;
+}
+
 const Searchbar: React.FC<{}> = () => {
     const [showFilterModal, setShowFilterModal] = useState(false);
-    const [filterQueries, setFilterQueries] = useState(null);
-    const [searchValue, setSearchValue] = useState(null);
+    const [filterQueries, setFilterQueries] = useState<string | null>(null);
+    const [searchValue, setSearchValue] = useState("");
     const [initialLoad, setInitialLoad] = useState(true);
 
     const onSubmitFilter = async (formValues: SearchFilterFormValues) => {
@@ -81,9 +88,9 @@ const Searchbar: React.FC<{}> = () => {
         }
     };
 
-    const [filterCategory, setFilterCategory] = useState(null);
-    const [filterProvince, setFilterProvince] = useState(null);
-    const [filterCity, setFilterCity] = useState(null);
+    const [filterCategory, setFilterCategory] = useState<string | null>(null);
+    const [filterProvince, setFilterProvince] = useState<string | null>(null);
+    const [filterCity, setFilterCity] = useState<string | null>(null);
 
     //For Query Strings:
     const { search } = useLocation();
@@ -125,7 +132,7 @@ const Searchbar: React.FC<{}> = () => {
     };
 
     const directToListingsPage = () => {
-        if (filterQueries && searchValue) {
+        if (filterQueries && searchValue != "") {
             // history.push(`/listings/1?search=${searchValue}&${filterQueries}`);
             history.push({
                 pathname: "/listings/1",

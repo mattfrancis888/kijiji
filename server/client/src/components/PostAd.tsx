@@ -10,12 +10,13 @@ import CookieService from "../CookieService";
 import { ListingDataResponse } from "../reducers/listingReducer";
 import Loading from "./Loading";
 
-export interface PostAdFormProps {
+export interface EditOrPostAdFormProps {
     onSubmit(formValues: any): void;
+    onDelete(formValues: any): void;
     fetchCategoriesForListing(): void;
     initialValues: Object;
     provinceValue: string;
-    categories: [];
+    categories: string[];
     dispatch: any;
     cloudinaryImage: string;
 }
