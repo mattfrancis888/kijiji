@@ -446,12 +446,10 @@ const mapStateToProps = (state: StoreState) => {
 };
 
 export default connect(mapStateToProps, { fetchCategoriesForListing })(
-    reduxForm<{}, EditOrPostAdFormValues>({
+    reduxForm<{}, EditOrPostAdFormProps>({
         form: "postAdForm",
         validate,
         enableReinitialize: true,
-        //@ts-ignore I'm missing a field value, too lazy to fix, refer to old projects to get the idea of proper
-        //typescipt integration with forms.
     })(PostAdForm)
 );
 

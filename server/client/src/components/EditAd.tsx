@@ -72,9 +72,8 @@ const EditAd: React.FC<EditAdProps> = (props) => {
                 <div className="editAdPageContainer">
                     <h1>`Edit Your Ad</h1>
                     <EditOrPostAdForm
-                        //@ts-ignore for some reason, there's a ts error with this react version
-                        onSubmit={onEditListing}
-                        onDelete={onDeleteListing}
+                        onSubmit={() => onEditListing}
+                        onDelete={() => onDeleteListing}
                         initialValues={{
                             title: listing_name,
                             description: listing_description,

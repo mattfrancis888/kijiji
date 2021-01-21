@@ -31,7 +31,7 @@ const Register: React.FC<RegisterProps> = (props) => {
     return (
         <div className="registerContainer">
             <div className="registerFormWrap">
-                <RegisterForm onSubmit={onSubmitRegister} />
+                <RegisterForm onSubmit={() => onSubmitRegister} />
             </div>
             <div className="registerMiscWrap">
                 <div className="alreadyRegisteredContainer">

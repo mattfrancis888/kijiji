@@ -44,7 +44,7 @@ const SearchFilterForm: React.FC<
                 {...input}
             >
                 <option value=""></option>
-                {optionValues.map((val) => (
+                {optionValues.map((val: string) => (
                     <option key={val} value={val}>
                         {val}
                     </option>
@@ -106,11 +106,13 @@ const SearchFilterForm: React.FC<
                                 type="text"
                                 component={renderDropDown}
                                 optionValues={
+                                    //@ts-ignore
                                     !props.provinceValue
                                         ? []
                                         : CANADIAN_PROVINCE_AND_CITIES.filter(
                                               (provinceAndCity) =>
                                                   provinceAndCity.province ===
+                                                  //@ts-ignore
                                                   props.provinceValue
                                           )[0].cities
                                 }

@@ -12,13 +12,13 @@ import Loading from "./Loading";
 
 export interface EditOrPostAdFormProps {
     onSubmit(formValues: any): void;
-    onDelete(formValues: any): void;
+    onDelete?(formValues: any): void;
     fetchCategoriesForListing(): void;
-    initialValues: Object;
-    provinceValue: string;
+    initialValues?: any;
+    provinceValue?: string;
     categories: string[];
-    dispatch: any;
-    cloudinaryImage: string;
+    dispatch?: any;
+    cloudinaryImage?: string;
 }
 
 export interface PostAdProps {
