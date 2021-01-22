@@ -139,11 +139,3 @@ test("Register form on submit", async () => {
         pushSpy.mockRestore();
     });
 }, 30000);
-
-// test("Click logo", async () => {
-//     act(() => {
-//         fireEvent.click(app.getByTestId("kijijiLogo"));
-//     });
-//     expect(pushSpy).toBeCalledWith("/listings/1");
-//     pushSpy.mockRestore();
-// }, 30000);

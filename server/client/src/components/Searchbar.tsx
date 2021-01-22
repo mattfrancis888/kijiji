@@ -169,6 +169,7 @@ const Searchbar: React.FC<{}> = () => {
     return (
         <form className="searchBarForm">
             <FontAwesomeIcon
+                data-testid="filterIcon"
                 className="searchBarIcons"
                 icon={faSlidersH}
                 onClick={() => setShowFilterModal(true)}
@@ -186,6 +187,7 @@ const Searchbar: React.FC<{}> = () => {
             />
             <FontAwesomeIcon
                 className="searchBarIcons"
+                data-testid="searchIcon"
                 icon={faSearch}
                 onClick={() => {
                     directToListingsPage();

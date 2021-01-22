@@ -435,6 +435,7 @@ body {
   font-size: 1.3rem;
 }
 .alreadyRegisteredContainer .alreadyRegisteredButton {
+  cursor: pointer;
   background-color: #373373;
   color: white;
   padding: 0.7rem;
@@ -522,6 +523,7 @@ body {
   font-size: 1.2rem;
 }
 .registerNowContainer .registerNowButton {
+  cursor: pointer;
   background-color: #373373;
   color: white;
   padding: 0.7rem;
@@ -1783,11 +1785,13 @@ nav .logo {
 .modalAcceptButton {
   background-color: #373373;
   color: white;
+  cursor: pointer;
 }
 
 .modalCancelButton {
   background-color: #e2e2e5;
   color: black;
+  cursor: pointer;
 }
 
 .serverErrorContainer {
