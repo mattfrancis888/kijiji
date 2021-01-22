@@ -1,6 +1,5 @@
 import Root from "Root";
 import React from "react";
-import Listing from "components/Listing";
 import "@testing-library/jest-dom/extend-expect";
 import { MemoryRouter } from "react-router";
 import Routes from "components/Routes";
@@ -11,8 +10,6 @@ import {
     fireEvent,
 } from "@testing-library/react";
 import { act } from "react-dom/test-utils";
-import axios from "axios";
-import MockAdapter from "axios-mock-adapter";
 import nock from "nock";
 import waitForExpect from "wait-for-expect";
 
@@ -23,7 +20,6 @@ import history from "browserHistory";
 //1.Handle routes that users are not supposed to visit:
 //https://ultimatecourses.com/blog/react-router-not-found-component
 //2.Handle long descriptions and elipsis
-//3. Fixed sign in and register buttons
 
 afterEach(() => {
     cleanup();
@@ -35,7 +31,7 @@ let pushSpy: jest.SpyInstance;
 
 beforeEach(async () => {
     // Method 1:
-    jest.mock("js-cookie", () => ({ get: () => "fr" }));
+    // jest.mock("js-cookie", () => ({ get: () => "fr" }));
 
     //Method 2:
     //Cookies.get = jest.fn().mockImplementation(() => "ACCESS_TOKEN");
@@ -53,8 +49,9 @@ beforeEach(async () => {
             </MemoryRouter>
         </Root>
     );
-    console.log("Cookie Val", Cookies.get());
-    // app.debug();
+
+    //console.log("Cookie Val", Cookies.get());
+    //app.debug();
 
     //Mocking history:
     //https://www.reddit.com/r/reactjs/comments/b1hsno/how_can_i_test_historypush_inside_action/
@@ -86,6 +83,13 @@ describe("Check for essential components", () => {
 //         expect(mockSet).toBeCalled();
 //     });
 // });
+
+test("Already registered button", async () => {
+    act(() => {
+        fireEvent.click(app.getByTestId("alreadyRegisteredButton"));
+    });
+    expect(pushSpy).toBeCalledWith("/signin");
+});
 
 test("Register form on submit", async () => {
     const signInResponse = {

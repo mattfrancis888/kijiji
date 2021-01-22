@@ -39,7 +39,13 @@ const Register: React.FC<RegisterProps> = (props) => {
                 <div className="alreadyRegisteredContainer">
                     <h1>Already Registered?</h1>
                     <p>Sign in to post your ad</p>
-                    <button className="alreadyRegisteredButton">Sign in</button>
+                    <button
+                        data-testid="alreadyRegisteredButton"
+                        className="alreadyRegisteredButton"
+                        onClick={() => history.push("/signin")}
+                    >
+                        Sign in
+                    </button>
                 </div>
                 <div className="whyRegisterContainer">
                     <h1>Why Register?</h1>

@@ -36,8 +36,13 @@ const renderTextInput = ({ input, label, meta, placeHolder }: any) => {
     //"label" automatically passes props to arguments
     return (
         <div>
-            <label>{label}</label>
-            <input className="createAuthInputs" {...input} autoComplete="off" />
+            {/* <label>{label}</label> */}
+            <input
+                className="createAuthInputs"
+                data-testid={label}
+                {...input}
+                autoComplete="off"
+            />
             {renderError(meta)}
         </div>
     );
@@ -48,9 +53,10 @@ const renderTextInput = ({ input, label, meta, placeHolder }: any) => {
 const renderPasswordInput = ({ input, label, meta, placeHolder }: any) => {
     return (
         <div>
-            <label>{label}</label>
+            {/* <label>{label}</label> */}
             <input
                 className="createAuthInputs"
+                data-testid={label}
                 type="password"
                 {...input}
                 autoComplete="off"
@@ -90,6 +96,7 @@ const SignInForm: React.FC<
                     </div>
                     <Field
                         name="email"
+                        label="email"
                         type="text"
                         component={renderTextInput}
                     />
@@ -103,12 +110,15 @@ const SignInForm: React.FC<
                     </div>
                     <Field
                         name="password"
+                        label="password"
                         type="password"
                         component={renderPasswordInput}
                     />
                 </div>
 
-                <button className="authButton">Sign In</button>
+                <button className="authButton" data-testid="signInButton">
+                    Sign In
+                </button>
             </form>
         </React.Fragment>
     );

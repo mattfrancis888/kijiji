@@ -41,7 +41,13 @@ const SignIn: React.FC<SignInProps> = (props) => {
                         Register now to post, edit, and manage ads. It’s quick,
                         easy, and free!
                     </p>
-                    <button className="registerNowButton">Register Now</button>
+                    <button
+                        data-testid="registerNowButton"
+                        className="registerNowButton"
+                        onClick={() => history.push("/")}
+                    >
+                        Register Now
+                    </button>
                 </div>
                 <div>
                     <h1>Protect Your Account</h1>
