@@ -58,7 +58,7 @@ export const signOut = () => async (dispatch: Dispatch) => {
             type: ActionTypes.AUTH_USER,
             payload: response.data,
         });
-        history.push("/signin");
+        history.push("/");
         alert("Logged out succesfully");
     } catch (err) {
         alert("Log out failed, try again");

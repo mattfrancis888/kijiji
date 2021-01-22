@@ -72,8 +72,10 @@ const EditAd: React.FC<EditAdProps> = (props) => {
                 <div className="editAdPageContainer">
                     <h1>`Edit Your Ad</h1>
                     <EditOrPostAdForm
-                        onSubmit={() => onEditListing}
-                        onDelete={() => onDeleteListing}
+                        onSubmit={(formValues: any) =>
+                            onEditListing(formValues)
+                        }
+                        onDelete={onDeleteListing}
                         initialValues={{
                             title: listing_name,
                             description: listing_description,

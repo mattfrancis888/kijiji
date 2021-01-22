@@ -30,7 +30,9 @@ const SignIn: React.FC<SignInProps> = (props) => {
     return (
         <div className="signInContainer">
             <div className="signInFormWrap">
-                <SignInForm onSubmit={() => onSubmitSignIn} />
+                <SignInForm
+                    onSubmit={(formValues: any) => onSubmitSignIn(formValues)}
+                />
             </div>
             <div className="signInMiscWrap">
                 <div className="registerNowContainer">

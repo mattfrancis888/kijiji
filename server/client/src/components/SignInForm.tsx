@@ -75,7 +75,11 @@ const SignInForm: React.FC<
 
     return (
         <React.Fragment>
-            <form className="authForm" onSubmit={props.handleSubmit(onSubmit)}>
+            <form
+                className="authForm"
+                data-testid="signInForm"
+                onSubmit={props.handleSubmit(onSubmit)}
+            >
                 <h1>Sign In</h1>
                 <div className="authFieldSection">
                     <div className="authFormFieldTitleWrap">
