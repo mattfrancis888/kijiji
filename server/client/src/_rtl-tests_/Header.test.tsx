@@ -22,54 +22,56 @@ afterEach(() => {
     cleanup();
 });
 
-beforeEach(async () => {
-    app = render(
-        <Root>
-            <MemoryRouter initialEntries={["/"]} initialIndex={0}>
-                <Routes />
-            </MemoryRouter>
-        </Root>
-    );
+describe("Header - When users are not signed in", () => {
+    beforeEach(async () => {
+        app = render(
+            <Root>
+                <MemoryRouter initialEntries={["/"]} initialIndex={0}>
+                    <Routes />
+                </MemoryRouter>
+            </Root>
+        );
 
-    //Mocking history:
-    //https://www.reddit.com/r/reactjs/comments/b1hsno/how_can_i_test_historypush_inside_action/
-    pushSpy = jest.spyOn(history, "push");
-});
-
-test("Click logo", async () => {
-    act(() => {
-        fireEvent.click(app.getByTestId("kijijiLogo"));
+        //Mocking history:
+        //https://www.reddit.com/r/reactjs/comments/b1hsno/how_can_i_test_historypush_inside_action/
+        pushSpy = jest.spyOn(history, "push");
     });
-    expect(pushSpy).toBeCalledWith("/listings/1");
-    pushSpy.mockRestore();
-});
 
-test("Click register text", async () => {
-    act(() => {
-        fireEvent.click(app.getByTestId("headerRegisterText"));
+    test("Click logo", async () => {
+        act(() => {
+            fireEvent.click(app.getByTestId("kijijiLogo"));
+        });
+        expect(pushSpy).toBeCalledWith("/listings/1");
+        pushSpy.mockRestore();
     });
-    expect(pushSpy).toBeCalledWith("/signup");
-    pushSpy.mockRestore();
-});
 
-test("Click sign in text", async () => {
-    act(() => {
-        fireEvent.click(app.getByTestId("headerSignInText"));
+    test("Click register text", async () => {
+        act(() => {
+            fireEvent.click(app.getByTestId("headerRegisterText"));
+        });
+        expect(pushSpy).toBeCalledWith("/signup");
+        pushSpy.mockRestore();
     });
-    expect(pushSpy).toBeCalledWith("/signin");
-    pushSpy.mockRestore();
-});
 
-// test("Click post ad button", async () => {
-//     //user is not signed in, so they cannot post an ad
-//     act(() => {
-//         fireEvent.click(app.getByTestId("postAdButtotn"));
-//     });
-//     expect(pushSpy).toBeCalledWith("/");
-//     pushSpy.mockRestore();
-// });
+    test("Click sign in text", async () => {
+        act(() => {
+            fireEvent.click(app.getByTestId("headerSignInText"));
+        });
+        expect(pushSpy).toBeCalledWith("/signin");
+        pushSpy.mockRestore();
+    });
 
-describe("Search bar functionality", () => {
+    test("Click post ad button", async () => {
+        //user is not signed in, so they cannot post an ad
+        act(() => {
+            fireEvent.click(app.getByTestId("postAdButtotn"));
+        });
+        expect(pushSpy).toBeCalledWith("/post-ad");
+        //BUT IF user is not signed in, it should be
+        // expect(pushSpy).toBeCalledWith("/");
+        pushSpy.mockRestore();
+    });
+
     test("Click search icon", async () => {
         //user is not signed in, so they cannot post an ad
         act(() => {
@@ -101,4 +103,31 @@ describe("Search bar functionality", () => {
     //     //expect("searchFilterForm").toBeInTheDocument();
     //     // pushSpy.mockRestore();
     // });
+});
+
+describe("Header - When users are already signed in", () => {
+    let app: RenderResult;
+    beforeEach(async () => {
+        Object.defineProperty(window.document, "cookie", {
+            writable: true,
+            value: "ACCESS_TOKEN=omnomnom",
+        });
+
+        app = render(
+            <Root>
+                <MemoryRouter initialEntries={["/"]} initialIndex={0}>
+                    <Routes />
+                </MemoryRouter>
+            </Root>
+        );
+
+        pushSpy = jest.spyOn(history, "push");
+    });
+
+    test("Check post ad", async () => {
+        act(() => {
+            fireEvent.click(app.getByTestId("postAdButtotn"));
+        });
+        expect(pushSpy).toBeCalledWith("/post-ad");
+    });
 });

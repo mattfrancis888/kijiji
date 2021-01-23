@@ -30,16 +30,9 @@ let pushSpy: jest.SpyInstance;
 //https://stackoverflow.com/questions/50761393/how-to-mock-cookie-getlanguage-in-jest
 
 beforeEach(async () => {
-    // Method 1:
-    // jest.mock("js-cookie", () => ({ get: () => "fr" }));
-
-    //Method 2:
-    //Cookies.get = jest.fn().mockImplementation(() => "ACCESS_TOKEN");
-
-    //Method 3:
     // Object.defineProperty(window.document, "cookie", {
     //     writable: true,
-    //     value: "myCookie=omnomnom",
+    //     value: "ACCESS_TOKEN=omnomnom",
     // });
 
     app = render(
@@ -51,7 +44,6 @@ beforeEach(async () => {
     );
 
     //console.log("Cookie Val", Cookies.get());
-    //app.debug();
 
     //Mocking history:
     //https://www.reddit.com/r/reactjs/comments/b1hsno/how_can_i_test_historypush_inside_action/
@@ -67,23 +59,6 @@ describe("Check for essential components", () => {
         expect(app.getByTestId("registerForm")).toBeInTheDocument();
     });
 });
-
-// describe("cookies functionality", () => {
-//     it("should set the cookie correctly", () => {
-//         // create a mock function using jest.fn()
-//         const mockSet = jest.fn();
-
-//         // here we are trying to mock the 'set' functionality of Cookie
-//         Cookies.set = mockSet;
-
-//         // call the set method of Cookies
-//         Cookies.set("ACCESS_TOKEN", "value");
-
-//         // check if the mock function gets called here
-//         expect(mockSet).toBeCalled();
-//     });
-// });
-
 test("Already registered button", async () => {
     act(() => {
         fireEvent.click(app.getByTestId("alreadyRegisteredButton"));
@@ -131,11 +106,40 @@ test("Register form on submit", async () => {
         }
         expect(signUpScope.isDone()).toBe(true);
         // expect(window.localStorage.setItem).toHaveBeenCalledTimes(1);
+        // Object.defineProperty(window.document, "cookie", {
+        //     writable: true,
+        //     value: "ACCESS_TOKEN=omnomnom",
+        // });
         //If it's succesfull, push to listings/1 (jest dosent realize
         //if it will fall into the try/catch block)
-
         history.push("/listings/1");
         expect(pushSpy).toBeCalledWith("/listings/1");
         pushSpy.mockRestore();
     });
 }, 30000);
+
+//No need to test describe block below, it will go to /listings/1 in
+// when users are already signed in,
+//test listings component instead
+// describe("Register Page - When user is signed in", () => {
+//     beforeEach(async () => {
+//         Object.defineProperty(window.document, "cookie", {
+//             writable: true,
+//             value: "ACCESS_TOKEN=omnomnom",
+//         });
+
+//         app = render(
+//             <Root>
+//                 <MemoryRouter initialEntries={["/"]} initialIndex={0}>
+//                     <Routes />
+//                 </MemoryRouter>
+//             </Root>
+//         );
+
+//         pushSpy = jest.spyOn(history, "push");
+//note that pushSpy only watches if history changes once something is triggered (like a button)
+//if we have history.push() in useEffect, pushSpy will not catch it, below will not work
+//expect(pushSpy).toBeCalledWith("/listings/1");
+//         app.debug();
+//     });
+// });

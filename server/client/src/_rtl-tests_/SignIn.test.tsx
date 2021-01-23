@@ -74,7 +74,10 @@ test("Sign in form on submit", async () => {
 
     const signInScope = nock("http://localhost:5000")
         .post("/signin", expectedMockFormValues)
-        .reply(200, signInResponse, { "Access-Control-Allow-Origin": "*" });
+        .reply(200, signInResponse, {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": "true",
+        });
 
     await waitForExpect(() => {
         if (!signInScope.isDone()) {
@@ -82,9 +85,8 @@ test("Sign in form on submit", async () => {
         }
         expect(signInScope.isDone()).toBe(true);
         // expect(window.localStorage.setItem).toHaveBeenCalledTimes(1);
-        //If it's succesfull, push to listings/1 (jest dosent realize
-        //if it will fall into the try/catch block)
-        history.push("/listings/1");
+        //If it's succesfull, push to listings/1
+        //console.log(Cookies.get());
         expect(pushSpy).toBeCalledWith("/listings/1");
         pushSpy.mockRestore();
     });
