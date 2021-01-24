@@ -15,10 +15,10 @@ import Loading from "./Loading";
 import Pagination from "./Pagination";
 import queryString from "query-string";
 import { useLocation, useParams } from "react-router-dom";
-const ORDER_BY_OLDEST_DATE = "Posted: oldest first";
-const ORDER_BY_NEWEST_DATE = "Posted: newest first";
-const ORDER_BY_LOWEST_PRICE = " Price: lowest first";
-const ORDER_BY_HIGHEST_PRICE = "Price: highest first";
+export const ORDER_BY_OLDEST_DATE = "Posted: oldest first";
+export const ORDER_BY_NEWEST_DATE = "Posted: newest first";
+export const ORDER_BY_LOWEST_PRICE = " Price: lowest first";
+export const ORDER_BY_HIGHEST_PRICE = "Price: highest first";
 
 interface IListings {
     fetchListingsByOldestDate(pageNumber: number, queryPath: string): void;

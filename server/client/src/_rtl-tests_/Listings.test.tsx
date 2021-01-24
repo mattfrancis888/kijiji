@@ -13,7 +13,7 @@ import { act } from "react-dom/test-utils";
 import Modal from "components/Modal";
 import nock from "nock";
 import waitForExpect from "wait-for-expect";
-
+import { ORDER_BY_OLDEST_DATE } from "components/Listings";
 import Cookies from "js-cookie";
 import history from "browserHistory";
 let pushSpy: jest.SpyInstance;
@@ -92,7 +92,7 @@ beforeEach(async () => {
 
     //Mocking history:
     //https://www.reddit.com/r/reactjs/comments/b1hsno/how_can_i_test_historypush_inside_action/
-    //pushSpy = jest.spyOn(history, "push");
+    pushSpy = jest.spyOn(history, "push");
 });
 
 test("Listing page, ComponentDidMount() - Fill listing page with listings", async () => {
@@ -102,14 +102,47 @@ test("Listing page, ComponentDidMount() - Fill listing page with listings", asyn
         }
         expect(scope.isDone()).toBe(true);
         expect(app.getByText("barbell")).toBeInTheDocument();
-        //pushSpy.mockRestore();
     });
 }, 30000);
 
-// test("Click sign in text", async () => {
+test("Pagination exists", async () => {
+    expect(app.getByText("1")).toBeInTheDocument();
+}, 30000);
+
+test("Pagination click", async () => {
+    // app.debug();
+    expect(app.getByText("1")).toBeInTheDocument();
+    act(() => {
+        fireEvent.click(app.getByText("1"));
+    });
+    expect(pushSpy).toBeCalledWith({ pathname: "/listings/1", search: "" });
+    pushSpy.mockRestore();
+}, 30000);
+
+// test("Dropdown value", async () => {
+//     // app.debug();
+//     console.log(ORDER_BY_OLDEST_DATE);
+//     expect(app.getByText(ORDER_BY_OLDEST_DATE)).toBeInTheDocument();
 //     act(() => {
-//         fireEvent.click(app.getByTestId("headerSignInText"));
+//         fireEvent.click(app.getByText(ORDER_BY_OLDEST_DATE));
 //     });
-//     expect(pushSpy).toBeCalledWith("/signin");
-//     pushSpy.mockRestore();
-// });
+
+//     expect(app.getByText("1")).toBeInTheDocument();
+//     act(() => {
+//         fireEvent.click(app.getByText("1"));
+//     });
+
+//     scope = nock("http://localhost:5000")
+//         .get("/listing-oldest-date/1")
+//         .reply(200, mockData, {
+//             "Access-Control-Allow-Origin": "*",
+//             "Access-Control-Allow-Credentials": "true",
+//         });
+//     await waitForExpect(() => {
+//         if (!scope.isDone()) {
+//             console.error("pending mocks: %j", scope.pendingMocks());
+//         }
+//         expect(scope.isDone()).toBe(true);
+//         expect(app.getByText("barbell")).toBeInTheDocument();
+//     });
+// }, 30000);
