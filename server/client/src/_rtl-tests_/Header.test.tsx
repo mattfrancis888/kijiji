@@ -81,6 +81,23 @@ describe("Header - When users are not signed in", () => {
         pushSpy.mockRestore();
     });
 
+    test("Search bar entered, click search icon", async () => {
+        //user is not signed in, so they cannot post an ad
+        fireEvent.change(app.getAllByTestId("searchBarInput")[0], {
+            target: { value: "barbel" },
+        });
+        expect(app.getAllByTestId("searchBarInput")[0]).toBeInTheDocument();
+        act(() => {
+            fireEvent.click(app.getAllByTestId("searchIcon")[0]);
+        });
+        expect(pushSpy).toBeCalledWith({
+            pathname: "/listings/1",
+            search: "?search=barbel",
+        });
+
+        pushSpy.mockRestore();
+    });
+
     //React's portals (Modal component)
     //It will complain " Target container is not a DOM element."
     //because Modal is created at a different div than "root" div in index.html

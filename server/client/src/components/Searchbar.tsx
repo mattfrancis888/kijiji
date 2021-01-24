@@ -175,6 +175,7 @@ const Searchbar: React.FC<{}> = () => {
                 onClick={() => setShowFilterModal(true)}
             />
             <input
+                data-testid="searchBarInput"
                 className="searchBarInput"
                 type="search"
                 placeholder="Search..."

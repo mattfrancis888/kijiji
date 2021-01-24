@@ -119,30 +119,16 @@ test("Pagination click", async () => {
     pushSpy.mockRestore();
 }, 30000);
 
-// test("Dropdown value", async () => {
-//     // app.debug();
-//     console.log(ORDER_BY_OLDEST_DATE);
-//     expect(app.getByText(ORDER_BY_OLDEST_DATE)).toBeInTheDocument();
-//     act(() => {
-//         fireEvent.click(app.getByText(ORDER_BY_OLDEST_DATE));
-//     });
+test("Dropdown value clicked, then page clicked", async () => {
+    expect(app.getByText(ORDER_BY_OLDEST_DATE)).toBeInTheDocument();
+    act(() => {
+        fireEvent.click(app.getByText(ORDER_BY_OLDEST_DATE));
+    });
 
-//     expect(app.getByText("1")).toBeInTheDocument();
-//     act(() => {
-//         fireEvent.click(app.getByText("1"));
-//     });
-
-//     scope = nock("http://localhost:5000")
-//         .get("/listing-oldest-date/1")
-//         .reply(200, mockData, {
-//             "Access-Control-Allow-Origin": "*",
-//             "Access-Control-Allow-Credentials": "true",
-//         });
-//     await waitForExpect(() => {
-//         if (!scope.isDone()) {
-//             console.error("pending mocks: %j", scope.pendingMocks());
-//         }
-//         expect(scope.isDone()).toBe(true);
-//         expect(app.getByText("barbell")).toBeInTheDocument();
-//     });
-// }, 30000);
+    expect(app.getByText("1")).toBeInTheDocument();
+    act(() => {
+        fireEvent.click(app.getByText("1"));
+    });
+    expect(pushSpy).toBeCalledWith({ pathname: "/listings/1", search: "" });
+    pushSpy.mockRestore();
+}, 30000);
