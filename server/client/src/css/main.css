@@ -1515,6 +1515,10 @@ nav .logo {
   margin: 0;
   margin-bottom: 0.2rem;
   font-weight: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 @media screen and (min-width: 768px) {
   .locationAndDateWrap .location {
@@ -1558,6 +1562,10 @@ nav .logo {
 @media screen and (min-width: 520px) {
   .listingDescription {
     display: block;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
     margin: 0;
     font-size: 1.5rem;
   }

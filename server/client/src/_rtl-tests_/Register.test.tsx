@@ -15,12 +15,6 @@ import waitForExpect from "wait-for-expect";
 
 import Cookies from "js-cookie";
 import history from "browserHistory";
-
-//TODO:
-//1.Handle routes that users are not supposed to visit:
-//https://ultimatecourses.com/blog/react-router-not-found-component
-//2.Handle long descriptions and elipsis
-
 afterEach(() => {
     cleanup();
 });

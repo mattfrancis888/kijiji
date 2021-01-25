@@ -77,6 +77,10 @@
         margin: 0;
         margin-bottom: 0.2rem;
         font-weight: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
         @media screen and (min-width: $md_breakpoint) {
             font-size: 1.7rem;
         }
@@ -110,6 +114,10 @@
     line-height: 22px;
     @media screen and (min-width: $sm_breakpoint) {
         display: block;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
         margin: 0;
         font-size: 1.5rem;
     }
