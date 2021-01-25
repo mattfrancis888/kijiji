@@ -8,6 +8,7 @@ import {
     ListingErrorAction,
     FetchListingsAction,
     FetchListingDetailAction,
+    DeleteListingAction,
 } from "../actions";
 import { EditListingAction } from "./listing";
 import { FetchUserProfileAction, FetchUserProfileErrorAction } from "./profile";

@@ -22,7 +22,7 @@ const Profile: React.FC<ProfileProps> = (props) => {
         props.fetchUserProfile();
     }, []);
 
-    const renderListings = (listings) => {
+    const renderListings = (listings: ListingType[]) => {
         if (listings.length === 0) {
             return (
                 <div className="userListingContainerEmpty">

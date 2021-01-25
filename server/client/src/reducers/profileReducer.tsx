@@ -1,9 +1,14 @@
-import { ActionTypes, UserProfileAction } from "../actions";
-import { UserProfile } from "../actions";
+import {
+    ActionTypes,
+    UserProfileAction,
+    UserProfile,
+    ServerError,
+} from "../actions";
+
 import _ from "lodash";
 
 export interface UserProfileDataResponse {
-    data?: UserProfile;
+    data?: UserProfile | ServerError;
 }
 
 const listingReducer = (

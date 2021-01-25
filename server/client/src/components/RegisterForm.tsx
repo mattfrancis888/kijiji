@@ -38,9 +38,9 @@ const renderTextInput = ({ input, label, meta, placeHolder }: any) => {
     //"label" automatically passes props to arguments
     return (
         <div>
-            <label>{label}</label>
+            {/* <label>{label}</label> */}
             <input
-                data-testid="registerTextInput"
+                data-testid={label}
                 className="createAuthInputs"
                 {...input}
                 autoComplete="off"
@@ -55,8 +55,9 @@ const renderTextInput = ({ input, label, meta, placeHolder }: any) => {
 const renderPasswordInput = ({ input, label, meta, placeHolder }: any) => {
     return (
         <div>
-            <label>{label}</label>
+            {/* <label>{label}</label> */}
             <input
+                data-testid={label}
                 className="createAuthInputs"
                 type="password"
                 {...input}
@@ -83,7 +84,11 @@ const RegisterForm: React.FC<
 
     return (
         <React.Fragment>
-            <form className="authForm" onSubmit={props.handleSubmit(onSubmit)}>
+            <form
+                className="authForm"
+                data-testid="registerForm"
+                onSubmit={props.handleSubmit(onSubmit)}
+            >
                 <h1>Register</h1>
                 <div className="authFieldSection">
                     <div className="authFormFieldTitleWrap">
@@ -94,6 +99,7 @@ const RegisterForm: React.FC<
                     </div>
                     <Field
                         name="email"
+                        label="email"
                         type="text"
                         component={renderTextInput}
                     />
@@ -107,6 +113,7 @@ const RegisterForm: React.FC<
                     </div>
                     <Field
                         name="firstName"
+                        label="firstName"
                         type="text"
                         component={renderTextInput}
                     />
@@ -120,6 +127,7 @@ const RegisterForm: React.FC<
                     </div>
                     <Field
                         name="lastName"
+                        label="lastName"
                         type="text"
                         component={renderTextInput}
                     />
@@ -133,6 +141,7 @@ const RegisterForm: React.FC<
                     </div>
                     <Field
                         name="password"
+                        label="password"
                         type="password"
                         component={renderPasswordInput}
                     />

@@ -5,14 +5,19 @@ import jwt_decode from "jwt-decode";
 import CookieService from "../CookieService";
 import { SERVER_ERROR_MESSAGE } from "../constants";
 import history from "../browserHistory";
+
+export interface ServerError {
+    error: string;
+}
+
 export interface FetchCategoriesForListingAction {
     type: ActionTypes.FETCH_CATEGORIES_FOR_LISTING;
-    payload: [];
+    payload: string[];
 }
 
 export interface FetchCategoriesForListingErrorAction {
     type: ActionTypes.FETCH_CATEGORIES_FOR_LISTING_ERROR;
-    payload: [string];
+    payload: string[];
 }
 
 export interface CloudinaryImagePath {
@@ -63,7 +68,7 @@ export interface CreateListingAction {
 
 export interface ListingErrorAction {
     type: ActionTypes.LISTING_ERROR;
-    payload: { error: string };
+    payload: ServerError;
 }
 
 export interface FetchListingsAction {
@@ -117,7 +122,7 @@ export const fetchCategoriesForListing = () => async (dispatch: Dispatch) => {
         const response = await axios.get<[]>("/categories-for-listing");
         dispatch<FetchCategoriesForListingAction>({
             type: ActionTypes.FETCH_CATEGORIES_FOR_LISTING,
-            payload: response.data,
+            payload: response.data || [],
         });
     } catch (error) {
         dispatch<FetchCategoriesForListingErrorAction>({

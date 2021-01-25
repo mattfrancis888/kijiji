@@ -5,9 +5,10 @@ const ACCESS_TOKEN = "ACCESS_TOKEN";
 //Redudant helper class, but still going to use it for future reference regarding refresh tokens being stored in
 //http only cookie
 const CookieService = (function () {
-    let _service;
+    let _service: any;
     function _getService() {
         if (!_service) {
+            // @ts-ignore
             _service = this;
             return _service;
         }

@@ -24,6 +24,7 @@ const Header: React.FC<IHeader> = (props) => {
                     className="logo"
                     src={kijijiLogo}
                     alt="logo"
+                    data-testid="kijijiLogo"
                     onClick={() => history.push("/listings/1")}
                 />
 
@@ -40,6 +41,7 @@ const Header: React.FC<IHeader> = (props) => {
 
                 <div className="headerProfileAndPostWrap">
                     <h1
+                        data-testid="headerRegisterText"
                         className={
                             props.authStatus
                                 ? "navAuthStatusHide"
@@ -52,6 +54,7 @@ const Header: React.FC<IHeader> = (props) => {
                         Register
                     </h1>
                     <h1
+                        data-testid="headerSignInText"
                         className={
                             props.authStatus
                                 ? "navAuthStatusHide"
@@ -84,11 +87,13 @@ const Header: React.FC<IHeader> = (props) => {
                         onClick={() => {
                             history.push("/profile");
                         }}
+                        data-testid="headerProfile"
                     >
                         Profile
                     </h1>
 
                     <button
+                        data-testid="postAdButtotn"
                         onClick={() => {
                             history.push("/post-ad");
                         }}

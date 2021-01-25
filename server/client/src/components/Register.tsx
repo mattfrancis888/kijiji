@@ -31,13 +31,21 @@ const Register: React.FC<RegisterProps> = (props) => {
     return (
         <div className="registerContainer">
             <div className="registerFormWrap">
-                <RegisterForm onSubmit={onSubmitRegister} />
+                <RegisterForm
+                    onSubmit={(formValues: any) => onSubmitRegister(formValues)}
+                />
             </div>
             <div className="registerMiscWrap">
                 <div className="alreadyRegisteredContainer">
                     <h1>Already Registered?</h1>
                     <p>Sign in to post your ad</p>
-                    <button className="alreadyRegisteredButton">Sign in</button>
+                    <button
+                        data-testid="alreadyRegisteredButton"
+                        className="alreadyRegisteredButton"
+                        onClick={() => history.push("/signin")}
+                    >
+                        Sign in
+                    </button>
                 </div>
                 <div className="whyRegisterContainer">
                     <h1>Why Register?</h1>

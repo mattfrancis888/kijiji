@@ -94,8 +94,10 @@
 .modalAcceptButton {
     background-color: $purple;
     color: white;
+    cursor: pointer;
 }
 .modalCancelButton {
     background-color: $light-grey;
     color: black;
+    cursor: pointer;
 }

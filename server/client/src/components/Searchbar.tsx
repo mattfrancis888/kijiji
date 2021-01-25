@@ -11,16 +11,24 @@ import { useLocation } from "react-router-dom";
 import { filter, initial } from "lodash";
 
 export interface SearchFilterFormProps {
-    handleSubmit(formValues: SearchFilterFormValues): void;
+    onSubmit(formValues: SearchFilterFormValues): void;
     onCancel(): void;
-    categories: [];
-    onDropdownChange(): void;
+    categories: string[];
+    fetchCategoriesForListing(): void;
+    initialValues?: any;
+}
+
+export interface ModalProps {
+    onDismiss(): void;
+    title: string;
+    content: JSX.Element;
+    actions?: JSX.Element;
 }
 
 const Searchbar: React.FC<{}> = () => {
     const [showFilterModal, setShowFilterModal] = useState(false);
-    const [filterQueries, setFilterQueries] = useState(null);
-    const [searchValue, setSearchValue] = useState(null);
+    const [filterQueries, setFilterQueries] = useState<string | null>(null);
+    const [searchValue, setSearchValue] = useState("");
     const [initialLoad, setInitialLoad] = useState(true);
 
     const onSubmitFilter = async (formValues: SearchFilterFormValues) => {
@@ -44,7 +52,9 @@ const Searchbar: React.FC<{}> = () => {
         const keyNames = Object.keys(formValues);
         let filterQuery = "";
         keyNames.map((name) => {
+            //@ts-ignore for formValues[name] dont worry, the ts solution is a bit nasty
             if (formValues[name] !== "") {
+                //@ts-ignore for formValues[name] dont worry, the ts solution is a bit nasty
                 filterQuery += `${name}=${formValues[name]}&`;
             }
         });
@@ -81,19 +91,19 @@ const Searchbar: React.FC<{}> = () => {
         }
     };
 
-    const [filterCategory, setFilterCategory] = useState(null);
-    const [filterProvince, setFilterProvince] = useState(null);
-    const [filterCity, setFilterCity] = useState(null);
+    const [filterCategory, setFilterCategory] = useState<string | null>(null);
+    const [filterProvince, setFilterProvince] = useState<string | null>(null);
+    const [filterCity, setFilterCity] = useState<string | null>(null);
 
     //For Query Strings:
     const { search } = useLocation();
     const queryValues: SearchFilterFormValues = queryString.parse(search);
 
     useEffect(() => {
-        setFilterCategory(queryValues.category);
-        setFilterProvince(queryValues.province);
-        setFilterCity(queryValues.city);
-        setSearchValue(queryValues.search);
+        if (queryValues.category) setFilterCategory(queryValues.category);
+        if (queryValues.province) setFilterProvince(queryValues.province);
+        if (queryValues.city) setFilterCity(queryValues.city);
+        if (queryValues.search) setSearchValue(queryValues.search);
     }, []);
 
     const renderInitialValuesForFilter = () => {
@@ -125,7 +135,7 @@ const Searchbar: React.FC<{}> = () => {
     };
 
     const directToListingsPage = () => {
-        if (filterQueries && searchValue) {
+        if (filterQueries && searchValue !== "") {
             // history.push(`/listings/1?search=${searchValue}&${filterQueries}`);
             history.push({
                 pathname: "/listings/1",
@@ -148,7 +158,7 @@ const Searchbar: React.FC<{}> = () => {
         }
     };
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: any) => {
         //https://stackoverflow.com/questions/31272207/to-call-onchange-event-after-pressing-enter-key
         if (event.key === "Enter") {
             event.preventDefault(); //so ?search= won't automatically be inserted in the query when enter is clicked
@@ -159,11 +169,13 @@ const Searchbar: React.FC<{}> = () => {
     return (
         <form className="searchBarForm">
             <FontAwesomeIcon
+                data-testid="filterIcon"
                 className="searchBarIcons"
                 icon={faSlidersH}
                 onClick={() => setShowFilterModal(true)}
             />
             <input
+                data-testid="searchBarInput"
                 className="searchBarInput"
                 type="search"
                 placeholder="Search..."
@@ -176,6 +188,7 @@ const Searchbar: React.FC<{}> = () => {
             />
             <FontAwesomeIcon
                 className="searchBarIcons"
+                data-testid="searchIcon"
                 icon={faSearch}
                 onClick={() => {
                     directToListingsPage();
