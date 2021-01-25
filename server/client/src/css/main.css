@@ -969,7 +969,7 @@ body {
   display: flex;
   align-items: center;
   width: 100vw;
-  height: 100vh;
+  height: 80vh;
 }
 .loadingCenter > div {
   margin: 0 auto;

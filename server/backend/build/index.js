@@ -23,6 +23,9 @@ app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(body_parser_1.default.json());
 app.use(cookie_parser_1.default());
 app.use(cors_1.default({ origin: true, credentials: true }));
+app.use("/test", function (req, res) {
+    res.send("hi");
+});
 console.log("NODE ENV", process.env.NODE_ENV);
 app.use("/", routes_1.default);
 app.use("/", listing_1.default);
