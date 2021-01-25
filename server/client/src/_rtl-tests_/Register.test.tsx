@@ -106,6 +106,8 @@ test("Register form on submit", async () => {
         }
         expect(signUpScope.isDone()).toBe(true);
         // expect(window.localStorage.setItem).toHaveBeenCalledTimes(1);
+        //I"m not sure how to mock cookies! Resources online does not work.
+        //https://stackoverflow.com/questions/65877050/react-testing-library-redux-how-to-mock-cookies
         // Object.defineProperty(window.document, "cookie", {
         //     writable: true,
         //     value: "ACCESS_TOKEN=omnomnom",
@@ -123,6 +125,8 @@ test("Register form on submit", async () => {
 //test listings component instead
 // describe("Register Page - When user is signed in", () => {
 //     beforeEach(async () => {
+//I"m not sure how to mock cookies! Resources online does not work.
+//https://stackoverflow.com/questions/65877050/react-testing-library-redux-how-to-mock-cookies
 //         Object.defineProperty(window.document, "cookie", {
 //             writable: true,
 //             value: "ACCESS_TOKEN=omnomnom",

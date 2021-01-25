@@ -125,6 +125,8 @@ describe("Header - When users are not signed in", () => {
 describe("Header - When users are already signed in", () => {
     let app: RenderResult;
     beforeEach(async () => {
+        //I"m not sure how to mock cookies! Resources online does not work.
+        //https://stackoverflow.com/questions/65877050/react-testing-library-redux-how-to-mock-cookies
         Object.defineProperty(window.document, "cookie", {
             writable: true,
             value: "ACCESS_TOKEN=omnomnom",

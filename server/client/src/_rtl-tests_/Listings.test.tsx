@@ -81,14 +81,16 @@ beforeEach(async () => {
             },
         ],
     };
+    //Access-Control-Allow-Credentials msut be used so that we can communicate with
+    // cookies
+
     scope = nock("http://localhost:5000")
+        .persist()
         .get("/listing-oldest-date/1")
         .reply(200, mockData, {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Credentials": "true",
         });
-    //Access-Control-Allow-Credentials msut be used so that we can communicate with
-    // cookies
 
     //Mocking history:
     //https://www.reddit.com/r/reactjs/comments/b1hsno/how_can_i_test_historypush_inside_action/
@@ -132,3 +134,57 @@ test("Dropdown value clicked, then page clicked", async () => {
     expect(pushSpy).toBeCalledWith({ pathname: "/listings/1", search: "" });
     pushSpy.mockRestore();
 }, 30000);
+
+// test("Listing clicked", async () => {
+//     expect(app.getByText("barbell")).toBeInTheDocument();
+
+//     act(() => {
+//         fireEvent.click(app.getByText("barbell"));
+//     });
+
+//     expect(pushSpy).toBeCalledWith("/listing/23");
+//     pushSpy.mockRestore();
+
+//     const listingDetailMockData = {
+//         first_name: "Matt",
+//         last_name: "Smith",
+//         member_since: "2020-12-15T05:00:00.000Z",
+//         email: "h@gmail.com",
+//         listing_id: 23,
+//         listing_name: "barbell",
+//         listing_price: "20.00",
+//         listing_description: "20",
+//         category_name: "Furniture",
+//         listing_image:
+//             "https://res.cloudinary.com/du8n2aa4p/image/upload/v1609282699/kijiji/n9oayrypkob3f98iorqx.jpg",
+//         province: "British Columbia",
+//         city: "City of Port Moody",
+//         street: "stree",
+//         listing_date: "2020-12-29T05:00:00.000Z",
+//     };
+
+//     app = render(
+//         <Root>
+//             <MemoryRouter initialEntries={["/listing/23"]} initialIndex={0}>
+//                 <Routes />
+//             </MemoryRouter>
+//         </Root>
+//     );
+
+//     // const scope2 = nock("http://localhost:5000")
+//     //     .get("/listing/2333 3")
+//     //     .reply(200, listingDetailMockData, {
+//     //         "Access-Control-Allow-Origin": "*",
+//     //         "Access-Control-Allow-Credentials": "true",
+//     //     });
+
+//     // await waitForExpect(() => {
+//     //     if (!scope2.isDone()) {
+//     //         console.error("pending mocks: %j", scope2.pendingMocks());
+//     //     }
+//     //     expect(scope2.isDone()).toBe(true);
+
+//     // });
+
+//     expect(app.getByText(listingDetailMockData.first_name)).toBeInTheDocument();
+// }, 30000);

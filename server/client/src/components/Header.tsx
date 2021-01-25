@@ -87,6 +87,7 @@ const Header: React.FC<IHeader> = (props) => {
                         onClick={() => {
                             history.push("/profile");
                         }}
+                        data-testid="headerProfile"
                     >
                         Profile
                     </h1>
