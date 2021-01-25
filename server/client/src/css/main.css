@@ -1796,7 +1796,8 @@ nav .logo {
 
 .serverErrorContainer {
   width: 100vw;
-  height: 100vh;
+  height: 75vh;
+  position: relative;
 }
 .serverErrorContainer h3 {
   z-index: -1;

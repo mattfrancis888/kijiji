@@ -8,6 +8,7 @@ import Listings from "./Listings";
 import ListingDetail from "./ListingDetail";
 import Profile from "./Profile";
 import EditAd from "./EditAd";
+import NotFound from "./NotFound";
 const Routes: React.FC<{}> = () => {
     return (
         <React.Fragment>
@@ -20,6 +21,7 @@ const Routes: React.FC<{}> = () => {
                 <Route path="/listing/:id" exact component={ListingDetail} />
                 <Route path="/profile" exact component={Profile} />
                 <Route path="/listing/:id/edit" exact component={EditAd} />
+                <Route component={NotFound} />
             </Switch>
         </React.Fragment>
     );
