@@ -48,7 +48,7 @@ const Header: React.FC<IHeader> = (props) => {
                                 : "navAuthStatus"
                         }
                         onClick={() => {
-                            history.push("/signup");
+                            history.push("/");
                         }}
                     >
                         Register

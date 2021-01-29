@@ -81,15 +81,24 @@ var refreshToken = function (req, res) { return __awaiter(void 0, void 0, void 0
                 //If the refresh token matches the one in our database
                 //Generate a new access token for the user to use
                 // For acces token,  flags should be "secure: true"
-                //For refreshtoken "secure: true" and "httpOnly: true"
-                //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
+                //For refreshtoken "secure: true" and "httpOnly: true" sameSite="strict"
+                //Note: cookies will not be shown in http://localhost dev tools because if it has flags of secure
                 /// but POSTMAN will show your cookies
                 ////Cookies, when used with the HttpOnly cookie flag, are not accessible through JavaScript, and are immune to XSS
                 var token = generateAccessToken(user.rows[0].email, PRIVATE_KEY);
                 // res.setHeader("set-cookie", [
                 //     `ACCESS_TOKEN=${token}; samesite=lax;`,
                 // ]);
-                res.cookie(ACCESS_TOKEN, token);
+                //Chrome's default settings for cookie is samesite=lax; to avoid CSRF attacks
+                //We should leave it sameSite=Strict, but I'm having trouble deploying
+                //the api and client at the same domain in Vercel via react's proxy, so I'm going to enable sameSite=none (which makes CSRF attacks possible)
+                //because my life is too short :)
+                res.cookie(ACCESS_TOKEN, token, {
+                    secure: true,
+                    sameSite: "strict",
+                });
+                //For development, we remove secure because it's on http:
+                // res.cookie(ACCESS_TOKEN, token);
                 res.send({
                     token: token,
                 });
@@ -164,11 +173,30 @@ var signIn = function (req, res) {
             // res.setHeader("set-cookie", [
             //     `REFRESH_TOKEN=${refreshToken}; httponly;`,
             // ]);
+            //Chrome's default settings for cookie is samesite=Strict (to avoid CSRF attacks) and Secure
+            //We should leave it sameSite=Strict to avoid CSRF attacks, but I'm having trouble deploying
+            //the api and client at the same domain in Vercel via react's proxy, so I'm going to enable sameSite=none (which makes CSRF attacks possible)
+            //because my life is too short :)
+            //GOOD PRACTICE (NOT EXPOSED TO CSRF ATTACKS):
+            // res.cookie(REFRESH_TOKEN, refreshToken, {
+            //     httpOnly: true,
+            //     sameSite: true,
+            // });
             res.cookie(REFRESH_TOKEN, refreshToken_1, {
+                sameSite: "strict",
+                secure: true,
                 httpOnly: true,
-                sameSite: true,
             });
-            res.cookie(ACCESS_TOKEN, token_1);
+            res.cookie(ACCESS_TOKEN, token_1, {
+                sameSite: "strict",
+                secure: true,
+            });
+            //For development, we remove secure because it's on http:
+            // res.cookie(REFRESH_TOKEN, refreshToken, {
+            //     httpOnly: true,
+            // });
+            // //For development, we remove secure because it's on http:
+            // res.cookie(ACCESS_TOKEN, token);
             res.send({
                 token: token_1,
                 refreshToken: refreshToken_1,

@@ -1,5 +1,5 @@
 {
-    "builds": [{ "src": "build/index.js", "use": "@now/node-server" }],
+    "builds": [{ "src": "backend-build/index.js", "use": "@now/node-server" }],
     "routes": [
         {
             "src": "(.*)",
@@ -9,7 +9,7 @@
                 "Access-Control-Allow-Credentials": "true"
             },
 
-            "dest": "build/index.js",
+            "dest": "backend-build/index.js",
             "continue": true
         }
     ]
