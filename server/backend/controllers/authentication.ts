@@ -73,16 +73,14 @@ export const refreshToken = async (req: any, res: Response) => {
                 // ]);
 
                 //Chrome's default settings for cookie is samesite=lax; to avoid CSRF attacks
-                //We should leave it sameSite=Strict, but I'm having trouble deploying
-                //the api and client at the same domain in Vercel via react's proxy, so I'm going to enable sameSite=none (which makes CSRF attacks possible)
-                //because my life is too short :)
-                res.cookie(ACCESS_TOKEN, token, {
-                    secure: true, //needs secure tag when we have sameSite tag
-                    sameSite: "strict",
-                });
+                //We should make it sameSite=Strict,
+                // res.cookie(ACCESS_TOKEN, token, {
+                //     secure: true, //needs secure tag when we have sameSite tag
+                //     sameSite: "strict",
+                // });
 
                 //For development, we remove secure because it's on http:
-                // res.cookie(ACCESS_TOKEN, token);
+                res.cookie(ACCESS_TOKEN, token);
                 res.send({
                     token,
                 });
@@ -171,33 +169,23 @@ export const signIn = (req: any, res: Response) => {
                 // ]);
 
                 //Chrome's default settings for cookie is samesite=Strict (to avoid CSRF attacks) and Secure
-                //We should leave it sameSite=Strict to avoid CSRF attacks, but I'm having trouble deploying
-                //the api and client at the same domain in Vercel via react's proxy, so I'm going to enable sameSite=none (which makes CSRF attacks possible)
-                //because my life is too short :)
-                //GOOD PRACTICE (NOT EXPOSED TO CSRF ATTACKS):
+                //We should make it samesite=strict
                 // res.cookie(REFRESH_TOKEN, refreshToken, {
+                //     sameSite: "strict",
+                //     secure: true,
                 //     httpOnly: true,
-                //     sameSite: true,
                 // });
 
-                res.cookie(REFRESH_TOKEN, refreshToken, {
-                    sameSite: "strict",
-                    secure: true,
-                    httpOnly: true,
-                });
-
-                res.cookie(ACCESS_TOKEN, token, {
-                    sameSite: "strict",
-                    secure: true,
-                });
+                // res.cookie(ACCESS_TOKEN, token, {
+                //     sameSite: "strict",
+                //     secure: true,
+                // });
 
                 //For development, we remove secure because it's on http:
-                // res.cookie(REFRESH_TOKEN, refreshToken, {
-                //     httpOnly: true,
-                // });
-
-                // //For development, we remove secure because it's on http:
-                // res.cookie(ACCESS_TOKEN, token);
+                res.cookie(REFRESH_TOKEN, refreshToken, {
+                    httpOnly: true,
+                });
+                res.cookie(ACCESS_TOKEN, token);
 
                 res.send({
                     token,

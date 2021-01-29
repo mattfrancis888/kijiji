@@ -171,7 +171,7 @@ export const deleteImage = async (req: any, res: Response) => {
     cloudinary.uploader.destroy(
         // req.params.cloudinaryPublicId,
         `kijiji/${req.params.cloudinaryPublicId}`,
-        (err, result) => {
+        (err: any, result: any) => {
             if (err) return console.log(err);
             console.log(req.params.cloudinaryPublicId, " deleted");
             res.send(result);
@@ -527,6 +527,7 @@ export const validateListingAndUserRelationship = async (
     const listing_id = req.params.id;
 
     const decodedJwt = jwt_decode(req.cookies.ACCESS_TOKEN);
+    //@ts-ignore
     const email = decodedJwt.subject;
     //const email = "h@gmail.com";
     //console.log("EMAIL", email);

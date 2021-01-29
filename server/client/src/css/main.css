@@ -913,6 +913,7 @@ body {
   .userListingContainerFilled {
     margin-top: 0;
     margin-left: 2rem;
+    width: 70%;
   }
 }
 .userListingContainerFilled h3 {
@@ -1229,6 +1230,20 @@ nav .logo {
   border-radius: 0.5rem;
 }
 
+.backIcon {
+  display: flex;
+  font-size: 1.3rem;
+  margin-bottom: 3rem;
+  margin-left: auto;
+  cursor: pointer;
+}
+@media screen and (min-width: 520px) {
+  .backIcon {
+    font-size: 1.7rem;
+    margin-bottom: 5rem;
+  }
+}
+
 .createPostAdInputs,
 .createPostAdDropDown {
   border: 1px solid #e2e2e5;
@@ -1268,6 +1283,7 @@ nav .logo {
   height: 14rem;
   padding: 1rem;
   font-size: 1.4rem;
+  line-height: 2rem;
 }
 .createPostAdTextArea:focus {
   outline: none;
@@ -1279,6 +1295,7 @@ nav .logo {
   .createPostAdTextArea {
     padding: 0.8rem;
     font-size: 1.7rem;
+    line-height: 2.4rem;
   }
 }
 

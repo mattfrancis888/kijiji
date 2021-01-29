@@ -5,6 +5,18 @@
     border-radius: 0.5rem;
 }
 
+.backIcon {
+    display: flex;
+    font-size: 1.3rem;
+    margin-bottom: 3rem;
+    margin-left: auto;
+    cursor: pointer;
+    @media screen and (min-width: $sm_breakpoint) {
+        font-size: 1.7rem;
+        margin-bottom: 5rem;
+    }
+}
+
 .createPostAdInputs,
 .createPostAdDropDown {
     border: 1px solid $light-grey;
@@ -40,6 +52,7 @@
     height: 14rem;
     padding: 1rem;
     font-size: 1.4rem;
+    line-height: 2rem;
     &:focus {
         outline: none;
         border: 1px solid $light-blue;
@@ -50,6 +63,7 @@
     @media screen and (min-width: $md_breakpoint) {
         padding: 0.8rem;
         font-size: 1.7rem;
+        line-height: 2.4rem;
     }
 }
 .postAdFieldSection {
