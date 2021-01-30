@@ -1,3 +1,6 @@
+//FUTURE ME: Proxy in package.json breaks nock's tests;
+//mocking cookies work; didn't fully test the app, but I get the idea :)
+
 import Root from "Root";
 import React from "react";
 import "@testing-library/jest-dom/extend-expect";
@@ -21,14 +24,14 @@ afterEach(() => {
 let app: RenderResult;
 let pushSpy: jest.SpyInstance;
 
-//https://stackoverflow.com/questions/50761393/how-to-mock-cookie-getlanguage-in-jest
+//Mocking cookies
+//https://stackoverflow.com/questions/65877050/react-testing-library-redux-how-to-mock-cookies
+
+jest.mock("js-cookie", () => ({ get: () => "fr" }), {
+    virtual: true,
+});
 
 beforeEach(async () => {
-    // Object.defineProperty(window.document, "cookie", {
-    //     writable: true,
-    //     value: "ACCESS_TOKEN=omnomnom",
-    // });
-
     app = render(
         <Root>
             <MemoryRouter initialEntries={["/"]} initialIndex={0}>

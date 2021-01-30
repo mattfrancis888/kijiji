@@ -1,3 +1,5 @@
+//FUTURE ME: Proxy in package.json breaks nock's tests;
+//mocking cookies work; didn't fully test the app, but I get the idea :)
 import Root from "Root";
 import React from "react";
 import "@testing-library/jest-dom/extend-expect";
@@ -53,7 +55,7 @@ beforeEach(async () => {
     //Access-Control-Allow-Credentials msut be used so that we can communicate with
     // cookies
 
-    scope = nock("http://localhost:5000")
+    scope = nock("http://localhost:5000/")
         .get("/listing/23")
         .reply(200, listingDetailMockData, {
             "Access-Control-Allow-Origin": "*",

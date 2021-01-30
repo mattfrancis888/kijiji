@@ -1,9 +1,12 @@
+//FUTURE ME: Proxy in package.json breaks nock's tests;
+//mocking cookies work; didn't fully test the app, but I get the idea :)
 import Root from "Root";
 import React from "react";
 import "@testing-library/jest-dom/extend-expect";
 import { MemoryRouter } from "react-router";
 import Routes from "components/Routes";
 import {
+    screen,
     render,
     cleanup,
     RenderResult,
@@ -16,22 +19,21 @@ import waitForExpect from "wait-for-expect";
 import { ORDER_BY_OLDEST_DATE } from "components/Listings";
 import Cookies from "js-cookie";
 import history from "browserHistory";
+
 let pushSpy: jest.SpyInstance;
 let app: RenderResult;
+//Mocking cookies
+//https://stackoverflow.com/questions/65877050/react-testing-library-redux-how-to-mock-cookies
+jest.mock("js-cookie", () => ({ get: () => "fr" }), {
+    virtual: true,
+});
+
 afterEach(() => {
     cleanup();
 });
 let scope: nock.Scope;
 let mockData: any;
-
 beforeEach(async () => {
-    //I"m not sure how to mock cookies! Resources online does not work.
-    //https://stackoverflow.com/questions/65877050/react-testing-library-redux-how-to-mock-cookies
-    Object.defineProperty(window.document, "cookie", {
-        writable: true,
-        value: "ACCESS_TOKEN=omnomnom",
-    });
-
     mockData = {
         user_id: 2,
         first_name: "Matt",
@@ -116,33 +118,35 @@ beforeEach(async () => {
             },
         ],
     };
-
-    scope = nock("http://localhost:5000").get("/profile").reply(200, mockData, {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": "true",
-    });
-    //Access-Control-Allow-Credentials msut be used so that we can communicate with
-    // cookies
-
+    app = render(
+        <Root>
+            <MemoryRouter initialEntries={["/profile"]} initialIndex={0}>
+                <Routes />
+            </MemoryRouter>
+        </Root>
+    );
     //Mocking history:
     //https://www.reddit.com/r/reactjs/comments/b1hsno/how_can_i_test_historypush_inside_action/
     pushSpy = jest.spyOn(history, "push");
 });
 
 test("Profile page, ComponentDidMount() - Fill with listings", async () => {
-    // app = render(
-    //     <Root>
-    //         <MemoryRouter initialEntries={["/profile"]} initialIndex={0}>
-    //             <Routes />
-    //         </MemoryRouter>
-    //     </Root>
-    // );
-    // await waitForExpect(() => {
-    //     if (!scope.isDone()) {
-    //         console.error("pending mocks: %j", scope.pendingMocks());
-    //     }
-    //     expect(scope.isDone()).toBe(true);
-    //     expect(app.getByText("Matt")).toBeInTheDocument();
-    // });
-    // pushSpy.mockRestore();
+    scope = nock("http://localhost:5000/api/")
+        .get("/profile")
+        .reply(200, mockData, {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": "true",
+        });
+    // Access-Control-Allow-Credentials msut be used so that we can communicate with
+    // cookies
+
+    await waitForExpect(() => {
+        if (!scope.isDone()) {
+            console.error("pending mocks: %j", scope.pendingMocks());
+        }
+        expect(scope.isDone()).toBe(true);
+        expect(app.getByText("Matt")).toBeInTheDocument();
+    });
+    // expect(app.getByText("Matt")).toBeInTheDocument();
+    pushSpy.mockRestore();
 }, 30000);

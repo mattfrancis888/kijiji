@@ -1,3 +1,6 @@
+//FUTURE ME: Proxy in package.json breaks nock's tests;
+//mocking cookies work; didn't fully test the app, but I get the idea :)
+
 import Root from "Root";
 import React from "react";
 import "@testing-library/jest-dom/extend-expect";
@@ -13,7 +16,6 @@ import { act } from "react-dom/test-utils";
 import nock from "nock";
 import waitForExpect from "wait-for-expect";
 
-import Cookies from "js-cookie";
 import history from "browserHistory";
 
 afterEach(() => {

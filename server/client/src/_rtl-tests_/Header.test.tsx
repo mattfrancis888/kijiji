@@ -1,3 +1,5 @@
+//FUTURE ME: Proxy in package.json breaks nock's tests;
+//mocking cookies work; didn't fully test the app, but I get the idea :)
 import Root from "Root";
 import React from "react";
 import "@testing-library/jest-dom/extend-expect";
@@ -102,7 +104,8 @@ describe("Header - When users are not signed in", () => {
     //It will complain " Target container is not a DOM element."
     //because Modal is created at a different div than "root" div in index.html
     //https://testing-library.com/docs/example-react-modal/
-    //I'm not too sure how to test it, Modal still gives errors + no guides online?
+    //I'm not too sure how to test it, Modal still gives errors?
+    //Refer to reddit's saved post on modal?
     // test("Click filter icon", async () => {
     //     //user is not signed in, so they cannot post an ad
     //     act(() => {
