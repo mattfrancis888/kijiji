@@ -204,6 +204,8 @@ export const signUp = async (req: any, res: Response, next: NextFunction) => {
         const password = req.body.password;
         const firstName = req.body.firstName;
         const lastName = req.body.lastName;
+        const refreshToken = generateRefreshToken(email, PRIVATE_KEY);
+        const token = generateAccessToken(email, PRIVATE_KEY);
 
         const UNPROCESSABLE_ENTITY_STATUS = 422;
         //Email or password not given
@@ -237,17 +239,39 @@ export const signUp = async (req: any, res: Response, next: NextFunction) => {
                 //https://kb.objectrocket.com/postgresql/nodejs-and-the-postgres-transaction-968
                 await pool.query("BEGIN");
                 await pool.query(
-                    ` INSERT INTO auth(email, password)VALUES($1, $2)`,
-                    [email, hashedPassword]
+                    ` INSERT INTO auth(email, password, refresh_token)VALUES($1, $2, $3)`,
+                    [email, hashedPassword, refreshToken]
                 );
                 await pool.query(
-                    ` INSERT INTO user_info(first_name, last_name, email)VALUES($1, $2, $3);`,
+                    `INSERT INTO user_info(first_name, last_name, email)VALUES($1, $2, $3);`,
                     [firstName, lastName, email]
                 );
+
                 pool.query("COMMIT");
+
                 //Generate a token when user signs in, this token will be used so that they can access protected routes
+
+                //Chrome's default settings for cookie is samesite=Strict (to avoid CSRF attacks) and Secure
+                //We should make it samesite=strict
+                // res.cookie(REFRESH_TOKEN, refreshToken, {
+                //     sameSite: "strict",
+                //     secure: true,
+                //     httpOnly: true,
+                // });
+
+                // res.cookie(ACCESS_TOKEN, token, {
+                //     sameSite: "strict",
+                //     secure: true,
+                // });
+
+                //For development, we remove secure because it's on http:
+                res.cookie(REFRESH_TOKEN, refreshToken, {
+                    httpOnly: true,
+                });
+                res.cookie(ACCESS_TOKEN, token);
+
                 res.send({
-                    token: generateAccessToken(email, PRIVATE_KEY),
+                    token,
                 });
             } catch (error) {
                 pool.query("ROLLBACK");
