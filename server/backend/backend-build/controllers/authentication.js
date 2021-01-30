@@ -81,14 +81,21 @@ var refreshToken = function (req, res) { return __awaiter(void 0, void 0, void 0
                 //If the refresh token matches the one in our database
                 //Generate a new access token for the user to use
                 // For acces token,  flags should be "secure: true"
-                //For refreshtoken "secure: true" and "httpOnly: true"
-                //Note: cookies will not be shown in http://localhost dev tools because it has flags of secure
+                //For refreshtoken "secure: true" and "httpOnly: true" sameSite="strict"
+                //Note: cookies will not be shown in http://localhost dev tools because if it has flags of secure
                 /// but POSTMAN will show your cookies
                 ////Cookies, when used with the HttpOnly cookie flag, are not accessible through JavaScript, and are immune to XSS
                 var token = generateAccessToken(user.rows[0].email, PRIVATE_KEY);
                 // res.setHeader("set-cookie", [
                 //     `ACCESS_TOKEN=${token}; samesite=lax;`,
                 // ]);
+                //Chrome's default settings for cookie is samesite=lax; to avoid CSRF attacks
+                //We should make it sameSite=Strict,
+                // res.cookie(ACCESS_TOKEN, token, {
+                //     secure: true, //needs secure tag when we have sameSite tag
+                //     sameSite: "strict",
+                // });
+                //For development, we remove secure because it's on http:
                 res.cookie(ACCESS_TOKEN, token);
                 res.send({
                     token: token,
@@ -164,9 +171,20 @@ var signIn = function (req, res) {
             // res.setHeader("set-cookie", [
             //     `REFRESH_TOKEN=${refreshToken}; httponly;`,
             // ]);
+            //Chrome's default settings for cookie is samesite=Strict (to avoid CSRF attacks) and Secure
+            //We should make it samesite=strict
+            // res.cookie(REFRESH_TOKEN, refreshToken, {
+            //     sameSite: "strict",
+            //     secure: true,
+            //     httpOnly: true,
+            // });
+            // res.cookie(ACCESS_TOKEN, token, {
+            //     sameSite: "strict",
+            //     secure: true,
+            // });
+            //For development, we remove secure because it's on http:
             res.cookie(REFRESH_TOKEN, refreshToken_1, {
                 httpOnly: true,
-                sameSite: true,
             });
             res.cookie(ACCESS_TOKEN, token_1);
             res.send({
@@ -181,7 +199,7 @@ var signIn = function (req, res) {
 };
 exports.signIn = signIn;
 var signUp = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var email, password, firstName, lastName, UNPROCESSABLE_ENTITY_STATUS, checkEmailResponse, saltRounds, hash, hashedPassword, error_1, error_2;
+    var email, password, firstName, lastName, refreshToken_2, token, UNPROCESSABLE_ENTITY_STATUS, checkEmailResponse, saltRounds, hash, hashedPassword, error_1, error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -190,6 +208,8 @@ var signUp = function (req, res, next) { return __awaiter(void 0, void 0, void 0
                 password = req.body.password;
                 firstName = req.body.firstName;
                 lastName = req.body.lastName;
+                refreshToken_2 = generateRefreshToken(email, PRIVATE_KEY);
+                token = generateAccessToken(email, PRIVATE_KEY);
                 UNPROCESSABLE_ENTITY_STATUS = 422;
                 //Email or password not given
                 if (!email || !password) {
@@ -225,16 +245,32 @@ var signUp = function (req, res, next) { return __awaiter(void 0, void 0, void 0
                 //Using transactions with psql pool:
                 //https://kb.objectrocket.com/postgresql/nodejs-and-the-postgres-transaction-968
                 _a.sent();
-                return [4 /*yield*/, databasePool_1.default.query(" INSERT INTO auth(email, password)VALUES($1, $2)", [email, hashedPassword])];
+                return [4 /*yield*/, databasePool_1.default.query(" INSERT INTO auth(email, password, refresh_token)VALUES($1, $2, $3)", [email, hashedPassword, refreshToken_2])];
             case 6:
                 _a.sent();
-                return [4 /*yield*/, databasePool_1.default.query(" INSERT INTO user_info(first_name, last_name, email)VALUES($1, $2, $3);", [firstName, lastName, email])];
+                return [4 /*yield*/, databasePool_1.default.query("INSERT INTO user_info(first_name, last_name, email)VALUES($1, $2, $3);", [firstName, lastName, email])];
             case 7:
                 _a.sent();
                 databasePool_1.default.query("COMMIT");
                 //Generate a token when user signs in, this token will be used so that they can access protected routes
+                //Chrome's default settings for cookie is samesite=Strict (to avoid CSRF attacks) and Secure
+                //We should make it samesite=strict
+                // res.cookie(REFRESH_TOKEN, refreshToken, {
+                //     sameSite: "strict",
+                //     secure: true,
+                //     httpOnly: true,
+                // });
+                // res.cookie(ACCESS_TOKEN, token, {
+                //     sameSite: "strict",
+                //     secure: true,
+                // });
+                //For development, we remove secure because it's on http:
+                res.cookie(REFRESH_TOKEN, refreshToken_2, {
+                    httpOnly: true,
+                });
+                res.cookie(ACCESS_TOKEN, token);
                 res.send({
-                    token: generateAccessToken(email, PRIVATE_KEY),
+                    token: token,
                 });
                 return [3 /*break*/, 9];
             case 8:

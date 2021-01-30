@@ -119,7 +119,7 @@ export interface DeleteListingAction {
 
 export const fetchCategoriesForListing = () => async (dispatch: Dispatch) => {
     try {
-        const response = await axios.get<[]>("/categories-for-listing");
+        const response = await axios.get<[]>("/api/categories-for-listing");
         dispatch<FetchCategoriesForListingAction>({
             type: ActionTypes.FETCH_CATEGORIES_FOR_LISTING,
             payload: response.data || [],
@@ -152,7 +152,7 @@ export const createListing = (formValues: any) => async (
             formData.append("image", formValues.image[0]);
 
             const imagePathResponse = await axios.post<CloudinaryImagePath>(
-                "/upload-image",
+                "/api/upload-image",
                 formData,
                 {
                     headers: {
@@ -172,11 +172,14 @@ export const createListing = (formValues: any) => async (
             cloudinaryImagePath = imagePathResponse.data;
         }
 
-        const listingResponse = await axios.post<Listing>("/create-listing", {
-            ...cloudinaryImagePath,
-            ...formValues,
-            ...jwtInfo,
-        });
+        const listingResponse = await axios.post<Listing>(
+            "/api/create-listing",
+            {
+                ...cloudinaryImagePath,
+                ...formValues,
+                ...jwtInfo,
+            }
+        );
 
         dispatch<CreateListingAction>({
             type: ActionTypes.CREATE_LISTING,
@@ -198,7 +201,7 @@ export const fetchListingsByOldestDate = (
 ) => async (dispatch: Dispatch) => {
     try {
         const response = await axios.get<FetchListingResponse>(
-            `/listing-oldest-date/${pageNumber}${queryPath}`
+            `/api/listing-oldest-date/${pageNumber}${queryPath}`
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,
@@ -218,7 +221,7 @@ export const fetchListingsByNewestDate = (
 ) => async (dispatch: Dispatch) => {
     try {
         const response = await axios.get<FetchListingResponse>(
-            `/listing-newest-date/${pageNumber}${queryPath}`
+            `/api/listing-newest-date/${pageNumber}${queryPath}`
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,
@@ -238,7 +241,7 @@ export const fetchListingsByLowestPrice = (
 ) => async (dispatch: Dispatch) => {
     try {
         const response = await axios.get<FetchListingResponse>(
-            `/listing-lowest-price/${pageNumber}${queryPath}`
+            `/api/listing-lowest-price/${pageNumber}${queryPath}`
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,
@@ -258,7 +261,7 @@ export const fetchListingsByHighestPrice = (
 ) => async (dispatch: Dispatch) => {
     try {
         const response = await axios.get<FetchListingResponse>(
-            `/listing-highest-price/${pageNumber}${queryPath}`
+            `/api/listing-highest-price/${pageNumber}${queryPath}`
         );
         dispatch<FetchListingsAction>({
             type: ActionTypes.FETCH_LISTINGS,
@@ -277,7 +280,7 @@ export const fetchListingDetail = (listingId: string) => async (
 ) => {
     try {
         const response = await axios.get<ListingDetail>(
-            `/listing/${listingId}`
+            `/api/listing/${listingId}`
         );
         dispatch<FetchListingDetailAction>({
             type: ActionTypes.FETCH_LISTING_DETAIL,
@@ -313,7 +316,7 @@ export const editListing = (
             formData.append("image", formValues.image[0]);
             //overrides current image with the current publicid
             const imagePathResponse = await axios.put<CloudinaryImagePath>(
-                `/edit-image/${cloudinaryPublicId}`,
+                `/api/edit-image/${cloudinaryPublicId}`,
                 formData,
                 {
                     headers: {
@@ -333,7 +336,7 @@ export const editListing = (
             formData.append("image", formValues.image[0]);
 
             const imagePathResponse = await axios.post<CloudinaryImagePath>(
-                "/upload-image",
+                "/api/upload-image",
                 formData,
                 {
                     headers: {
@@ -346,12 +349,12 @@ export const editListing = (
         } else if (formValues.image === null) {
             //User wants to remove image
             await axios.delete<CloudinaryImageDelete>(
-                `/delete-image/${cloudinaryPublicId}`
+                `/api/delete-image/${cloudinaryPublicId}`
             );
         }
 
         const listingResponse = await axios.patch<Listing>(
-            `/listing/${listingId}/edit`,
+            `/api/listing/${listingId}/edit`,
             {
                 ...cloudinaryImagePath,
                 ...formValues,
@@ -379,7 +382,7 @@ export const deleteListing = (
     try {
         //Delete data from database:
         const response = await axios.delete<DeletedListing>(
-            `/listing/${listingId}/delete`
+            `/api/listing/${listingId}/delete`
         );
         dispatch<DeleteListingAction>({
             type: ActionTypes.DELETE_LISTING,
@@ -387,7 +390,7 @@ export const deleteListing = (
         });
         if (cloudinaryPublicId) {
             await axios.delete<CloudinaryImageDelete>(
-                `/delete-image/${cloudinaryPublicId}`
+                `/api/delete-image/${cloudinaryPublicId}`
             );
         }
 
@@ -406,7 +409,7 @@ export const validateUserAndGetListingDetail = (listingId: string) => async (
 ) => {
     try {
         const response = await axios.get<ListingDetail>(
-            `/listing/${listingId}/validate-user/edit`
+            `/api/listing/${listingId}/validate-user/edit`
         );
         dispatch<FetchListingDetailAction>({
             type: ActionTypes.FETCH_LISTING_DETAIL,

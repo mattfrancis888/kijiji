@@ -35,7 +35,7 @@ export interface FetchUserProfileErrorAction {
 }
 export const fetchUserProfile = () => async (dispatch: Dispatch) => {
     try {
-        const response = await axios.get<UserProfile>(`/profile`);
+        const response = await axios.get<UserProfile>(`/api/profile`);
         dispatch<FetchUserProfileAction>({
             type: ActionTypes.FETCH_USER_PROFILE,
             payload: response.data,

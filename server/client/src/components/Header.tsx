@@ -48,7 +48,7 @@ const Header: React.FC<IHeader> = (props) => {
                                 : "navAuthStatus"
                         }
                         onClick={() => {
-                            history.push("/signup");
+                            history.push("/");
                         }}
                     >
                         Register
@@ -95,7 +95,9 @@ const Header: React.FC<IHeader> = (props) => {
                     <button
                         data-testid="postAdButtotn"
                         onClick={() => {
-                            history.push("/post-ad");
+                            props.authStatus
+                                ? history.push("/post-ad")
+                                : history.push("/signin");
                         }}
                         className="postAdButton"
                     >

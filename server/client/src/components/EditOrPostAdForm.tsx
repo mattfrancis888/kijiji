@@ -19,7 +19,9 @@ import Loading from "./Loading";
 import { SERVER_ERROR_MESSAGE } from "../constants";
 
 import { useLocation } from "react-router-dom";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import history from "../browserHistory";
 export interface EditOrPostAdFormValues {
     title: string;
     description: string;
@@ -233,6 +235,13 @@ const PostAdForm: React.FC<
                     className="postAdForm"
                     onSubmit={props.handleSubmit(onSubmit)}
                 >
+                    <FontAwesomeIcon
+                        className="backIcon"
+                        icon={faArrowLeft}
+                        onClick={() => {
+                            history.go(-1);
+                        }}
+                    />
                     {renderFieldSectionLayout(
                         "Ad Title",
                         <Field

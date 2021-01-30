@@ -6,6 +6,8 @@ import CookieService from "../CookieService";
 
 export interface JWTType {
     token: string;
+    //our api could also return the refresh token, but it dosent matter
+    //I did it for signin, but it means nothing
 }
 export interface AuthUserAction {
     type: ActionTypes.AUTH_USER;
@@ -18,7 +20,7 @@ export interface AuthErrorAction {
 
 export const signUp = (formValues: any) => async (dispatch: Dispatch) => {
     try {
-        const response = await auth.post<JWTType>("/signup", formValues);
+        const response = await auth.post<JWTType>("/api/signup", formValues);
         dispatch<AuthUserAction>({
             type: ActionTypes.AUTH_USER,
             payload: response.data,
@@ -33,7 +35,7 @@ export const signUp = (formValues: any) => async (dispatch: Dispatch) => {
 };
 export const signIn = (formValues: any) => async (dispatch: Dispatch) => {
     try {
-        const response = await auth.post<JWTType>("/signin", formValues);
+        const response = await auth.post<JWTType>("/api/signin", formValues);
         dispatch<AuthUserAction>({
             type: ActionTypes.AUTH_USER,
             payload: response.data,
@@ -53,7 +55,7 @@ export const signIn = (formValues: any) => async (dispatch: Dispatch) => {
 
 export const signOut = () => async (dispatch: Dispatch) => {
     try {
-        const response = await auth.post<JWTType>("/signout");
+        const response = await auth.post<JWTType>("/api/signout");
         dispatch<AuthUserAction>({
             type: ActionTypes.AUTH_USER,
             payload: response.data,

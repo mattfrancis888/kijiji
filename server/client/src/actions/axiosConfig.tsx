@@ -9,7 +9,8 @@ const axiosConfig = axios.create({
     withCredentials: true, //Without it cookies will not be sent! Also, needs to be first in axios.create(..)!!
     //As mentioned in:
     //https://stackoverflow.com/questions/43002444/make-axios-send-cookies-in-its-requests-automatically
-    baseURL: "http://localhost:5000/",
+    //baseURL: "http://localhost:5000/api",
+    //baseURL: "https://kijiji-backend.vercel.app/",
 });
 
 //Followed article below for axios interceptors:
@@ -58,7 +59,7 @@ axiosConfig.interceptors.response.use(
             //ALL 403 errors are because of invalid tokens
             originalRequest._retry = true;
             axiosConfig
-                .post("/token")
+                .post("/api/token")
                 .then((res) => {
                     //Call original request again so that we can use the new access token on the original request
                     //We give the new access token by giving it at axios.interceptors.request

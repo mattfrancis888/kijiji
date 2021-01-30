@@ -70,7 +70,7 @@ const EditAd: React.FC<EditAdProps> = (props) => {
 
             return (
                 <div className="editAdPageContainer">
-                    <h1>`Edit Your Ad</h1>
+                    <h1>Edit Your Ad</h1>
                     <EditOrPostAdForm
                         onSubmit={(formValues: any) =>
                             onEditListing(formValues)
