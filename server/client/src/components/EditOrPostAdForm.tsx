@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from "react";
 import {
     Field,
     reduxForm,
-    reset,
     change,
     FormErrors,
     InjectedFormProps,
@@ -22,6 +21,7 @@ import { useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import history from "../browserHistory";
+
 export interface EditOrPostAdFormValues {
     title: string;
     description: string;
@@ -120,15 +120,6 @@ const renderDropDown = ({
     );
 };
 
-const formatAmount = (input: string) => {
-    //For price input, from: https://blog.harveydelaney.com/redux-form-lifecycle-example/
-    if (!input) return;
-    if (isNaN(parseInt(input[input.length - 1], 10))) {
-        return input.slice(0, -1);
-    }
-    return input.replace(/,/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-};
-
 const normalizeAmount = (val: string) => {
     //For price input, from: https://blog.harveydelaney.com/redux-form-lifecycle-example/
     return val.replace(/,/g, "");
@@ -151,12 +142,31 @@ const PostAdForm: React.FC<
     const openFileExplorer = useRef(null);
     const [listingImage, setListingImage] = useState<string | null>(null);
     const [cloudinaryImage, setCloudinaryImage] = useState<string | null>(null);
+
+    const formatAmount = (input: string) => {
+        //For price input, from: https://blog.harveydelaney.com/redux-form-lifecycle-example/
+        if (!input) return;
+        if (!props.postAdForm) {
+            if (isNaN(parseInt(input[input.length - 1], 10))) {
+                return input.slice(0, -1);
+            }
+            return input
+                .replace(/,/g, "")
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    };
+
     useEffect(() => {
         props.fetchCategoriesForListing();
-        if (props.cloudinaryImage) setCloudinaryImage(props.cloudinaryImage);
-        //  props.dispatch(change("postAdForm", "price", props.listingPrice));
-        // props.dispatch(change("postAdForm", "description", "hi"));
     }, []);
+    useEffect(() => {
+        if (props.listingDetail)
+            setCloudinaryImage(props.listingDetail.listing_image);
+
+        if (props.postAdForm) {
+            setCloudinaryImage(null);
+        }
+    }, [props.listingDetail]);
 
     const onSubmit = (formValues: any, dispatch: any) => {
         props.onSubmit(formValues);
@@ -312,7 +322,7 @@ const PostAdForm: React.FC<
                                     style={renderImage()}
                                 />
 
-                                {(listingImage || props.cloudinaryImage) && (
+                                {(listingImage || cloudinaryImage) && (
                                     <h3
                                         className="removeUploadedImage"
                                         onClick={() => {
@@ -450,6 +460,7 @@ const selector = formValueSelector("postAdForm");
 const mapStateToProps = (state: StoreState) => {
     return {
         categories: state.categories,
+        listingDetail: state.listingInfo.data,
         provinceValue: selector(state, "province"),
     };
 };

@@ -67,7 +67,7 @@ const EditAd: React.FC<EditAdProps> = (props) => {
                 street,
                 listing_price,
             } = props.listingDetail;
-
+            console.log("listing_image", listing_image);
             return (
                 <div className="editAdPageContainer">
                     <h1>Edit Your Ad</h1>
@@ -85,7 +85,7 @@ const EditAd: React.FC<EditAdProps> = (props) => {
                             street,
                             price: listing_price,
                         }}
-                        cloudinaryImage={listing_image}
+                        postAdForm={false}
                     />
                 </div>
             );

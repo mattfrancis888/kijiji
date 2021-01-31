@@ -18,7 +18,8 @@ export interface EditOrPostAdFormProps {
     provinceValue?: string;
     categories: string[];
     dispatch?: any;
-    cloudinaryImage?: string;
+    postAdForm?: boolean;
+    listingDetail?: any;
 }
 
 export interface PostAdProps {
@@ -39,6 +40,7 @@ const PostAd: React.FC<PostAdProps> = (props) => {
             <h1>Post Your Ad, it's fast and easy</h1>
             <EditOrPostAdForm
                 onSubmit={onSubmitPostListing}
+                postAdForm={true}
                 // initialValues={{
                 //     title: "bye",
                 //     image: "",
