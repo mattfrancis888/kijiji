@@ -126,16 +126,48 @@ const Listings: React.FC<IListings> = (props) => {
                                     className="sortByDropdown"
                                     onChange={handleDropdownChange}
                                 >
-                                    <option value={ORDER_BY_OLDEST_DATE}>
+                                    <option
+                                        value={ORDER_BY_OLDEST_DATE}
+                                        selected={
+                                            selectedSort ===
+                                            ORDER_BY_OLDEST_DATE
+                                                ? true
+                                                : false
+                                        }
+                                    >
                                         {ORDER_BY_OLDEST_DATE}
                                     </option>
-                                    <option value={ORDER_BY_NEWEST_DATE}>
+                                    <option
+                                        value={ORDER_BY_NEWEST_DATE}
+                                        selected={
+                                            selectedSort ===
+                                            ORDER_BY_NEWEST_DATE
+                                                ? true
+                                                : false
+                                        }
+                                    >
                                         {ORDER_BY_NEWEST_DATE}
                                     </option>
-                                    <option value={ORDER_BY_LOWEST_PRICE}>
+                                    <option
+                                        value={ORDER_BY_LOWEST_PRICE}
+                                        selected={
+                                            selectedSort ===
+                                            ORDER_BY_LOWEST_PRICE
+                                                ? true
+                                                : false
+                                        }
+                                    >
                                         {ORDER_BY_LOWEST_PRICE}
                                     </option>
-                                    <option value={ORDER_BY_HIGHEST_PRICE}>
+                                    <option
+                                        value={ORDER_BY_HIGHEST_PRICE}
+                                        selected={
+                                            selectedSort ===
+                                            ORDER_BY_HIGHEST_PRICE
+                                                ? true
+                                                : false
+                                        }
+                                    >
                                         {ORDER_BY_HIGHEST_PRICE}
                                     </option>
                                 </select>
@@ -163,45 +195,16 @@ const Listings: React.FC<IListings> = (props) => {
     };
 
     useEffect(() => {
-        //When we click the back button, fetchListing does not get rendered
-        //So we intercept the back button and forward button with:
-        let backAndForwardButtonClicked = false;
-        window.onpopstate = (e: Event) => {
-            backAndForwardButtonClicked = true;
-            console.log("back button", selectedSort);
-            if (selectedSort === ORDER_BY_OLDEST_DATE) {
-                props.fetchListingsByOldestDate(currentPage, search);
-            } else if (selectedSort === ORDER_BY_NEWEST_DATE) {
-                props.fetchListingsByNewestDate(currentPage, search);
-            } else if (selectedSort === ORDER_BY_LOWEST_PRICE) {
-                props.fetchListingsByLowestPrice(currentPage, search);
-            } else if (selectedSort === ORDER_BY_HIGHEST_PRICE) {
-                props.fetchListingsByHighestPrice(currentPage, search);
-            }
-        };
-        if (backAndForwardButtonClicked === false) {
-            if (selectedSort === ORDER_BY_OLDEST_DATE) {
-                props.fetchListingsByOldestDate(
-                    props.match.params.page,
-                    search
-                );
-            } else if (selectedSort === ORDER_BY_NEWEST_DATE) {
-                props.fetchListingsByNewestDate(
-                    props.match.params.page,
-                    search
-                );
-            } else if (selectedSort === ORDER_BY_LOWEST_PRICE) {
-                props.fetchListingsByLowestPrice(
-                    props.match.params.page,
-                    search
-                );
-            } else if (selectedSort === ORDER_BY_HIGHEST_PRICE) {
-                props.fetchListingsByHighestPrice(
-                    props.match.params.page,
-                    search
-                );
-            }
+        if (selectedSort === ORDER_BY_OLDEST_DATE) {
+            props.fetchListingsByOldestDate(props.match.params.page, search);
+        } else if (selectedSort === ORDER_BY_NEWEST_DATE) {
+            props.fetchListingsByNewestDate(props.match.params.page, search);
+        } else if (selectedSort === ORDER_BY_LOWEST_PRICE) {
+            props.fetchListingsByLowestPrice(props.match.params.page, search);
+        } else if (selectedSort === ORDER_BY_HIGHEST_PRICE) {
+            props.fetchListingsByHighestPrice(props.match.params.page, search);
         }
+
         setCurrentPage(props.match.params.page); //hook renders after everything in useffect is executed
     }, [props.match.params.page, search]);
 
