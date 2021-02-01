@@ -229,7 +229,7 @@ const PostAdForm: React.FC<
     const renderFields = (): JSX.Element => {
         if (props.categories.length === 0) {
             return (
-                <div className="loadingCenter">
+                <div className="loadingCenter loadingCenterForEditOrPostAdForm">
                     <Loading />
                 </div>
             );

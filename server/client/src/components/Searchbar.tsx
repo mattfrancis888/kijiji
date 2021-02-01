@@ -182,10 +182,11 @@ const Searchbar: React.FC<{}> = () => {
                 // aria-label="Search"
                 value={searchValue}
                 name="search"
-                onChange={(event) => setSearchValue(event.target.value.trim())}
+                onChange={(event) => setSearchValue(event.target.value)}
                 onKeyDown={handleKeyDown}
                 autoComplete="off"
             />
+
             <FontAwesomeIcon
                 className="searchBarIcons"
                 data-testid="searchIcon"

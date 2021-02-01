@@ -1002,6 +1002,10 @@ body {
   }
 }
 
+.loadingCenterForEditOrPostAdForm {
+  width: 100%;
+}
+
 nav {
   z-index: 2;
   width: 100%;
