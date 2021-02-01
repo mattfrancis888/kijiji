@@ -711,22 +711,31 @@ body {
 .listingDetailImageContainer {
   display: flex;
   justify-content: center;
+  align-items: center;
   border: 1px solid #e2e2e5;
   background-color: white;
   padding: 2rem 0;
+  height: 45rem;
 }
 .listingDetailImageContainer img {
-  width: 90%;
+  max-width: 90%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
-.listingDescriptionTextWrap {
+.listingDescriptionShowMoreTextWrap {
   margin: 2rem 0rem;
   padding: 2rem;
 }
+
+.listingDescriptionHideTextWrap {
+  margin: 2rem 0rem;
+  padding: 2rem;
+  max-height: 25rem;
+  overflow: hidden;
+}
 @media screen and (min-width: 992px) {
-  .listingDescriptionTextWrap {
+  .listingDescriptionHideTextWrap {
     margin: 4rem 0;
   }
 }
@@ -736,6 +745,7 @@ body {
 }
 .listingDetailDescriptionContainer p {
   font-size: 1.5rem;
+  line-height: 2.6rem;
 }
 
 .listingDetailPostedOn,
@@ -756,6 +766,7 @@ body {
   position: relative;
   z-index: 1;
   cursor: pointer;
+  margin: 4rem 0;
 }
 
 .listingDetailShowMoreTextHide {
@@ -1455,11 +1466,14 @@ nav .logo {
   border: 1px solid #e2e2e5;
   width: 8rem;
   height: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .listingPreviewImageContainer img {
-  width: 100%;
-  height: 100%;
-  background-size: contain;
+  max-width: 100%;
+  max-height: 100%;
+  background-size: cover;
 }
 @media screen and (min-width: 520px) {
   .listingPreviewImageContainer {

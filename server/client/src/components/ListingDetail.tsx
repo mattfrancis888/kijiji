@@ -86,7 +86,13 @@ const ListingDetail: React.FC<ListingDetailProps> = (props) => {
                                 />
                             </div>
                             <div className="listingDetailDescriptionContainer">
-                                <div className="listingDescriptionTextWrap">
+                                <div
+                                    className={
+                                        showMore
+                                            ? "listingDescriptionShowMoreTextWrap"
+                                            : "listingDescriptionHideTextWrap"
+                                    }
+                                >
                                     <h3 className="listingDetailPostedOn">
                                         {`Posted On:  ${moment(
                                             listing_date

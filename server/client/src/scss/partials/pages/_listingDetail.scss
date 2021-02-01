@@ -50,26 +50,36 @@
 .listingDetailImageContainer {
     display: flex;
     justify-content: center;
+    align-items: center;
     border: 1px solid $light-grey;
     background-color: white;
     padding: 2rem 0;
+    height: 45rem;
+
     img {
-        width: 90%;
+        max-width: 90%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
     }
 }
-.listingDescriptionTextWrap {
+.listingDescriptionShowMoreTextWrap {
+    margin: 2rem 0rem;
+    padding: 2rem;
+}
+.listingDescriptionHideTextWrap {
     margin: 2rem 0rem;
     padding: 2rem;
     @media screen and (min-width: $lg_breakpoint) {
         margin: 4rem 0;
     }
+    max-height: 25rem;
+    overflow: hidden;
 }
 .listingDetailDescriptionContainer {
     position: relative;
     p {
         font-size: 1.5rem;
+        line-height: 2.6rem;
     }
 }
 
@@ -89,6 +99,7 @@
     position: relative; //needed for z-index
     z-index: 1;
     cursor: pointer;
+    margin: 4rem 0;
 }
 
 .listingDetailShowMoreTextHide {
