@@ -158,8 +158,12 @@ const PostAdForm: React.FC<
     };
 
     useEffect(() => {
-        if (!props.listingDetail.listing_image)
+        if (!props.postAdForm) {
+            if (!props.listingDetail.listing_image)
+                props.change("imagePreview", CHOOSE_FILES);
+        } else {
             props.change("imagePreview", CHOOSE_FILES);
+        }
         props.fetchCategoriesForListing();
     }, []);
 

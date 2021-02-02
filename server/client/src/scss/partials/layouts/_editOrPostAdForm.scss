@@ -161,6 +161,7 @@
     flex-direction: column;
     max-width: 10rem;
     .postAdChooseListingImage {
+        cursor: pointer;
         width: 10rem;
         padding: 2rem;
         border: 1px solid $light-grey;

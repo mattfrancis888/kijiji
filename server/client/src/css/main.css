@@ -1432,6 +1432,7 @@ nav .logo {
   max-width: 10rem;
 }
 .imageUploadWrapper .postAdChooseListingImage {
+  cursor: pointer;
   width: 10rem;
   padding: 2rem;
   border: 1px solid #e2e2e5;
