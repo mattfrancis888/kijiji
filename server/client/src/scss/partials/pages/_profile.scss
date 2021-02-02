@@ -1,0 +1,110 @@
+.profileInfoAndListingContainer {
+    display: flex;
+    flex-direction: column;
+    @media screen and (min-width: $sm_breakpoint) {
+        padding: 5rem;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        padding: 4rem;
+        flex-direction: row;
+        justify-content: space-evenly;
+    }
+}
+.profileInfoContainer {
+    width: 100%;
+    background-color: white;
+    h3 {
+        margin: 0;
+        padding-bottom: 3rem;
+        font-size: 1.7rem;
+        font-weight: normal;
+        text-align: center;
+    }
+    @media screen and (min-width: $sm_breakpoint) {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    @media screen and (min-width: $lg_breakpoint) {
+        width: 30%;
+        max-height: 30rem;
+    }
+}
+.profileBannerContainer {
+    width: 100%;
+    position: relative;
+
+    img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        width: 7rem;
+        height: 7rem;
+    }
+    .purpleBanner {
+        width: 100%;
+        height: 7rem;
+        background-color: $purple;
+    }
+
+    .whiteBanner {
+        width: 100%;
+        height: 7rem;
+        background-color: white;
+    }
+}
+
+.userListingContainerEmpty {
+    display: flex;
+    flex-direction: column;
+    margin-top: 3rem;
+    @media screen and (min-width: $sm_breakpoint) {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-evenly;
+        margin-top: 0;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        width: 70%;
+    }
+}
+.userListingContainerFilled {
+    display: flex;
+    flex-direction: column;
+    margin-top: 3rem;
+    padding: 1rem;
+    @media screen and (min-width: $sm_breakpoint) {
+        padding: 0;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        margin-top: 0;
+        margin-left: 2rem;
+        width: 70%;
+    }
+    h3 {
+        margin: 0;
+        margin-bottom: 1rem;
+        color: $purple;
+        font-size: 1.4rem;
+        @media screen and (min-width: $sm_breakpoint) {
+            font-size: 2rem;
+        }
+    }
+}
+.userListingText {
+    color: $purple;
+    font-size: 2.5rem;
+    text-align: center;
+    margin: 0;
+}
+
+.emptyBox {
+    width: 30rem;
+    height: 30rem;
+    margin: 0 auto;
+    @media screen and (min-width: $sm_breakpoint) {
+        margin: 0;
+    }
+}

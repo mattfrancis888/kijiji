@@ -1,0 +1,73 @@
+.registerContainer {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    padding: 2rem;
+    @media screen and (min-width: $md_breakpoint) {
+        flex-direction: row;
+        padding: 5rem;
+    }
+}
+
+.registerFormWrap,
+.alreadyRegisteredContainer,
+.whyRegisterContainer {
+    @include cardDesign;
+}
+
+.registerFormWrap {
+    padding: 2rem;
+    margin: 2rem;
+    @media screen and (min-width: $md_breakpoint) {
+        width: 50%;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        width: 70%;
+    }
+}
+
+.registerMiscWrap {
+    margin: 2rem;
+    @media screen and (min-width: $md_breakpoint) {
+        width: 50%;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        width: 30%;
+    }
+}
+
+.alreadyRegisteredContainer {
+    padding: 2rem;
+    margin-bottom: 2rem;
+    h1 {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+    p {
+        font-size: 1.3rem;
+    }
+    .alreadyRegisteredButton {
+        cursor: pointer;
+        background-color: $purple;
+        color: white;
+        padding: 0.7rem;
+        @media screen and (min-width: $md_breakpoint) {
+            padding: 1rem;
+        }
+        font-size: 1.3rem;
+        width: 100%;
+        border-radius: 0.4rem;
+    }
+}
+
+.whyRegisterContainer {
+    h1 {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+    p {
+        font-size: 1.2rem;
+    }
+    padding: 2rem;
+    margin-bottom: 2rem;
+}

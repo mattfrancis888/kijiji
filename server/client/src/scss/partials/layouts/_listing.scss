@@ -1,0 +1,153 @@
+.listingPreviewContainer {
+    display: flex;
+    background: white;
+    border-radius: 3px;
+    background-clip: padding-box;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    padding: 1rem;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+}
+.listingPreviewImageContainer {
+    margin-right: 0.9rem;
+    border: 1px solid $light-grey;
+    width: 8rem;
+    height: 10rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+        max-width: 100%;
+        max-height: 100%;
+        background-size: cover;
+    }
+
+    @media screen and (min-width: $sm_breakpoint) {
+        width: 13rem;
+    }
+    @media screen and (min-width: $md_breakpoint) {
+        width: 20rem;
+        height: 16rem;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        width: 23rem;
+        margin-right: 2rem;
+    }
+}
+.listingPreviewInfoWrap {
+    width: 100%;
+}
+.titleAndPriceWrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    .title {
+        color: $purple;
+        font-size: 1.3rem;
+        margin: 0;
+        margin-bottom: 0.2rem;
+        @media screen and (min-width: $sm_breakpoint) {
+            font-size: 1.8rem;
+        }
+        @media screen and (min-width: $md_breakpoint) {
+            font-size: 2rem;
+        }
+    }
+    .price {
+        color: $light-green;
+        font-size: 1.3rem;
+        margin: 0;
+        @media screen and (min-width: $sm_breakpoint) {
+            font-size: 1.8rem;
+        }
+        @media screen and (min-width: $md_breakpoint) {
+            font-size: 2rem;
+        }
+    }
+}
+
+.locationAndDateWrap {
+    display: flex;
+    flex-direction: column;
+    color: $grey;
+
+    .location {
+        margin-right: 3rem;
+        font-size: 1.3rem;
+        margin: 0;
+        margin-bottom: 0.2rem;
+        font-weight: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        @media screen and (min-width: $md_breakpoint) {
+            font-size: 1.7rem;
+        }
+    }
+
+    .date {
+        font-size: 1.3rem;
+        margin: 0;
+        font-weight: normal;
+        @media screen and (min-width: $sm_breakpoint) {
+            border-left: 1px $light-grey solid;
+            margin-left: 1rem;
+            padding-left: 1rem;
+        }
+        @media screen and (min-width: $md_breakpoint) {
+            font-size: 1.7rem;
+        }
+    }
+    @media screen and (min-width: $sm_breakpoint) {
+        flex-direction: row;
+        margin: 1rem 0;
+    }
+    @media screen and (min-width: $md_breakpoint) {
+        margin: 1.5rem 0;
+    }
+}
+
+.listingDescription {
+    display: none;
+    color: $light-purple;
+    line-height: 22px;
+    @media screen and (min-width: $sm_breakpoint) {
+        display: block;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin: 0;
+        font-size: 1.5rem;
+    }
+    @media screen and (min-width: $md_breakpoint) {
+        font-size: 1.8rem;
+    }
+}
+
+.pencilIcon {
+    color: $light-blue;
+    position: absolute;
+    font-size: 1.3rem;
+    right: 1rem;
+    top: 1rem;
+    cursor: pointer;
+    z-index: 1;
+    @media screen and (min-width: $sm_breakpoint) {
+        font-size: 1.7rem;
+        right: 2rem;
+        top: 2rem;
+    }
+    &:hover {
+        font-size: 1.8rem;
+        transition: all 0.25s ease 0s;
+        color: $purple;
+        @media screen and (min-width: $sm_breakpoint) {
+            font-size: 2.2rem;
+        }
+    }
+}

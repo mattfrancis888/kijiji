@@ -1,0 +1,155 @@
+.listingDetailCategories {
+    padding: 3rem 2rem 1rem 2rem;
+    h3 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 300;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        padding-left: 4rem;
+    }
+}
+
+.listingDetailTitleAndPriceContainer {
+    padding: 2rem;
+
+    @media screen and (min-width: $lg_breakpoint) {
+        padding: 2rem 4rem 4rem 4rem;
+    }
+}
+
+.listingDetailTitle,
+.listingDetailPrice {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.listingDetailPrice {
+    color: $light-green;
+    margin-top: 1.3rem;
+    font-weight: normal;
+}
+.listingDetailInfoAndContactContainer {
+    display: flex;
+    flex-wrap: wrap;
+    @media screen and (min-width: $lg_breakpoint) {
+        justify-content: space-around;
+    }
+    margin-bottom: 3rem;
+}
+
+.listingDetailContainer {
+    width: 100%;
+    @media screen and (min-width: $lg_breakpoint) {
+        width: 50%;
+    }
+    @media screen and (min-width: $xl_breakpoint) {
+        width: 60%;
+    }
+}
+.listingDetailImageContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid $light-grey;
+    background-color: white;
+    padding: 2rem 0;
+    height: 45rem;
+
+    img {
+        max-width: 90%;
+        height: 100%;
+        object-fit: contain;
+    }
+}
+.listingDescriptionShowMoreTextWrap {
+    margin: 2rem 0rem;
+    padding: 2rem;
+}
+.listingDescriptionHideTextWrap {
+    margin: 2rem 0rem;
+    padding: 2rem;
+    @media screen and (min-width: $lg_breakpoint) {
+        margin: 4rem 0;
+    }
+    max-height: 25rem;
+    overflow: hidden;
+}
+.listingDetailDescriptionContainer {
+    position: relative;
+    p {
+        font-size: 1.5rem;
+        line-height: 2.6rem;
+    }
+}
+
+.listingDetailPostedOn,
+.listingDetailDescriptionTitle {
+    font-size: 1.7rem;
+    font-weight: normal;
+}
+.locationOfPost {
+    font-size: 1.7rem;
+}
+.listingDetailShowMoreText {
+    text-align: center;
+    font-weight: normal;
+    font-size: 1.5rem;
+    color: $light-blue;
+    position: relative; //needed for z-index
+    z-index: 1;
+    cursor: pointer;
+    margin: 4rem 0;
+}
+
+.listingDetailShowMoreTextHide {
+    display: none;
+}
+.listingDetailDescriptionFade {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0) 0, #f8f9f9 85%);
+    height: 15rem;
+    z-index: 0;
+}
+.listingDetailContactContainer {
+    background-color: white;
+    padding: 2rem;
+    margin: 0 2rem;
+    width: 100%;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    @media screen and (min-width: $lg_breakpoint) {
+        margin: 0 2rem 4rem 2rem;
+        width: 45%;
+        margin: 0;
+        max-height: 20rem;
+    }
+    @media screen and (min-width: $xl_breakpoint) {
+        width: 35%;
+    }
+}
+
+.listingDetailProfileImageAndNameWrap {
+    display: flex;
+    align-items: center;
+    img {
+        width: 8rem;
+        height: 8rem;
+        border-radius: 50%;
+        margin-right: 2rem;
+        object-fit: cover;
+    }
+    h3 {
+        font-size: 1.8rem;
+        font-weight: 300;
+    }
+}
+
+.contactAndMemberWrap {
+    h3 {
+        font-size: 1.3rem;
+        font-weight: 300;
+    }
+}

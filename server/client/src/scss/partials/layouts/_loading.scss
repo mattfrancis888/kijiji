@@ -1,0 +1,25 @@
+.loadingCenter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100vw;
+    height: 80vh;
+    & > div {
+        margin: 0 auto;
+        z-index: -1;
+        width: 10rem;
+        height: 10rem;
+        @media screen and (min-width: $sm_breakpoint) {
+            width: 12rem;
+            height: 12rem;
+        }
+        @media screen and (min-width: $md_breakpoint) {
+            width: 16rem;
+            height: 16rem;
+        }
+    }
+}
+
+.loadingCenterForEditOrPostAdForm {
+    width: 100%;
+}

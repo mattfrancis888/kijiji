@@ -1,0 +1,33 @@
+@mixin carouselNextAndPrevButton {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    border-radius: 100%;
+    font-size: 3rem;
+    color: $light-blue;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border: none;
+    background-color: white;
+    @media screen and (min-width: $md_breakpoint) {
+        font-size: 4rem;
+    }
+    @media screen and (min-width: $lg_breakpoint) {
+        font-size: 5rem;
+    }
+}
+
+@mixin overlay {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+@mixin cardDesign {
+    background: white;
+    border-radius: 3px;
+    background-clip: padding-box;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}

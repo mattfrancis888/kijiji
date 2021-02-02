@@ -1,0 +1,103 @@
+.modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(52, 49, 49, 0.4);
+}
+.modalBox {
+    background-color: white;
+    width: 90%;
+    border-radius: 0.8rem 0.8rem;
+    padding: 5rem 3rem;
+    @media screen and (min-width: $md_breakpoint) {
+        width: 80%;
+        padding: 5rem 9rem;
+    }
+    > h2 {
+        color: $purple;
+        font-size: 2rem;
+        margin-bottom: 3rem;
+        @media screen and (min-width: $md_breakpoint) {
+            font-size: 2.5rem;
+        }
+    }
+
+    button {
+        margin-right: 1rem;
+        text-transform: uppercase;
+        border-radius: 0.4rem;
+        font: 1.4rem "Larsseit-Bold";
+        padding: 1.4rem 1.8rem;
+        border: none;
+        @media screen and (min-width: $md_breakpoint) {
+            padding: 1.6rem 2.5rem;
+        }
+    }
+
+    h3 {
+        font-weight: 300;
+        letter-spacing: 0.1rem;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
+    }
+}
+
+.centerLoadingForModal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalFilterLocationWrap {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+}
+.modalLocationDropdownWrap {
+    width: 100%;
+
+    @media screen and (min-width: $md_breakpoint) {
+        width: 50%;
+    }
+    &:nth-child(2n + 1) {
+        @media screen and (min-width: $md_breakpoint) {
+            padding-right: 1rem;
+        }
+    }
+}
+.modalFilterCategoriesDropdown {
+    border: 1px solid $light-grey;
+    border-radius: 0.5rem;
+    outline: none;
+    padding: 1rem;
+    font-size: 1.2rem;
+    width: 100%;
+
+    &:focus {
+        outline: none;
+        border: 1px solid $light-blue;
+        box-shadow: 0 0 5px $light-blue;
+        background-color: white;
+    }
+
+    @media screen and (min-width: $md_breakpoint) {
+        padding: 1.7rem;
+        font-size: 1.7rem;
+    }
+}
+.modalAcceptButton {
+    background-color: $purple;
+    color: white;
+    cursor: pointer;
+}
+.modalCancelButton {
+    background-color: $light-grey;
+    color: black;
+    cursor: pointer;
+}

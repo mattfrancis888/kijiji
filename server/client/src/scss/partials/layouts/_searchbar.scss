@@ -1,0 +1,35 @@
+.searchBarForm {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-around;
+    border: 1px solid $light-grey;
+    border-radius: 0.4rem;
+    width: 100%;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.searchBarIcons {
+    font-size: 1.3rem;
+    cursor: pointer;
+    @media screen and (min-width: $sm_breakpoint) {
+        font-size: 1.7rem;
+    }
+}
+
+.searchBarInput {
+    font-size: 1.2rem;
+    &:focus {
+        box-shadow: none;
+    }
+    border: none;
+    outline: none;
+    margin: none;
+    width: 100%;
+    margin: 0 0.8rem;
+    @media screen and (min-width: $sm_breakpoint) {
+        margin: 0 1rem;
+        font-size: 1.7rem;
+    }
+}
