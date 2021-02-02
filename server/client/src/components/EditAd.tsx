@@ -71,7 +71,7 @@ const EditAd: React.FC<EditAdProps> = (props) => {
                 street,
                 listing_price,
             } = props.listingDetail;
-
+            let previewImageVal = listing_image ? null : CHOOSE_FILES;
             return (
                 <div className="editAdPageContainer">
                     <h1>Edit Your Ad</h1>
@@ -88,6 +88,7 @@ const EditAd: React.FC<EditAdProps> = (props) => {
                             city,
                             street,
                             price: listing_price,
+                            imagePreview: previewImageVal,
                         }}
                         postAdForm={false}
                     />

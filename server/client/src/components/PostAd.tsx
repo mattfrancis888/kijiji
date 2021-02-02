@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import requireAuth from "./requireAuth";
-import EditOrPostAdForm from "./EditOrPostAdForm";
+import EditOrPostAdForm, { CHOOSE_FILES } from "./EditOrPostAdForm";
 import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import { createListing, Listing } from "../actions/listing";
@@ -35,16 +35,17 @@ const PostAd: React.FC<PostAdProps> = (props) => {
     const onSubmitPostListing = async (formValues: any) => {
         props.createListing(formValues);
     };
+
     return (
         <div className="postAdPageContainer">
             <h1>Post Your Ad, it's fast and easy</h1>
             <EditOrPostAdForm
                 onSubmit={onSubmitPostListing}
                 postAdForm={true}
-                // initialValues={{
-                //     title: "bye",
-                //     image: "",
-                // }}
+                //Price was not being removed because of formatAmount, so we force it here
+                initialValues={{
+                    price: "",
+                }}
             />
         </div>
     );

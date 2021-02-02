@@ -147,21 +147,24 @@ const PostAdForm: React.FC<
     const formatAmount = (input: string) => {
         //For price input, from: https://blog.harveydelaney.com/redux-form-lifecycle-example/
         if (!input) return;
-        if (!props.postAdForm) {
-            if (isNaN(parseInt(input[input.length - 1], 10))) {
-                return input.slice(0, -1);
-            }
-            return input
-                .replace(/,/g, "")
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        if (isNaN(parseInt(input[input.length - 1], 10))) {
+            return input.slice(0, -1);
         }
+        return input.replace(/,/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
 
     useEffect(() => {
-        if (!props.postAdForm) {
-            if (!props.listingDetail.listing_image)
-                props.change("imagePreview", CHOOSE_FILES);
-        } else {
+        if (props.postAdForm) {
+            //It looks like initalValues does not work when we manipulated a field with
+            // props.change
+            //weird behaviour from redux form. So we do this instead of having:
+            //of
+            // <EditOrPostAdForm
+            // initialValues={{
+            //     imagePreview: CHOOSE_FILES,
+            // }}
+            // />
             props.change("imagePreview", CHOOSE_FILES);
         }
         props.fetchCategoriesForListing();
@@ -284,7 +287,7 @@ const PostAdForm: React.FC<
                         className="backIcon"
                         icon={faArrowLeft}
                         onClick={() => {
-                            history.go(-1);
+                            history.push("/profile");
                         }}
                     />
                     {renderFieldSectionLayout(
