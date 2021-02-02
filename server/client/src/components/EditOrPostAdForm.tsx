@@ -273,7 +273,7 @@ const PostAdForm: React.FC<
             );
         } else if (props.categories[0] === SERVER_ERROR_MESSAGE) {
             return (
-                <div className="serverErrorContainer">
+                <div className="serverErrorContainer editOrPostAdFormServerErrorContainer">
                     <h3 className="serverErrorText">{props.categories[0]}</h3>
                 </div>
             );
