@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import requireAuth from "./requireAuth";
-import EditOrPostAdForm, { EditOrPostAdFormValues } from "./EditOrPostAdForm";
+import EditOrPostAdForm, {
+    CHOOSE_FILES,
+    EditOrPostAdFormValues,
+} from "./EditOrPostAdForm";
 import { connect } from "react-redux";
 import { StoreState } from "../reducers";
 import jwt_decode from "jwt-decode";
@@ -21,7 +24,8 @@ export interface EditAdProps {
     editListing(
         formValues: any,
         listingId: string,
-        cloudinaryPublicId: string | null
+        cloudinaryPublicId: string | null,
+        existingCloudinaryImagePath: string | null
     ): void;
     deleteListing(listingId: string, cloudinaryPublicId: string | null): void;
     validateUserAndGetListingDetail(listingId: string): void;
@@ -67,7 +71,7 @@ const EditAd: React.FC<EditAdProps> = (props) => {
                 street,
                 listing_price,
             } = props.listingDetail;
-            console.log("listing_image", listing_image);
+
             return (
                 <div className="editAdPageContainer">
                     <h1>Edit Your Ad</h1>
@@ -95,23 +99,50 @@ const EditAd: React.FC<EditAdProps> = (props) => {
     const onEditListing = async (formValues: EditOrPostAdFormValues) => {
         console.log("editAds", formValues);
 
-        if (props.listingDetail.listing_image && formValues.image) {
+        if (props.listingDetail.listing_image) {
             let cloudinaryPaths = props.listingDetail.listing_image.split("/");
-
             let cloudinaryLastPath = cloudinaryPaths.pop();
             //@ts-ignore, catch block will catch it at editListing, dont worry
             let cloudinaryPublicId = cloudinaryLastPath.split(".")[0];
-            console.log("cloudinaryPublicId", cloudinaryPublicId);
-            props.editListing(
-                formValues,
-                props.match.params.id,
-                cloudinaryPublicId
-            );
+
+            if (formValues.image) {
+                //Replace existing picture with new picture
+                props.editListing(
+                    formValues,
+                    props.match.params.id,
+                    cloudinaryPublicId,
+                    null
+                );
+            } else {
+                if (formValues.imagePreview === CHOOSE_FILES) {
+                    //user removed picture.
+                    //Replace existing picture with nothing
+                    props.editListing(
+                        formValues,
+                        props.match.params.id,
+                        cloudinaryPublicId,
+                        null
+                    );
+                } else {
+                    //If user has an existing image already, but they did not modify  <input type="file"/>
+                    //formValue.image will be empty. So we are going to prevent the user from
+                    //updating an the list with an empty image by using the cloudinary image link
+
+                    //props.istingDetail.listing_image represents the  cloudinary image link
+                    props.editListing(
+                        formValues,
+                        props.match.params.id,
+                        cloudinaryPublicId,
+                        props.listingDetail.listing_image
+                    );
+                }
+            }
         } else {
             //If listing does not have initial cloudinary image link (because they made a listing without a picture beforehand
             //or they removed their picture and want to edit their listing picture again)
             //Upload cloudinary image
-            props.editListing(formValues, props.match.params.id, null);
+
+            props.editListing(formValues, props.match.params.id, null, null);
         }
     };
 

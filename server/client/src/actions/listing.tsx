@@ -297,7 +297,8 @@ export const fetchListingDetail = (listingId: string) => async (
 export const editListing = (
     formValues: any,
     listingId: string,
-    cloudinaryPublicId: string | null
+    cloudinaryPublicId: string | null,
+    existingCloudinaryImagePath: string | null
 ) => async (dispatch: Dispatch) => {
     try {
         //Distributed transaction takes place here, if an error occurs in uploading to one of the storage systems,
@@ -307,6 +308,7 @@ export const editListing = (
         //https://stackoverflow.com/questions/43013858/how-to-post-a-file-from-a-form-with-axios
 
         let cloudinaryImagePath = {};
+
         if (
             formValues.image instanceof FileList &&
             cloudinaryPublicId != null
@@ -346,6 +348,13 @@ export const editListing = (
             );
 
             cloudinaryImagePath = imagePathResponse.data;
+        } else if (
+            existingCloudinaryImagePath &&
+            Object.keys(cloudinaryImagePath).length === 0
+        ) {
+            cloudinaryImagePath = {
+                cloudinaryImagePath: existingCloudinaryImagePath,
+            };
         } else if (formValues.image === null) {
             //User wants to remove image
             await axios.delete<CloudinaryImageDelete>(

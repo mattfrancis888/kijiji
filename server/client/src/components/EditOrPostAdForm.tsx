@@ -21,7 +21,7 @@ import { useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import history from "../browserHistory";
-
+export const CHOOSE_FILES = "Choose Files!";
 export interface EditOrPostAdFormValues {
     title: string;
     description: string;
@@ -31,6 +31,7 @@ export interface EditOrPostAdFormValues {
     city: string;
     street: string;
     price: number;
+    imagePreview: string;
 }
 
 const renderError = ({ error, touched }: any) => {
@@ -157,9 +158,14 @@ const PostAdForm: React.FC<
     };
 
     useEffect(() => {
+        if (!props.listingDetail.listing_image)
+            props.change("imagePreview", CHOOSE_FILES);
         props.fetchCategoriesForListing();
     }, []);
+
     useEffect(() => {
+        //If our listingDetail changes because we are swithcing listngs
+        //in our profile page
         if (props.listingDetail)
             setCloudinaryImage(props.listingDetail.listing_image);
 
@@ -200,6 +206,31 @@ const PostAdForm: React.FC<
                     //     change("postAdForm", "image", event.target.files[0])
                     // );
                 }}
+            />
+        );
+    };
+
+    const renderImageUploadPreview = ({
+        input,
+        label,
+        meta,
+        placeHolder,
+        optionValues,
+    }: any) => {
+        //We cannot pass in {...input} (so that the input is submited when onSubmit button is clicked) like our other renders because <input> has type="file"
+        //Must do this instead: https://github.com/redux-form/redux-form/issues/3686
+        //We do not have a name in <input> so that redux won't complain with validate (thus making this input optional)
+
+        return (
+            <input
+                type="button"
+                {...input}
+                className="postAdChooseListingImage"
+                onClick={() => {
+                    // @ts-ignore
+                    openFileExplorer.current.click();
+                }}
+                style={renderImage()}
             />
         );
     };
@@ -299,6 +330,7 @@ const PostAdForm: React.FC<
                                             event.target.files[0]
                                         )
                                     );
+                                    props.change("imagePreview", null);
 
                                     // console.log(
                                     //     `Selected file - ${event.target.files[0].name}`
@@ -307,19 +339,10 @@ const PostAdForm: React.FC<
                                 }}
                             />
                             <div className="imageUploadWrapper">
-                                <input
+                                <Field
+                                    name="imagePreview"
                                     type="button"
-                                    value={
-                                        listingImage || cloudinaryImage
-                                            ? ""
-                                            : "Choose Files!"
-                                    }
-                                    className="postAdChooseListingImage"
-                                    onClick={() => {
-                                        // @ts-ignore
-                                        openFileExplorer.current.click();
-                                    }}
-                                    style={renderImage()}
+                                    component={renderImageUploadPreview}
                                 />
 
                                 {(listingImage || cloudinaryImage) && (
@@ -334,6 +357,10 @@ const PostAdForm: React.FC<
                                                     "image",
                                                     null
                                                 )
+                                            );
+                                            props.change(
+                                                "imagePreview",
+                                                CHOOSE_FILES
                                             );
                                         }}
                                     >
